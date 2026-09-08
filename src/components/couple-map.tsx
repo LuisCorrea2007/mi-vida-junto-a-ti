@@ -74,6 +74,12 @@ export default function CoupleMap({
           pathOptions={{ color: "oklch(0.685 0.105 38)", weight: 3, dashArray: "6 8", opacity: 0.9 }}
         />
       )}
+      {route && route.length > 1 && (
+        <Polyline
+          positions={route}
+          pathOptions={{ color: "oklch(0.79 0.1 80)", weight: 5, opacity: 0.85, lineCap: "round" }}
+        />
+      )}
       {people.map((p) => (
         <Marker key={p.id} position={[p.lat, p.lng]} icon={personIcon(p)}>
           <Popup>
