@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-profiles";
+import { notifyPartner } from "@/lib/notify";
 import { NOTE_CATEGORIES, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,21 +69,26 @@ function NotesPage() {
     mutationFn: async () => {
       if (!user) throw new Error("Sin sesión");
       if (!form.title.trim()) throw new Error("Ponle un título");
-      const { error } = await supabase.from("notes").insert({
-        user_id: user.id,
-        title: form.title.trim().slice(0, 140),
-        content: form.content.slice(0, 8000),
-        category: form.category,
-        scheduled_date: form.scheduled || null,
-      });
+      const { data: created, error } = await supabase
+        .from("notes")
+        .insert({
+          user_id: user.id,
+          title: form.title.trim().slice(0, 140),
+          content: form.content.slice(0, 8000),
+          category: form.category,
+          scheduled_date: form.scheduled || null,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
       const other = profiles?.find((p) => p.id !== user.id);
       if (other) {
-        await supabase.from("notifications").insert({
-          user_id: other.id,
+        await notifyPartner({
+          toUserId: other.id,
           type: "nota",
           title: "Tienes una nota nueva",
           message: form.title.trim().slice(0, 140),
+          link: `/notas/${created.id}`,
         });
       }
     },

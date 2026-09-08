@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarHeart, Heart, Images, NotebookPen, Stars } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,7 +52,6 @@ function Landing() {
           <Heart className="size-5 fill-primary text-primary" /> Nuestro Espacio
         </span>
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <Button asChild variant="ghost" className="rounded-full">
             <Link to="/auth">Entrar</Link>
           </Button>

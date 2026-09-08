@@ -257,6 +257,9 @@ function Panel() {
         )}
       </section>
 
+      {user && <ActivityWidget userId={user.id} />}
+
+
       <section className="surface p-6 text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">Pregunta de hoy</p>
         <p className="mt-3 font-display text-xl">{question}</p>

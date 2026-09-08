@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, HeartHandshake, Loader2, Upload } from "lucide-react";
+import { BellRing, Check, Copy, HeartHandshake, Loader2, Smartphone, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyProfile, useProfiles } from "@/hooks/use-profiles";
 import { useCouple } from "@/hooks/use-couple";
 import { compressImage, uploadMedia, useSignedUrl, validateImage } from "@/lib/media";
+import { disablePush, enablePush, pushEnabled, pushSupported } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -281,6 +282,9 @@ function SettingsPage() {
         )}
       </section>
 
+      <PushSection userId={user?.id} />
+      <InstallSection />
+
       <section className="surface p-6">
         <h2 className="font-display text-xl font-semibold">Almacenamiento</h2>
 
@@ -292,5 +296,108 @@ function SettingsPage() {
         </p>
       </section>
     </div>
+  );
+}
+
+function PushSection({ userId }: { userId: string | undefined }) {
+  const [supported, setSupported] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setSupported(pushSupported());
+    pushEnabled().then(setEnabled);
+  }, []);
+
+  async function toggle() {
+    if (!userId) return;
+    setBusy(true);
+    try {
+      if (enabled) {
+        await disablePush(userId);
+        setEnabled(false);
+        toast.success("Avisos desactivados en este dispositivo");
+      } else {
+        const ok = await enablePush(userId);
+        setEnabled(ok);
+        if (ok) toast.success("Listo: te avisaremos en este dispositivo");
+        else toast.error("No se dio permiso para los avisos");
+      }
+    } catch {
+      toast.error("No pudimos cambiar los avisos");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="surface space-y-3 p-6">
+      <h2 className="font-display text-xl font-semibold">Avisos en el celular</h2>
+      <p className="text-sm text-muted-foreground">
+        Recibe una notificación cuando tu pareja suba, comente o cambie algo, incluso con la app cerrada.
+      </p>
+      {supported ? (
+        <Button variant={enabled ? "outline" : "default"} className="rounded-full" onClick={toggle} disabled={busy}>
+          <BellRing className="mr-1 size-4" />
+          {enabled ? "Desactivar en este dispositivo" : "Activar avisos"}
+        </Button>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Este navegador no admite avisos. En iPhone, primero agrega la app a la pantalla de inicio y ábrela desde ahí.
+        </p>
+      )}
+    </section>
+  );
+}
+
+type InstallPromptEvent = Event & { prompt: () => Promise<void> };
+
+function InstallSection() {
+  const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState(false);
+  const [ios, setIos] = useState(false);
+
+  useEffect(() => {
+    setInstalled(window.matchMedia("(display-mode: standalone)").matches);
+    setIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      setPrompt(e as InstallPromptEvent);
+    };
+    const onInstalled = () => setInstalled(true);
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+
+  return (
+    <section className="surface space-y-3 p-6">
+      <h2 className="font-display text-xl font-semibold">Instalar la app</h2>
+      {installed ? (
+        <p className="text-sm text-muted-foreground">Ya tienes Nuestro Espacio en tu pantalla de inicio. 💗</p>
+      ) : prompt ? (
+        <Button
+          className="rounded-full"
+          onClick={async () => {
+            await prompt.prompt();
+            setPrompt(null);
+          }}
+        >
+          <Smartphone className="mr-1 size-4" /> Agregar a la pantalla de inicio
+        </Button>
+      ) : ios ? (
+        <p className="text-sm text-muted-foreground">
+          En Safari toca el botón <strong>Compartir</strong> y luego <strong>Agregar a pantalla de inicio</strong>.
+          Verás el corazón rosa como ícono.
+        </p>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Abre el menú del navegador y elige <strong>Instalar app</strong> o <strong>Agregar a pantalla de inicio</strong>.
+        </p>
+      )}
+    </section>
   );
 }

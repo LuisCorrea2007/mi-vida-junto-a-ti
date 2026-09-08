@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAjustesRouteImport } from './routes/_authenticated/ajustes'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
+import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
 import { Route as AuthenticatedDiversionRouteImport } from './routes/_authenticated/diversion'
@@ -45,6 +46,11 @@ const AuthenticatedAjustesRoute = AuthenticatedAjustesRouteImport.update({
 const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCercaRoute = AuthenticatedCercaRouteImport.update({
+  id: '/cerca',
+  path: '/cerca',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDeseosRoute = AuthenticatedDeseosRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/cerca': typeof AuthenticatedCercaRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/cerca': typeof AuthenticatedCercaRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/ajustes': typeof AuthenticatedAjustesRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
+  '/_authenticated/cerca': typeof AuthenticatedCercaRoute
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
   '/_authenticated/diversion': typeof AuthenticatedDiversionRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/ajustes'
     | '/calendario'
+    | '/cerca'
     | '/deseos'
     | '/diario'
     | '/diversion'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/ajustes'
     | '/calendario'
+    | '/cerca'
     | '/deseos'
     | '/diario'
     | '/diversion'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/ajustes'
     | '/_authenticated/calendario'
+    | '/_authenticated/cerca'
     | '/_authenticated/deseos'
     | '/_authenticated/diario'
     | '/_authenticated/diversion'
@@ -219,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof AuthenticatedCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cerca': {
+      id: '/_authenticated/cerca'
+      path: '/cerca'
+      fullPath: '/cerca'
+      preLoaderRoute: typeof AuthenticatedCercaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/deseos': {
@@ -283,6 +302,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAjustesRoute: typeof AuthenticatedAjustesRoute
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
+  AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
   AuthenticatedDiversionRoute: typeof AuthenticatedDiversionRoute
@@ -296,6 +316,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAjustesRoute: AuthenticatedAjustesRoute,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
+  AuthenticatedCercaRoute: AuthenticatedCercaRoute,
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
   AuthenticatedDiversionRoute: AuthenticatedDiversionRoute,
@@ -319,10 +340,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

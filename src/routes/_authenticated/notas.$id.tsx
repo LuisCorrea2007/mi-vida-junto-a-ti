@@ -1,17 +1,32 @@
 import { useState, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArchiveRestore, ArrowLeft, Star, Trash2, Mic, FileText, Play, Download } from "lucide-react";
+import {
+  ArchiveRestore,
+  ArrowLeft,
+  Star,
+  Trash2,
+  Mic,
+  FileText,
+  Download,
+  Link as LinkIcon,
+  ExternalLink,
+  Square,
+  Paperclip,
+} from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-profiles";
 import { NOTE_CATEGORIES, REACTIONS, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSignedUrl } from "@/lib/media";
+import { notifyPartner } from "@/lib/notify";
 
 function AttachmentItem({ attachment, canDelete, onDelete }: { 
   attachment: any; 
@@ -73,6 +88,43 @@ function AttachmentItem({ attachment, canDelete, onDelete }: {
         )}
         <Button variant="outline" size="sm" onClick={handleDownload}>
           <Download className="mr-1 size-4" /> Descargar
+        </Button>
+        {canDelete && (
+          <Button variant="ghost" size="icon" onClick={onDelete}>
+            <Trash2 className="size-4 text-destructive" />
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  if (attachment.attachment_type === "link" && attachment.url) {
+    let host = attachment.url;
+    try {
+      host = new URL(attachment.url).hostname.replace(/^www\./, "");
+    } catch {
+      /* se muestra tal cual */
+    }
+    return (
+      <div className="surface flex items-center gap-3 p-3 rounded-lg">
+        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+          <LinkIcon className="size-5 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <a
+            href={attachment.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block truncate text-sm font-medium hover:underline"
+          >
+            {host}
+          </a>
+          <p className="truncate text-xs text-muted-foreground">{attachment.url}</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <a href={attachment.url} target="_blank" rel="noopener noreferrer">
+            <ExternalLink className="mr-1 size-4" /> Abrir
+          </a>
         </Button>
         {canDelete && (
           <Button variant="ghost" size="icon" onClick={onDelete}>
@@ -164,11 +216,12 @@ function NoteDetail() {
       if (error) throw error;
       const other = profiles?.find((p) => p.id !== user.id);
       if (other && note) {
-        await supabase.from("notifications").insert({
-          user_id: other.id,
+        await notifyPartner({
+          toUserId: other.id,
           type: "respuesta",
           title: "Respondieron tu nota",
           message: note.title,
+          link: `/notas/${id}#respuestas`,
         });
       }
     },
@@ -266,6 +319,81 @@ function NoteDetail() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Enlaces web
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const addLink = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Sin sesión");
+      const parsed = z.string().trim().url().max(2000).safeParse(linkUrl);
+      if (!parsed.success || !/^https?:\/\//i.test(parsed.data)) {
+        throw new Error("Escribe una dirección válida que empiece con http:// o https://");
+      }
+      const { error } = await supabase.from("note_attachments").insert({
+        note_id: id,
+        user_id: user.id,
+        file_path: "",
+        attachment_type: "link",
+        url: parsed.data,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Enlace guardado");
+      setLinkUrl("");
+      setLinkOpen(false);
+      qc.invalidateQueries({ queryKey: ["note-attachments", id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Grabación de voz
+  const [recording, setRecording] = useState(false);
+  const [recSeconds, setRecSeconds] = useState(0);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  async function startRecording() {
+    if (typeof MediaRecorder === "undefined") {
+      toast.error("Este navegador no permite grabar audio");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
+      const rec = new MediaRecorder(stream, { mimeType: mime });
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+      rec.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        if (timerRef.current) clearInterval(timerRef.current);
+        setRecording(false);
+        const blob = new Blob(chunks, { type: mime });
+        if (blob.size < 1024) {
+          toast.error("La grabación quedó vacía, inténtalo de nuevo");
+          return;
+        }
+        const ext = mime === "audio/webm" ? "webm" : "m4a";
+        uploadAttachment.mutate(new File([blob], `voz-${Date.now()}.${ext}`, { type: mime }));
+      };
+      recorderRef.current = rec;
+      rec.start();
+      setRecSeconds(0);
+      setRecording(true);
+      timerRef.current = setInterval(() => setRecSeconds((s) => s + 1), 1000);
+    } catch {
+      toast.error("Necesitamos permiso para usar el micrófono");
+    }
+  }
+
+  function stopRecording() {
+    recorderRef.current?.stop();
+  }
+
+  const audios = attachments?.filter((a) => a.attachment_type === "audio") ?? [];
+  const docs = attachments?.filter((a) => a.attachment_type !== "audio") ?? [];
+
+
   if (isLoading) return <Skeleton className="h-64 rounded-2xl" />;
   if (!note)
     return (
@@ -300,35 +428,24 @@ function NoteDetail() {
           {note.content}
         </p>
 
-        {/* Adjuntos: audios y PDFs */}
+        {/* Notas de voz */}
         <div className="mt-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">Adjuntos</h3>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="audio/*,application/pdf,image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) uploadAttachment.mutate(file);
-                e.target.value = "";
-              }}
-            />
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="font-display text-lg font-semibold">Notas de voz</h3>
             <Button
-              variant="outline"
+              variant={recording ? "destructive" : "outline"}
               size="sm"
               className="rounded-full"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={recording ? stopRecording : startRecording}
+              disabled={uploadAttachment.isPending}
             >
-              <Mic className="mr-1 size-4" />
-              Agregar audio/PDF
+              {recording ? <Square className="mr-1 size-4" /> : <Mic className="mr-1 size-4" />}
+              {recording ? `Detener · ${recSeconds}s` : "Grabar audio"}
             </Button>
           </div>
-
-          {attachments && attachments.length > 0 ? (
+          {audios.length > 0 ? (
             <div className="space-y-2">
-              {attachments.map((att) => (
+              {audios.map((att) => (
                 <AttachmentItem
                   key={att.id}
                   attachment={att}
@@ -338,7 +455,81 @@ function NoteDetail() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Sin adjuntos todavía</p>
+            <p className="text-sm text-muted-foreground">Graba un mensaje con tu voz para acompañar la nota.</p>
+          )}
+        </div>
+
+        {/* Documentos y enlaces */}
+        <div className="mt-6 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-lg font-semibold">Documentos y enlaces</h3>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf,audio/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadAttachment.mutate(file);
+                  e.target.value = "";
+                }}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadAttachment.isPending}
+              >
+                <Paperclip className="mr-1 size-4" /> PDF
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => setLinkOpen((v) => !v)}
+              >
+                <LinkIcon className="mr-1 size-4" /> Enlace
+              </Button>
+            </div>
+          </div>
+
+          {linkOpen && (
+            <form
+              className="flex gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                addLink.mutate();
+              }}
+            >
+              <Input
+                type="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="https://…"
+                maxLength={2000}
+                autoFocus
+              />
+              <Button type="submit" size="sm" className="rounded-full" disabled={addLink.isPending}>
+                Guardar
+              </Button>
+            </form>
+          )}
+
+          {docs.length > 0 ? (
+            <div className="space-y-2">
+              {docs.map((att) => (
+                <AttachmentItem
+                  key={att.id}
+                  attachment={att}
+                  canDelete={att.user_id === user?.id}
+                  onDelete={() => deleteAttachment.mutate(att.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Sube un PDF o guarda un enlace de una página web.</p>
           )}
         </div>
 

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles } from "@/hooks/use-profiles";
+import { notifyPartner } from "@/lib/notify";
 import { EVENT_CATEGORIES, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,11 +114,12 @@ function CalendarPage() {
       if (error) throw error;
       const other = profiles?.find((p) => p.id !== user.id);
       if (other) {
-        await supabase.from("notifications").insert({
-          user_id: other.id,
+        await notifyPartner({
+          toUserId: other.id,
           type: "cita",
           title: "Nueva propuesta de cita",
           message: form.title.trim().slice(0, 140),
+          link: "/calendario",
         });
       }
     },
