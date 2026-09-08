@@ -180,3 +180,26 @@
 @utility animate-heartbeat {
   animation: heartbeat 2.4s ease-in-out infinite;
 }
+
+/* Mapa en tonos oscuros y cálidos, acorde a la app. */
+.map-dark-tiles {
+  filter: invert(1) hue-rotate(190deg) brightness(0.82) contrast(0.9) saturate(0.55) sepia(0.25);
+}
+
+.leaflet-container {
+  background: var(--muted);
+  font-family: var(--font-sans);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-soft);
+}
+
+.leaflet-container .leaflet-control-zoom a {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+}
