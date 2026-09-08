@@ -66,7 +66,7 @@ export function MoodBar() {
           toUserId: couple.partnerId,
           type: "animo",
           title: `Se siente ${mood.label.toLowerCase()} ${mood.emoji}`,
-          message: note.trim() || undefined,
+          message: note.trim() || null,
           link: "/panel",
         });
       }

@@ -260,6 +260,29 @@ function Panel() {
         )}
       </section>
 
+      <MoodBar />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <NextCapsule />
+        <section className="surface p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-semibold">Reto de hoy</h2>
+            <Link to="/retos" className="text-xs text-primary hover:underline">
+              Ver retos
+            </Link>
+          </div>
+          {challengeIdea && (
+            <>
+              <p className="mt-4 font-display text-lg">{challengeIdea.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{challengeIdea.description}</p>
+            </>
+          )}
+          <Button asChild variant="outline" className="mt-4 rounded-full">
+            <Link to="/canciones">Nuestras canciones y frases</Link>
+          </Button>
+        </section>
+      </div>
+
       {user && <ActivityWidget userId={user.id} />}
 
       <Recuerdos />
