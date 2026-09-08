@@ -5,6 +5,7 @@ import { Heart, Plus, Search, Star } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { notifyPartner } from "@/lib/notify";
 import { NOTE_CATEGORIES, labelFor } from "@/lib/content";
@@ -46,6 +47,7 @@ function NotesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profiles } = useProfiles();
+  useRealtime("notes", "note_attachments", "note_replies", "note_reactions");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [archived, setArchived] = useState(false);

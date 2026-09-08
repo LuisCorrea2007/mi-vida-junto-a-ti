@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Images, Star, Trash2, Upload, X, Download, M
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { notifyPartner } from "@/lib/notify";
 import { compressImage, imageSize, uploadMedia, useSignedUrl, validateImage } from "@/lib/media";
@@ -79,6 +80,7 @@ function Tile({ photo, onOpen }: { photo: Photo; onOpen: () => void }) {
 function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
   const qc = useQueryClient();
   const { data: profiles } = useProfiles();
+  useRealtime("photo_comments", "photo_reactions");
   const [text, setText] = useState("");
   const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";
 
@@ -350,6 +352,7 @@ function Lightbox({
 function GalleryPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  useRealtime("photos", "albums");
   const fileRef = useRef<HTMLInputElement>(null);
   const [album, setAlbum] = useState("todos");
   const [onlyFav, setOnlyFav] = useState(false);
