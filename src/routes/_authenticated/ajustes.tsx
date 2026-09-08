@@ -282,8 +282,8 @@ function SettingsPage() {
       </section>
 
       <section className="surface p-6">
-
         <h2 className="font-display text-xl font-semibold">Almacenamiento</h2>
+
         <p className="mt-2 text-sm text-muted-foreground">
           {storage ? `${storage.count} fotos · ${storage.mb} MB usados` : "Calculando…"}
         </p>
