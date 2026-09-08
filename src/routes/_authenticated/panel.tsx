@@ -132,7 +132,7 @@ function Panel() {
     <div className="space-y-8">
       <section className="surface warm-gradient animate-fade-up p-8 text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">
-          Hola{me?.name ? `, ${me.name}` : ""}
+          {greeting(me?.name)}
         </p>
         {elapsed ? (
           <>
