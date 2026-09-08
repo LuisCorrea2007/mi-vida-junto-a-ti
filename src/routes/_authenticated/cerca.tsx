@@ -348,7 +348,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
       <div className="relative h-72 bg-muted sm:h-96">
         {people.length > 0 ? (
           <Suspense fallback={<Skeleton className="size-full rounded-none" />}>
-            <CoupleMap people={people} />
+            <CoupleMap people={people} route={driving?.line ?? null} />
           </Suspense>
         ) : (
           <div className="flex size-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
