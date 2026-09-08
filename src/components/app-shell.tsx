@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   LogOut,
   MapPin,
+  Music,
   NotebookPen,
   Settings,
   Sparkles,
