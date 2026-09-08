@@ -5,6 +5,7 @@ import { Check, MessageCircle, Plus, Stars, ThumbsUp, Trash2 } from "lucide-reac
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { WISH_CATEGORIES, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ function WishesPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profiles } = useProfiles();
+  useRealtime("wishes", "wish_votes", "wish_comments");
   const [open, setOpen] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [commentFor, setCommentFor] = useState<string | null>(null);

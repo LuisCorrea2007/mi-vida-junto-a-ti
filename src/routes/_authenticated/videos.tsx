@@ -5,6 +5,7 @@ import { Video, Upload, Download, MessageCircle, Clock, Play } from "lucide-reac
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles, type Profile } from "@/hooks/use-profiles";
 import { notifyPartner } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ function VideosPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profiles } = useProfiles();
+  useRealtime("videos_diarios", "video_comentarios");
   const [titulo, setTitulo] = useState("");
   const [subiendo, setSubiendo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { NOTE_CATEGORIES, REACTIONS, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
@@ -303,6 +304,7 @@ function NoteDetail() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { data: profiles } = useProfiles();
+  useRealtime("notes", "note_replies", "note_reactions", "note_attachments");
   const [reply, setReply] = useState("");
 
   const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";

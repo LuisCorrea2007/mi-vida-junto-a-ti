@@ -7,7 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { get, set, del } from "idb-keyval";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -135,7 +138,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
-
+  const [online, setOnline] = useState(true);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
@@ -146,8 +149,50 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  // Guarda los datos en el dispositivo: la app abre mostrando todo al instante
+  // y luego se actualiza sola en segundo plano.
+  useEffect(() => {
+    const persister = createAsyncStoragePersister({
+      storage: {
+        getItem: (key: string) => get(key),
+        setItem: (key: string, value: string) => set(key, value),
+        removeItem: (key: string) => del(key),
+      },
+    });
+    const [unsubscribe] = persistQueryClient({
+      queryClient,
+      persister,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      buster: "v1",
+    });
+    return unsubscribe;
+  }, [queryClient]);
+
+  // Guarda la interfaz para usarla sin internet (solo en la app publicada).
+  useEffect(() => {
+    if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("/app-sw.js", { scope: "/" }).catch(() => {});
+  }, []);
+
+  // Aviso discreto cuando se cae la conexión.
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    update();
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
+      {!online && (
+        <div className="fixed inset-x-0 top-0 z-[60] bg-muted px-4 py-1.5 text-center text-xs text-muted-foreground">
+          Sin conexión — estás viendo lo último guardado
+        </div>
+      )}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" richColors />

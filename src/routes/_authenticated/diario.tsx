@@ -5,6 +5,7 @@ import { Heart, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { DAILY_QUESTIONS, pickOfTheDay } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/_authenticated/diario")({
 function DiaryPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  useRealtime("milestones");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     title: "",
