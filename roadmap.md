@@ -1,3 +1,3 @@
-## En curso
-- [ ] Corregir variables de conexión en la versión publicada
-- [ ] Verificar todas las páginas y la compilación
+## Completado
+- [x] Restaurar los valores de conexión de Lovable Cloud
+- [x] Verificar la portada y la comprobación del código
