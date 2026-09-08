@@ -225,3 +225,19 @@
     background: transparent !important;
   }
 }
+
+/* Corazones flotantes */
+@keyframes heart-rise {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-70vh) scale(1.1); }
+}
+
+.heart-float {
+  animation: heart-rise 2.4s ease-out forwards;
+}
+
+/* Sobre sellado de las cápsulas */
+.sealed {
+  background-image: radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 70%);
+}

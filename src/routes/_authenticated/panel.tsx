@@ -6,8 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRealtime } from "@/hooks/use-realtime";
 import { Recuerdos } from "@/components/recuerdos";
+import { MoodBar, NextCapsule } from "@/components/romance-widgets";
 import { anniversaryOf, useProfiles } from "@/hooks/use-profiles";
 import { DAILY_QUESTIONS, ROMANTIC_QUOTES, pickOfTheDay } from "@/lib/content";
+import { CHALLENGE_IDEAS, daysToAnniversary, greeting } from "@/lib/romance";
 import { useSignedUrl } from "@/lib/media";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -66,6 +68,8 @@ function Panel() {
   const elapsed = useElapsed(anniversaryOf(profiles));
   const quote = pickOfTheDay(ROMANTIC_QUOTES);
   const question = pickOfTheDay(DAILY_QUESTIONS, 3);
+  const challengeIdea = pickOfTheDay(CHALLENGE_IDEAS, 1);
+  const anniversaryIn = daysToAnniversary(anniversaryOf(profiles));
 
   const { data: notes } = useQuery({
     queryKey: ["notes", "recent"],
@@ -128,7 +132,7 @@ function Panel() {
     <div className="space-y-8">
       <section className="surface warm-gradient animate-fade-up p-8 text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">
-          Hola{me?.name ? `, ${me.name}` : ""}
+          {greeting(me?.name)}
         </p>
         {elapsed ? (
           <>
@@ -146,6 +150,13 @@ function Panel() {
               <Link to="/ajustes">Añadir fecha de aniversario</Link>
             </Button>
           </div>
+        )}
+        {anniversaryIn !== null && (
+          <p className="mt-4 inline-block rounded-full bg-primary/15 px-4 py-1.5 text-xs text-primary">
+            {anniversaryIn === 0
+              ? "¡Hoy es su aniversario! 🎉"
+              : `Faltan ${anniversaryIn} ${anniversaryIn === 1 ? "día" : "días"} para su aniversario 💗`}
+          </p>
         )}
         <p className="mx-auto mt-6 max-w-md text-sm italic text-muted-foreground">“{quote}”</p>
       </section>
@@ -259,6 +270,29 @@ function Panel() {
           </p>
         )}
       </section>
+
+      <MoodBar />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <NextCapsule />
+        <section className="surface p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-semibold">Reto de hoy</h2>
+            <Link to="/retos" className="text-xs text-primary hover:underline">
+              Ver retos
+            </Link>
+          </div>
+          {challengeIdea && (
+            <>
+              <p className="mt-4 font-display text-lg">{challengeIdea.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{challengeIdea.description}</p>
+            </>
+          )}
+          <Button asChild variant="outline" className="mt-4 rounded-full">
+            <Link to="/canciones">Nuestras canciones y frases</Link>
+          </Button>
+        </section>
+      </div>
 
       {user && <ActivityWidget userId={user.id} />}
 
