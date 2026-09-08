@@ -3,10 +3,12 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
+  BellRing,
   CalendarHeart,
   Heart,
   Images,
   Laugh,
+  LayoutGrid,
   LogOut,
   MapPin,
   NotebookPen,
@@ -14,7 +16,9 @@ import {
   Sparkles,
   Stars,
   Video,
+  X,
 } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyProfile } from "@/hooks/use-profiles";
@@ -46,6 +50,53 @@ const NAV = [
   { to: "/diario", label: "Diario", icon: Heart },
   { to: "/diversion", label: "Diversión", icon: Laugh },
 ] as const;
+
+/** En el celular: 4 accesos fijos y el resto dentro de "Más". */
+const MOBILE_PRIMARY = ["/panel", "/notas", "/galeria", "/cerca"] as const;
+
+function PushBanner({ userId }: { userId: string }) {
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!pushSupported() || Notification.permission !== "default") return;
+    if (window.localStorage.getItem("push-banner-dismissed")) return;
+    setShow(true);
+  }, []);
+  if (!show) return null;
+  return (
+    <div className="border-b border-primary/30 bg-primary/10">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 text-xs">
+        <BellRing className="size-4 text-primary" />
+        <span className="flex-1">Activa los avisos para enterarte al instante de lo que haga tu pareja.</span>
+        <Button
+          size="sm"
+          className="h-7 rounded-full px-3 text-xs"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            const ok = await enablePush(userId).catch(() => false);
+            setBusy(false);
+            setShow(false);
+            if (ok) toast.success("Listo: te avisaremos en este dispositivo");
+            else toast.error("No se dio permiso para los avisos");
+          }}
+        >
+          Activar
+        </Button>
+        <button
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Cerrar"
+          onClick={() => {
+            window.localStorage.setItem("push-banner-dismissed", "1");
+            setShow(false);
+          }}
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type NotificationRow = {
   id: string;
