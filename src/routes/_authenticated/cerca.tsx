@@ -73,6 +73,58 @@ function distancePhrase(km: number) {
   return "Lejos de ojos, cerca del corazón";
 }
 
+type DrivingRoute = { km: number; minutes: number; line: [number, number][] };
+
+/** Distancia y tiempo por carretera (servicio público de rutas). */
+function useDrivingRoute(a: MapPerson | undefined, b: MapPerson | undefined) {
+  const key = a && b ? `${a.lat.toFixed(4)},${a.lng.toFixed(4)}-${b.lat.toFixed(4)},${b.lng.toFixed(4)}` : null;
+  return useQuery({
+    queryKey: ["driving-route", key],
+    enabled: !!key,
+    staleTime: 5 * 60_000,
+    retry: false,
+    queryFn: async (): Promise<DrivingRoute | null> => {
+      const url = `https://router.project-osrm.org/route/v1/driving/${a!.lng},${a!.lat};${b!.lng},${b!.lat}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const json = (await res.json()) as {
+        routes?: { distance: number; duration: number; geometry: { coordinates: [number, number][] } }[];
+      };
+      const route = json.routes?.[0];
+      if (!route) return null;
+      return {
+        km: route.distance / 1000,
+        minutes: Math.max(1, Math.round(route.duration / 60)),
+        line: route.geometry.coordinates.map(([lng, lat]) => [lat, lng] as [number, number]),
+      };
+    },
+  });
+}
+
+function travelMinutesLabel(minutes: number) {
+  if (minutes < 60) return `${minutes} min en auto`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h} h${m ? ` ${m} min` : ""} en auto`;
+}
+
+function uberLink(from: MapPerson, to: MapPerson) {
+  const params = new URLSearchParams({
+    action: "setPickup",
+    "pickup[latitude]": String(from.lat),
+    "pickup[longitude]": String(from.lng),
+    "pickup[nickname]": "Donde estoy",
+    "dropoff[latitude]": String(to.lat),
+    "dropoff[longitude]": String(to.lng),
+    "dropoff[nickname]": to.name,
+  });
+  return `https://m.uber.com/ul/?${params.toString()}`;
+}
+
+function mapsLink(from: MapPerson, to: MapPerson) {
+  return `https://www.google.com/maps/dir/?api=1&origin=${from.lat},${from.lng}&destination=${to.lat},${to.lng}&travelmode=driving`;
+}
+
 function timeAgo(iso: string | null) {
   if (!iso) return "sin ubicación";
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60_000);
