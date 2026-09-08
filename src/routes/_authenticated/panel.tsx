@@ -68,6 +68,8 @@ function Panel() {
   const elapsed = useElapsed(anniversaryOf(profiles));
   const quote = pickOfTheDay(ROMANTIC_QUOTES);
   const question = pickOfTheDay(DAILY_QUESTIONS, 3);
+  const challengeIdea = pickOfTheDay(CHALLENGE_IDEAS, 1);
+  const anniversaryIn = daysToAnniversary(anniversaryOf(profiles));
 
   const { data: notes } = useQuery({
     queryKey: ["notes", "recent"],
