@@ -5,6 +5,7 @@ import { Laugh, Lightbulb, Brain, HelpCircle, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +64,7 @@ interface FunItem {
 function FunPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  useRealtime("fun_items");
   const [category, setCategory] = useState<FunCategory | "todas">("todas");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<{

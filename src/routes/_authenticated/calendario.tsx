@@ -5,6 +5,7 @@ import { CalendarHeart, Check, Plus, Trash2, X, Clock, ExternalLink } from "luci
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { notifyPartner } from "@/lib/notify";
 import { EVENT_CATEGORIES, labelFor } from "@/lib/content";
@@ -62,6 +63,7 @@ function CalendarPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: profiles } = useProfiles();
+  useRealtime("events", "event_responses");
   const today = new Date();
   const [cursor, setCursor] = useState({ y: today.getFullYear(), m: today.getMonth() });
   const [selected, setSelected] = useState<string | null>(null);
