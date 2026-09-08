@@ -216,7 +216,73 @@ function SettingsPage() {
         </Button>
       </section>
 
+      <section className="surface space-y-4 p-6">
+        <div className="flex items-center gap-2">
+          <HeartHandshake className="size-5 text-primary" />
+          <h2 className="font-display text-xl font-semibold">Su espacio de pareja</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Todo lo que guardan aquí es privado. Solo lo verán las dos personas vinculadas a este
+          espacio.
+        </p>
+
+        {!couple?.coupleId ? (
+          <div className="space-y-5">
+            <div>
+              <Button
+                className="rounded-full"
+                onClick={() => createSpace.mutate()}
+                disabled={createSpace.isPending}
+              >
+                Crear nuestro espacio
+              </Button>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Crea el espacio y comparte el código con tu pareja.
+              </p>
+            </div>
+            <div className="space-y-2 border-t pt-5">
+              <Label htmlFor="jc">Ya tengo un código</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="jc"
+                  placeholder="Pega aquí el código"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                />
+                <Button
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => joinSpace.mutate()}
+                  disabled={joinSpace.isPending}
+                >
+                  Unirme
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : partner ? (
+          <p className="text-sm">
+            Vinculado con <span className="font-semibold">{partner.name ?? "tu pareja"}</span>. Ya
+            se ven todo entre ustedes.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            <Label>Código de invitación</Label>
+            <div className="flex gap-2">
+              <Input readOnly value={couple.coupleId} className="font-mono text-xs" />
+              <Button variant="outline" className="rounded-full" onClick={copyCode}>
+                {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Envíale este código a tu pareja para que se una.
+            </p>
+          </div>
+        )}
+      </section>
+
       <section className="surface p-6">
+
         <h2 className="font-display text-xl font-semibold">Almacenamiento</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {storage ? `${storage.count} fotos · ${storage.mb} MB usados` : "Calculando…"}
