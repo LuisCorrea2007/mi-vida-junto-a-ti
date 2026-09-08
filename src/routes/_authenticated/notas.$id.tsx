@@ -576,45 +576,69 @@ function NoteDetail() {
         </p>
 
         {/* Notas de voz */}
-        <div className="mt-6 space-y-3">
+        <div className="mt-7 rounded-3xl border border-border/70 bg-background/40 p-4">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold">Notas de voz</h3>
+            <div className="flex items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-full bg-primary/15">
+                <Mic className="size-4 text-primary" />
+              </span>
+              <div>
+                <h3 className="font-display text-lg font-semibold leading-tight">Notas de voz</h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {audios.length ? `${audios.length} audio${audios.length > 1 ? "s" : ""}` : "Aún no hay audios"}
+                </p>
+              </div>
+            </div>
             <Button
-              variant={recording ? "destructive" : "outline"}
+              variant={recording ? "destructive" : "default"}
               size="sm"
-              className="rounded-full"
+              className={cn("rounded-full", recording && "animate-pulse")}
               onClick={recording ? stopRecording : startRecording}
               disabled={uploadAttachment.isPending}
             >
               {recording ? <Square className="mr-1 size-4" /> : <Mic className="mr-1 size-4" />}
-              {recording ? `Detener · ${recSeconds}s` : "Grabar audio"}
+              {recording ? `Detener · ${formatClock(recSeconds)}` : "Grabar"}
             </Button>
           </div>
           {audios.length > 0 ? (
-            <div className="space-y-2">
+            <div className="mt-4 space-y-2">
               {audios.map((att) => (
-                <AttachmentItem
+                <VoiceNote
                   key={att.id}
                   attachment={att}
+                  author={nameOf(att.user_id)}
+                  mine={att.user_id === user?.id}
                   canDelete={att.user_id === user?.id}
                   onDelete={() => deleteAttachment.mutate(att.id)}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Graba un mensaje con tu voz para acompañar la nota.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Graba un mensaje con tu voz para acompañar la nota.
+            </p>
           )}
         </div>
 
         {/* Documentos y enlaces */}
-        <div className="mt-6 space-y-3">
+        <div className="mt-4 rounded-3xl border border-border/70 bg-background/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold">Documentos y enlaces</h3>
+            <div className="flex items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-full bg-primary/15">
+                <Paperclip className="size-4 text-primary" />
+              </span>
+              <div>
+                <h3 className="font-display text-lg font-semibold leading-tight">Documentos y enlaces</h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {docs.length ? `${docs.length} guardado${docs.length > 1 ? "s" : ""}` : "PDF y páginas web"}
+                </p>
+              </div>
+            </div>
             <div className="flex gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="application/pdf,audio/*"
+                accept="application/pdf"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -629,10 +653,10 @@ function NoteDetail() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadAttachment.isPending}
               >
-                <Paperclip className="mr-1 size-4" /> PDF
+                <FileText className="mr-1 size-4" /> PDF
               </Button>
               <Button
-                variant="outline"
+                variant={linkOpen ? "secondary" : "outline"}
                 size="sm"
                 className="rounded-full"
                 onClick={() => setLinkOpen((v) => !v)}
@@ -644,7 +668,7 @@ function NoteDetail() {
 
           {linkOpen && (
             <form
-              className="flex gap-2"
+              className="mt-3 flex gap-2"
               onSubmit={(e) => {
                 e.preventDefault();
                 addLink.mutate();
@@ -665,18 +689,21 @@ function NoteDetail() {
           )}
 
           {docs.length > 0 ? (
-            <div className="space-y-2">
+            <div className="mt-4 space-y-2">
               {docs.map((att) => (
-                <AttachmentItem
+                <DocumentCard
                   key={att.id}
                   attachment={att}
+                  author={nameOf(att.user_id)}
                   canDelete={att.user_id === user?.id}
                   onDelete={() => deleteAttachment.mutate(att.id)}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Sube un PDF o guarda un enlace de una página web.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sube un PDF o guarda un enlace de una página web.
+            </p>
           )}
         </div>
 
