@@ -1,7 +1,17 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock, HeartPulse, LocateFixed, LocateOff, MapPin, Send, Timer } from "lucide-react";
+import {
+  Car,
+  Clock,
+  HeartPulse,
+  LocateFixed,
+  LocateOff,
+  MapPin,
+  Navigation as NavigationIcon,
+  Send,
+  Timer,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
