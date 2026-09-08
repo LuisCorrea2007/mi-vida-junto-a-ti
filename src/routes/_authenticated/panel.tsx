@@ -151,6 +151,13 @@ function Panel() {
             </Button>
           </div>
         )}
+        {anniversaryIn !== null && (
+          <p className="mt-4 inline-block rounded-full bg-primary/15 px-4 py-1.5 text-xs text-primary">
+            {anniversaryIn === 0
+              ? "¡Hoy es su aniversario! 🎉"
+              : `Faltan ${anniversaryIn} ${anniversaryIn === 1 ? "día" : "días"} para su aniversario 💗`}
+          </p>
+        )}
         <p className="mx-auto mt-6 max-w-md text-sm italic text-muted-foreground">“{quote}”</p>
       </section>
 
