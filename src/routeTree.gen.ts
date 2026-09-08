@@ -16,6 +16,7 @@ import { Route as CitasRouteImport } from './routes/citas'
 import { Route as FotosRouteImport } from './routes/fotos'
 import { Route as AuthenticatedAjustesRouteImport } from './routes/_authenticated/ajustes'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
+import { Route as AuthenticatedCapsulasRouteImport } from './routes/_authenticated/capsulas'
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
 import { Route as AuthenticatedDedicatoriasRouteImport } from './routes/_authenticated/dedicatorias'
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
@@ -60,6 +61,11 @@ const AuthenticatedAjustesRoute = AuthenticatedAjustesRouteImport.update({
 const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCapsulasRoute = AuthenticatedCapsulasRouteImport.update({
+  id: '/capsulas',
+  path: '/capsulas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCercaRoute = AuthenticatedCercaRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/fotos': typeof FotosRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/capsulas': typeof AuthenticatedCapsulasRoute
   '/cerca': typeof AuthenticatedCercaRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/fotos': typeof FotosRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
+  '/capsulas': typeof AuthenticatedCapsulasRoute
   '/cerca': typeof AuthenticatedCercaRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/fotos': typeof FotosRoute
   '/_authenticated/ajustes': typeof AuthenticatedAjustesRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
+  '/_authenticated/capsulas': typeof AuthenticatedCapsulasRoute
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
   '/_authenticated/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/fotos'
     | '/ajustes'
     | '/calendario'
+    | '/capsulas'
     | '/cerca'
     | '/dedicatorias'
     | '/deseos'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/fotos'
     | '/ajustes'
     | '/calendario'
+    | '/capsulas'
     | '/cerca'
     | '/dedicatorias'
     | '/deseos'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/fotos'
     | '/_authenticated/ajustes'
     | '/_authenticated/calendario'
+    | '/_authenticated/capsulas'
     | '/_authenticated/cerca'
     | '/_authenticated/dedicatorias'
     | '/_authenticated/deseos'
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof AuthenticatedCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/capsulas': {
+      id: '/_authenticated/capsulas'
+      path: '/capsulas'
+      fullPath: '/capsulas'
+      preLoaderRoute: typeof AuthenticatedCapsulasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cerca': {
@@ -381,6 +400,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAjustesRoute: typeof AuthenticatedAjustesRoute
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
+  AuthenticatedCapsulasRoute: typeof AuthenticatedCapsulasRoute
   AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
   AuthenticatedDedicatoriasRoute: typeof AuthenticatedDedicatoriasRoute
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
@@ -397,6 +417,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAjustesRoute: AuthenticatedAjustesRoute,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
+  AuthenticatedCapsulasRoute: AuthenticatedCapsulasRoute,
   AuthenticatedCercaRoute: AuthenticatedCercaRoute,
   AuthenticatedDedicatoriasRoute: AuthenticatedDedicatoriasRoute,
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
