@@ -47,7 +47,13 @@ function FitPeople({ people }: { people: MapPerson[] }) {
   return null;
 }
 
-export default function CoupleMap({ people }: { people: MapPerson[] }) {
+export default function CoupleMap({
+  people,
+  route,
+}: {
+  people: MapPerson[];
+  route?: [number, number][] | null;
+}) {
   const center: [number, number] = people[0] ? [people[0].lat, people[0].lng] : [-2.17, -79.92];
   return (
     <MapContainer
