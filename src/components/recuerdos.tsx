@@ -52,27 +52,35 @@ export function Recuerdos() {
   const { data: memories } = useQuery({
     queryKey: ["recuerdos", "hoy", mm, dd],
     queryFn: async (): Promise<Memory[]> => {
-      const like = `%-${mm}-${dd}%`;
       const [photos, notes, videos] = await Promise.all([
         supabase
           .from("photos")
           .select("id, caption, file_path, created_at")
-          .ilike("created_at::text", like),
-        supabase.from("notes").select("id, title, created_at").ilike("created_at::text", like),
-        supabase.from("videos_diarios").select("id, titulo, created_at").ilike("created_at::text", like),
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase.from("notes").select("id, title, created_at").limit(200),
+        supabase.from("videos_diarios").select("id, titulo, created_at").limit(200),
       ]);
       const out: Memory[] = [];
       const now = new Date().toDateString();
+      const sameDay = (iso: string) => {
+        const d = new Date(iso);
+        return (
+          d.toDateString() !== now &&
+          d.getMonth() === today.getMonth() &&
+          d.getDate() === today.getDate()
+        );
+      };
       for (const p of photos.data ?? []) {
-        if (new Date(p.created_at).toDateString() === now) continue;
+        if (!sameDay(p.created_at)) continue;
         out.push({ kind: "foto", id: p.id, title: p.caption ?? "Una foto", date: p.created_at, path: p.file_path });
       }
       for (const n of notes.data ?? []) {
-        if (new Date(n.created_at).toDateString() === now) continue;
+        if (!sameDay(n.created_at)) continue;
         out.push({ kind: "nota", id: n.id, title: n.title, date: n.created_at });
       }
       for (const v of videos.data ?? []) {
-        if (new Date(v.created_at).toDateString() === now) continue;
+        if (!sameDay(v.created_at)) continue;
         out.push({ kind: "video", id: v.id, title: v.titulo, date: v.created_at });
       }
       return out.sort((a, b) => a.date.localeCompare(b.date)).slice(0, 6);
