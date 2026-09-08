@@ -112,14 +112,16 @@ function SettingsPage() {
     mutationFn: async () => {
       if (!user) throw new Error("Sin sesión");
       if (!form.name.trim()) throw new Error("Escribe un nombre");
-      const { error } = await supabase
-        .from("profiles")
-        .update({
+      const { error } = await supabase.from("profiles").upsert(
+        {
+          id: user.id,
+          email: user.email ?? null,
           name: form.name.trim().slice(0, 60),
           anniversary_date: form.anniversary || null,
           location: form.location.trim().slice(0, 120) || null,
-        })
-        .eq("id", user.id);
+        },
+        { onConflict: "id" },
+      );
       if (error) throw error;
     },
     onSuccess: () => {
@@ -141,7 +143,9 @@ function SettingsPage() {
       const blob = await compressImage(file, 512, 0.9);
       const ext = blob.type === "image/webp" ? "webp" : file.name.split(".").pop() || "jpg";
       const path = await uploadMedia("avatars", user.id, blob, ext);
-      const { error } = await supabase.from("profiles").update({ avatar_url: path }).eq("id", user.id);
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({ id: user.id, email: user.email ?? null, avatar_url: path }, { onConflict: "id" });
       if (error) throw error;
       toast.success("Foto actualizada");
       qc.invalidateQueries({ queryKey: ["profiles"] });

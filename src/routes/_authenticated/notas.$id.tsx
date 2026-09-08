@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -13,6 +13,9 @@ import {
   ExternalLink,
   Square,
   Paperclip,
+  Play,
+  Pause,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -27,76 +30,178 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSignedUrl } from "@/lib/media";
 import { notifyPartner } from "@/lib/notify";
+import { cn } from "@/lib/utils";
 
-function AttachmentItem({ attachment, canDelete, onDelete }: { 
-  attachment: any; 
-  canDelete: boolean; 
+type Attachment = {
+  id: string;
+  file_path: string;
+  file_type: string | null;
+  file_size: number | null;
+  attachment_type: string;
+  created_at: string;
+  user_id: string;
+  url: string | null;
+};
+
+function formatSize(bytes: number | null) {
+  if (!bytes) return "";
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
+}
+
+function formatClock(seconds: number) {
+  if (!Number.isFinite(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function whenLabel(iso: string) {
+  return new Date(iso).toLocaleString("es", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Barras decorativas fijas para que cada audio tenga su propia "onda". */
+const BARS = Array.from({ length: 28 }, (_, i) => 30 + Math.round(60 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6))));
+
+function VoiceNote({
+  attachment,
+  author,
+  mine,
+  canDelete,
+  onDelete,
+}: {
+  attachment: Attachment;
+  author: string;
+  mine: boolean;
+  canDelete: boolean;
   onDelete: () => void;
 }) {
   const { data: url } = useSignedUrl(attachment.file_path);
-  
-  const formatSize = (bytes: number) => {
-    if (!bytes) return "";
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
-  };
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [current, setCurrent] = useState(0);
 
-  const handleDownload = async () => {
-    if (!url) return;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = attachment.file_path.split("/").pop() || "archivo";
-    a.click();
-  };
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    const onTime = () => {
+      setCurrent(a.currentTime);
+      if (a.duration && Number.isFinite(a.duration)) setProgress(a.currentTime / a.duration);
+    };
+    const onMeta = () => Number.isFinite(a.duration) && setDuration(a.duration);
+    const onEnd = () => {
+      setPlaying(false);
+      setProgress(0);
+      setCurrent(0);
+    };
+    a.addEventListener("timeupdate", onTime);
+    a.addEventListener("loadedmetadata", onMeta);
+    a.addEventListener("durationchange", onMeta);
+    a.addEventListener("ended", onEnd);
+    return () => {
+      a.removeEventListener("timeupdate", onTime);
+      a.removeEventListener("loadedmetadata", onMeta);
+      a.removeEventListener("durationchange", onMeta);
+      a.removeEventListener("ended", onEnd);
+    };
+  }, [url]);
 
-  if (attachment.attachment_type === "audio") {
-    return (
-      <div className="surface flex items-center gap-3 p-3 rounded-lg">
-        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-          <Mic className="size-5 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">Nota de voz</p>
-          <p className="text-xs text-muted-foreground">{formatSize(attachment.file_size)}</p>
-        </div>
-        <audio src={url ?? undefined} controls className="h-8" />
-        <Button variant="ghost" size="icon" onClick={handleDownload}>
-          <Download className="size-4" />
-        </Button>
-        {canDelete && (
-          <Button variant="ghost" size="icon" onClick={onDelete}>
-            <Trash2 className="size-4 text-destructive" />
-          </Button>
-        )}
-      </div>
-    );
+  function toggle() {
+    const a = audioRef.current;
+    if (!a || !url) return;
+    if (playing) {
+      a.pause();
+      setPlaying(false);
+    } else {
+      a.play().then(() => setPlaying(true)).catch(() => toast.error("No pudimos reproducir el audio"));
+    }
   }
 
-  if (attachment.attachment_type === "pdf") {
-    return (
-      <div className="surface flex items-center gap-3 p-3 rounded-lg">
-        <div className="flex size-10 items-center justify-center rounded-full bg-red-100">
-          <FileText className="size-5 text-red-600" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">Documento PDF</p>
-          <p className="text-xs text-muted-foreground">{formatSize(attachment.file_size)}</p>
-        </div>
-        {url && (
-          <iframe src={`${url}#toolbar=0`} className="w-24 h-12 border rounded" title="PDF preview" />
-        )}
-        <Button variant="outline" size="sm" onClick={handleDownload}>
-          <Download className="mr-1 size-4" /> Descargar
-        </Button>
-        {canDelete && (
-          <Button variant="ghost" size="icon" onClick={onDelete}>
-            <Trash2 className="size-4 text-destructive" />
-          </Button>
-        )}
-      </div>
-    );
+  function seek(e: React.MouseEvent<HTMLDivElement>) {
+    const a = audioRef.current;
+    if (!a || !a.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    a.currentTime = ratio * a.duration;
   }
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-3 rounded-2xl border p-3",
+        mine ? "border-primary/30 bg-primary/10" : "border-border bg-muted/40",
+      )}
+    >
+      <audio ref={audioRef} src={url ?? undefined} preload="metadata" />
+      <button
+        onClick={toggle}
+        disabled={!url}
+        aria-label={playing ? "Pausar" : "Reproducir"}
+        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-soft)] transition-transform hover:scale-105 disabled:opacity-50"
+      >
+        {playing ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
+      </button>
+      <div className="min-w-0 flex-1">
+        <div
+          className="flex h-8 cursor-pointer items-end gap-[3px]"
+          onClick={seek}
+          role="slider"
+          aria-label="Posición del audio"
+          aria-valuenow={Math.round(progress * 100)}
+        >
+          {BARS.map((h, i) => {
+            const active = i / BARS.length <= progress;
+            return (
+              <span
+                key={i}
+                className={cn(
+                  "w-full rounded-full transition-colors",
+                  active ? "bg-primary" : "bg-foreground/25",
+                  playing && active && "animate-pulse",
+                )}
+                style={{ height: `${h}%` }}
+              />
+            );
+          })}
+        </div>
+        <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="truncate">
+            {author} · {whenLabel(attachment.created_at)}
+          </span>
+          <span className="font-mono">
+            {formatClock(playing || current > 0 ? current : duration)}
+          </span>
+        </div>
+      </div>
+      {canDelete && (
+        <Button variant="ghost" size="icon" className="shrink-0" aria-label="Eliminar audio" onClick={onDelete}>
+          <Trash2 className="size-4 text-destructive" />
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function DocumentCard({
+  attachment,
+  author,
+  canDelete,
+  onDelete,
+}: {
+  attachment: Attachment;
+  author: string;
+  canDelete: boolean;
+  onDelete: () => void;
+}) {
+  const { data: url } = useSignedUrl(attachment.file_path);
 
   if (attachment.attachment_type === "link" && attachment.url) {
     let host = attachment.url;
@@ -106,28 +211,38 @@ function AttachmentItem({ attachment, canDelete, onDelete }: {
       /* se muestra tal cual */
     }
     return (
-      <div className="surface flex items-center gap-3 p-3 rounded-lg">
-        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-          <LinkIcon className="size-5 text-primary" />
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/40 p-3">
+        <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-background">
+          <img
+            src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`}
+            alt=""
+            width={24}
+            height={24}
+            loading="lazy"
+            className="size-6"
+          />
         </div>
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <a
             href={attachment.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block truncate text-sm font-medium hover:underline"
+            className="block truncate text-sm font-semibold hover:underline"
           >
             {host}
           </a>
           <p className="truncate text-xs text-muted-foreground">{attachment.url}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {author} · {whenLabel(attachment.created_at)}
+          </p>
         </div>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild size="icon" variant="outline" className="shrink-0 rounded-full" aria-label="Abrir enlace">
           <a href={attachment.url} target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="mr-1 size-4" /> Abrir
+            <ExternalLink className="size-4" />
           </a>
         </Button>
         {canDelete && (
-          <Button variant="ghost" size="icon" onClick={onDelete}>
+          <Button variant="ghost" size="icon" className="shrink-0" aria-label="Eliminar enlace" onClick={onDelete}>
             <Trash2 className="size-4 text-destructive" />
           </Button>
         )}
@@ -135,7 +250,39 @@ function AttachmentItem({ attachment, canDelete, onDelete }: {
     );
   }
 
-  return null;
+  const name = attachment.file_path.split("/").pop() || "documento.pdf";
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-border bg-muted/40 p-3">
+      <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-destructive/15">
+        <FileText className="size-5 text-destructive" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">Documento PDF</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {formatSize(attachment.file_size)}
+          {formatSize(attachment.file_size) ? " · " : ""}
+          {author} · {whenLabel(attachment.created_at)}
+        </p>
+        <div className="mt-2 flex gap-2">
+          <Button asChild size="sm" variant="outline" className="h-7 rounded-full px-3 text-xs" disabled={!url}>
+            <a href={url ?? "#"} target="_blank" rel="noopener noreferrer">
+              <Eye className="mr-1 size-3.5" /> Ver
+            </a>
+          </Button>
+          <Button asChild size="sm" variant="outline" className="h-7 rounded-full px-3 text-xs" disabled={!url}>
+            <a href={url ?? "#"} download={name}>
+              <Download className="mr-1 size-3.5" /> Descargar
+            </a>
+          </Button>
+        </div>
+      </div>
+      {canDelete && (
+        <Button variant="ghost" size="icon" className="shrink-0" aria-label="Eliminar documento" onClick={onDelete}>
+          <Trash2 className="size-4 text-destructive" />
+        </Button>
+      )}
+    </div>
+  );
 }
 
 export const Route = createFileRoute("/_authenticated/notas/$id")({
@@ -429,45 +576,69 @@ function NoteDetail() {
         </p>
 
         {/* Notas de voz */}
-        <div className="mt-6 space-y-3">
+        <div className="mt-7 rounded-3xl border border-border/70 bg-background/40 p-4">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold">Notas de voz</h3>
+            <div className="flex items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-full bg-primary/15">
+                <Mic className="size-4 text-primary" />
+              </span>
+              <div>
+                <h3 className="font-display text-lg font-semibold leading-tight">Notas de voz</h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {audios.length ? `${audios.length} audio${audios.length > 1 ? "s" : ""}` : "Aún no hay audios"}
+                </p>
+              </div>
+            </div>
             <Button
-              variant={recording ? "destructive" : "outline"}
+              variant={recording ? "destructive" : "default"}
               size="sm"
-              className="rounded-full"
+              className={cn("rounded-full", recording && "animate-pulse")}
               onClick={recording ? stopRecording : startRecording}
               disabled={uploadAttachment.isPending}
             >
               {recording ? <Square className="mr-1 size-4" /> : <Mic className="mr-1 size-4" />}
-              {recording ? `Detener · ${recSeconds}s` : "Grabar audio"}
+              {recording ? `Detener · ${formatClock(recSeconds)}` : "Grabar"}
             </Button>
           </div>
           {audios.length > 0 ? (
-            <div className="space-y-2">
+            <div className="mt-4 space-y-2">
               {audios.map((att) => (
-                <AttachmentItem
+                <VoiceNote
                   key={att.id}
                   attachment={att}
+                  author={nameOf(att.user_id)}
+                  mine={att.user_id === user?.id}
                   canDelete={att.user_id === user?.id}
                   onDelete={() => deleteAttachment.mutate(att.id)}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Graba un mensaje con tu voz para acompañar la nota.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Graba un mensaje con tu voz para acompañar la nota.
+            </p>
           )}
         </div>
 
         {/* Documentos y enlaces */}
-        <div className="mt-6 space-y-3">
+        <div className="mt-4 rounded-3xl border border-border/70 bg-background/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold">Documentos y enlaces</h3>
+            <div className="flex items-center gap-2">
+              <span className="flex size-8 items-center justify-center rounded-full bg-primary/15">
+                <Paperclip className="size-4 text-primary" />
+              </span>
+              <div>
+                <h3 className="font-display text-lg font-semibold leading-tight">Documentos y enlaces</h3>
+                <p className="text-[11px] text-muted-foreground">
+                  {docs.length ? `${docs.length} guardado${docs.length > 1 ? "s" : ""}` : "PDF y páginas web"}
+                </p>
+              </div>
+            </div>
             <div className="flex gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="application/pdf,audio/*"
+                accept="application/pdf"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -482,10 +653,10 @@ function NoteDetail() {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadAttachment.isPending}
               >
-                <Paperclip className="mr-1 size-4" /> PDF
+                <FileText className="mr-1 size-4" /> PDF
               </Button>
               <Button
-                variant="outline"
+                variant={linkOpen ? "secondary" : "outline"}
                 size="sm"
                 className="rounded-full"
                 onClick={() => setLinkOpen((v) => !v)}
@@ -497,7 +668,7 @@ function NoteDetail() {
 
           {linkOpen && (
             <form
-              className="flex gap-2"
+              className="mt-3 flex gap-2"
               onSubmit={(e) => {
                 e.preventDefault();
                 addLink.mutate();
@@ -518,18 +689,21 @@ function NoteDetail() {
           )}
 
           {docs.length > 0 ? (
-            <div className="space-y-2">
+            <div className="mt-4 space-y-2">
               {docs.map((att) => (
-                <AttachmentItem
+                <DocumentCard
                   key={att.id}
                   attachment={att}
+                  author={nameOf(att.user_id)}
                   canDelete={att.user_id === user?.id}
                   onDelete={() => deleteAttachment.mutate(att.id)}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Sube un PDF o guarda un enlace de una página web.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Sube un PDF o guarda un enlace de una página web.
+            </p>
           )}
         </div>
 
