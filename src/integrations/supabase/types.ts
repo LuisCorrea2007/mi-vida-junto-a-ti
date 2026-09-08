@@ -118,6 +118,118 @@ export type Database = {
         }
         Relationships: []
       }
+      dedication_comments: {
+        Row: {
+          content: string
+          created_at: string
+          dedication_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          dedication_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          dedication_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedication_comments_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dedication_reactions: {
+        Row: {
+          created_at: string
+          dedication_id: string
+          id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedication_id: string
+          id?: string
+          reaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedication_id?: string
+          id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dedication_reactions_dedication_id_fkey"
+            columns: ["dedication_id"]
+            isOneToOne: false
+            referencedRelation: "dedications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dedications: {
+        Row: {
+          content: string | null
+          created_at: string
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          is_archived: boolean
+          is_favorite: boolean
+          kind: string
+          title: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_archived?: boolean
+          is_favorite?: boolean
+          kind: string
+          title: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          is_archived?: boolean
+          is_favorite?: boolean
+          kind?: string
+          title?: string
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_responses: {
         Row: {
           created_at: string
