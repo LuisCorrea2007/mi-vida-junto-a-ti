@@ -49,7 +49,7 @@ export function useMyProfile(userId?: string) {
       const name = meta["name"] || meta["full_name"] || u.email?.split("@")[0] || "";
       const { data: created, error: insertError } = await supabase
         .from("profiles")
-        .upsert({ id: u.id, email: u.email, name }, { onConflict: "id" })
+        .upsert({ id: u.id, email: u.email ?? null, name }, { onConflict: "id" })
         .select(COLUMNS)
         .single();
       if (insertError) throw insertError;
