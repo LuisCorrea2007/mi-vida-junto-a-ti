@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
 import { useProfiles } from "@/hooks/use-profiles";
 import { NOTE_CATEGORIES, REACTIONS, labelFor } from "@/lib/content";
 import { Button } from "@/components/ui/button";
