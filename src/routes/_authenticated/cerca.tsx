@@ -324,7 +324,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
                 </Button>
                 <Button asChild variant="outline" className="rounded-full">
                   <a href={mapsLink(mePerson, otherPerson)} target="_blank" rel="noopener noreferrer">
-                    <Navigation className="mr-1 size-4" /> Abrir en Maps
+                    <NavigationIcon className="mr-1 size-4" /> Abrir en Maps
                   </a>
                 </Button>
               </div>
