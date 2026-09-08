@@ -581,6 +581,7 @@ export type Database = {
           id: string
           latitude: number | null
           location: string | null
+          location_shares_until: string | null
           location_updated_at: string | null
           longitude: number | null
           name: string
@@ -594,6 +595,7 @@ export type Database = {
           id: string
           latitude?: number | null
           location?: string | null
+          location_shares_until?: string | null
           location_updated_at?: string | null
           longitude?: number | null
           name?: string
@@ -607,6 +609,7 @@ export type Database = {
           id?: string
           latitude?: number | null
           location?: string | null
+          location_shares_until?: string | null
           location_updated_at?: string | null
           longitude?: number | null
           name?: string
