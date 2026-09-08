@@ -239,6 +239,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
         .update({
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
+          location_accuracy: pos.coords.accuracy ?? null,
           location_updated_at: new Date().toISOString(),
           ...(opts.silent ? {} : { location_shares_until: until }),
         })
