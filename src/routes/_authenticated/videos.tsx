@@ -5,7 +5,7 @@ import { Video, Upload, Download, MessageCircle, Clock, Play } from "lucide-reac
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useProfiles } from "@/hooks/use-profiles";
+import { useProfiles, type Profile } from "@/hooks/use-profiles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,22 @@ export const Route = createFileRoute("/_authenticated/videos")({
   component: VideosPage,
 });
 
+type VideoRow = {
+  id: string;
+  user_id: string;
+  titulo: string;
+  file_path: string;
+  file_size: number;
+  created_at: string;
+};
+
+type ComentarioRow = {
+  id: string;
+  user_id: string;
+  contenido: string;
+  created_at: string;
+};
+
 function VideosPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -40,7 +56,7 @@ function VideosPage() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as VideoRow[];
     },
   });
 
@@ -75,13 +91,13 @@ function VideosPage() {
       if (dbError) throw dbError;
 
       // Notificar a la pareja
-      const other = profiles?.find((p) => p.id !== user.id);
+      const other = profiles?.find((p: Profile) => p.id !== user.id);
       if (other) {
         await supabase.from("notifications").insert({
           user_id: other.id,
           type: "video",
           title: "Nuevo video diario",
-          message: `${profiles?.find(p => p.id === user.id)?.name} subió un video: ${titulo.trim()}`,
+          message: `${profiles?.find((p: Profile) => p.id === user.id)?.name} subió un video: ${titulo.trim()}`,
         });
       }
     },
@@ -107,7 +123,7 @@ function VideosPage() {
       if (error) throw error;
       
       // Obtener dueño del video para notificar
-      const video = videos?.find(v => v.id === videoId);
+      const video = videos?.find((v: VideoRow) => v.id === videoId);
       if (video && video.user_id !== user.id) {
         await supabase.from("notifications").insert({
           user_id: video.user_id,
@@ -139,7 +155,7 @@ function VideosPage() {
     e.target.value = "";
   };
 
-  const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";
+  const nameOf = (uid: string) => profiles?.find((p: Profile) => p.id === uid)?.name ?? "Alguien";
 
   return (
     <div className="space-y-6">
@@ -205,7 +221,7 @@ function VideosPage() {
         </div>
       ) : videos && videos.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video) => (
+          {videos.map((video: VideoRow) => (
             <VideoCard
               key={video.id}
               video={video}
@@ -236,8 +252,8 @@ function VideoCard({
   nameOf, 
   onComentar 
 }: { 
-  video: any; 
-  profiles: any[]; 
+  video: VideoRow; 
+  profiles: Profile[]; 
   nameOf: (id: string) => string;
   onComentar: (contenido: string) => void;
 }) {
@@ -255,7 +271,7 @@ function VideoCard({
         .eq("video_id", video.id)
         .order("created_at");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as ComentarioRow[];
     },
   });
 
@@ -322,7 +338,7 @@ function VideoCard({
             <h4 className="text-sm font-semibold">Comentarios</h4>
             {comentarios && comentarios.length > 0 ? (
               <div className="space-y-2 max-h-40 overflow-y-auto">
-                {comentarios.map((c) => (
+                {comentarios.map((c: ComentarioRow) => (
                   <div key={c.id} className="text-sm">
                     <span className="font-medium">{nameOf(c.user_id)}:</span>{" "}
                     {c.contenido}
