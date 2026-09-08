@@ -8,6 +8,7 @@ import {
   Images,
   Laugh,
   LogOut,
+  MapPin,
   NotebookPen,
   Settings,
   Sparkles,
@@ -18,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyProfile } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { enablePush, pushSupported } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,7 @@ const NAV = [
   { to: "/galeria", label: "Galería", icon: Images },
   { to: "/videos", label: "Videos", icon: Video },
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
+  { to: "/cerca", label: "Ahora", icon: MapPin },
   { to: "/deseos", label: "Deseos", icon: Stars },
   { to: "/diario", label: "Diario", icon: Heart },
   { to: "/diversion", label: "Diversión", icon: Laugh },
@@ -49,24 +51,43 @@ type NotificationRow = {
   id: string;
   title: string;
   message: string | null;
+  link: string | null;
   is_read: boolean;
   created_at: string;
 };
 
+/** Navega a la ruta interna de un aviso (con su ancla si la tiene). */
+export function goToLink(navigate: ReturnType<typeof useNavigate>, link: string) {
+  const url = new URL(link, window.location.origin);
+  if (url.origin !== window.location.origin) return;
+  navigate({ href: `${url.pathname}${url.search}${url.hash}` });
+}
+
 function NotificationBell({ userId }: { userId: string }) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const { data = [] } = useQuery({
     queryKey: ["notifications", userId],
     queryFn: async (): Promise<NotificationRow[]> => {
       const { data, error } = await supabase
         .from("notifications")
-        .select("id, title, message, is_read, created_at")
+        .select("id, title, message, link, is_read, created_at")
         .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  async function openNotification(n: NotificationRow) {
+    if (!n.is_read) {
+      await supabase.from("notifications").update({ is_read: true }).eq("id", n.id);
+      qc.invalidateQueries({ queryKey: ["notifications", userId] });
+    }
+    setOpen(false);
+    if (n.link) goToLink(navigate, n.link);
+  }
 
   useEffect(() => {
     const channel = supabase
@@ -90,7 +111,7 @@ function NotificationBell({ userId }: { userId: string }) {
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
@@ -126,19 +147,28 @@ function NotificationBell({ userId }: { userId: string }) {
           ) : (
             <ul className="divide-y">
               {data.map((n) => (
-                <li key={n.id} className={cn("px-4 py-3", !n.is_read && "bg-accent/40")}>
-                  <p className="text-sm font-medium">{n.title}</p>
-                  {n.message && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">{n.message}</p>
-                  )}
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    {new Date(n.created_at).toLocaleString("es", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+                <li key={n.id}>
+                  <button
+                    onClick={() => openNotification(n)}
+                    className={cn(
+                      "block w-full px-4 py-3 text-left transition-colors hover:bg-accent/60",
+                      !n.is_read && "bg-accent/40",
+                    )}
+                  >
+                    <p className="text-sm font-medium">{n.title}</p>
+                    {n.message && (
+                      <p className="mt-0.5 text-xs text-muted-foreground">{n.message}</p>
+                    )}
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {new Date(n.created_at).toLocaleString("es", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      {n.link && <span className="text-primary"> · Ver</span>}
+                    </p>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -158,6 +188,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const hash = useRouterState({ select: (s) => s.location.hash });
+
+  // Mantiene al día el aviso al celular en este dispositivo si ya estaba permitido.
+  useEffect(() => {
+    if (!user || !pushSupported() || Notification.permission !== "granted") return;
+    enablePush(user.id).catch(() => {});
+  }, [user]);
+
+  // Lleva hasta el elemento exacto cuando el enlace trae un ancla (p. ej. un comentario).
+  useEffect(() => {
+    if (!hash) return;
+    const id = window.setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 350);
+    return () => window.clearTimeout(id);
+  }, [hash, pathname]);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -193,7 +239,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
-            <ThemeToggle />
+            
             {mounted && user && <NotificationBell userId={user.id} />}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

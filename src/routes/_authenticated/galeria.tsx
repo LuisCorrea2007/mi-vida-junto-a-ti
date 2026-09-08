@@ -1,15 +1,16 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Images, Star, Trash2, Upload, X, Download, MessageCircle, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useProfiles } from "@/hooks/use-profiles";
+import { notifyPartner } from "@/lib/notify";
 import { compressImage, imageSize, uploadMedia, useSignedUrl, validateImage } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -28,6 +29,8 @@ import {
 import { REACTIONS } from "@/lib/content";
 
 export const Route = createFileRoute("/_authenticated/galeria")({
+  validateSearch: (search: Record<string, unknown>): { foto?: string } =>
+    typeof search["foto"] === "string" ? { foto: search["foto"] } : {},
   head: () => ({
     meta: [
       { title: "Galería — Nuestro Espacio" },
@@ -73,9 +76,161 @@ function Tile({ photo, onOpen }: { photo: Photo; onOpen: () => void }) {
   );
 }
 
+function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
+  const qc = useQueryClient();
+  const { data: profiles } = useProfiles();
+  const [text, setText] = useState("");
+  const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";
+
+  const { data: comments } = useQuery({
+    queryKey: ["photo-comments", photo.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("photo_comments")
+        .select("id, content, user_id, created_at")
+        .eq("photo_id", photo.id)
+        .order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: reactions } = useQuery({
+    queryKey: ["photo-reactions", photo.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("photo_reactions")
+        .select("id, reaction_type, user_id")
+        .eq("photo_id", photo.id);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const addComment = useMutation({
+    mutationFn: async () => {
+      const content = text.trim().slice(0, 1000);
+      if (!content) throw new Error("Escribe algo primero");
+      const { error } = await supabase
+        .from("photo_comments")
+        .insert({ photo_id: photo.id, user_id: userId, content });
+      if (error) throw error;
+      const other = profiles?.find((p) => p.id !== userId);
+      if (other) {
+        await notifyPartner({
+          toUserId: other.id,
+          type: "comentario_foto",
+          title: "Comentaron una foto",
+          message: content.slice(0, 140),
+          link: `/galeria?foto=${photo.id}`,
+        });
+      }
+    },
+    onSuccess: () => {
+      setText("");
+      qc.invalidateQueries({ queryKey: ["photo-comments", photo.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const toggleReaction = useMutation({
+    mutationFn: async (type: string) => {
+      const mine = reactions?.find((r) => r.user_id === userId && r.reaction_type === type);
+      if (mine) {
+        await supabase.from("photo_reactions").delete().eq("id", mine.id);
+        return;
+      }
+      await supabase
+        .from("photo_reactions")
+        .insert({ photo_id: photo.id, user_id: userId, reaction_type: type });
+      const other = profiles?.find((p) => p.id !== userId);
+      const emoji = REACTIONS.find((r) => r.type === type)?.emoji ?? "❤️";
+      if (other && photo.user_id === other.id) {
+        await notifyPartner({
+          toUserId: other.id,
+          type: "reaccion_foto",
+          title: `Reaccionaron ${emoji} a tu foto`,
+          message: photo.caption,
+          link: `/galeria?foto=${photo.id}`,
+        });
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["photo-reactions", photo.id] }),
+  });
+
+  return (
+    <div className="flex h-full flex-col gap-4 text-left">
+      <div className="flex flex-wrap gap-2">
+        {REACTIONS.map((r) => {
+          const count = reactions?.filter((x) => x.reaction_type === r.type).length ?? 0;
+          const mine = reactions?.some((x) => x.reaction_type === r.type && x.user_id === userId);
+          return (
+            <button
+              key={r.type}
+              onClick={() => toggleReaction.mutate(r.type)}
+              aria-label={r.label}
+              className={`rounded-full border px-3 py-1 text-sm transition-transform hover:scale-105 ${
+                mine ? "border-primary bg-primary/15" : "border-border"
+              }`}
+            >
+              {r.emoji} {count > 0 && count}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+        {comments?.length ? (
+          comments.map((c) => (
+            <div key={c.id} className="rounded-xl bg-muted/60 p-3">
+              <p className="text-[11px] text-muted-foreground">
+                {nameOf(c.user_id)} ·{" "}
+                {new Date(c.created_at).toLocaleString("es", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+              <p className="mt-1 whitespace-pre-wrap text-sm">{c.content}</p>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-muted-foreground">Sé la primera persona en comentar.</p>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <Input
+          value={text}
+          maxLength={1000}
+          placeholder="Escribe un comentario…"
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              addComment.mutate();
+            }
+          }}
+        />
+        <Button
+          size="icon"
+          className="shrink-0 rounded-full"
+          aria-label="Enviar comentario"
+          onClick={() => addComment.mutate()}
+          disabled={addComment.isPending}
+        >
+          <MessageCircle className="size-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function Lightbox({
   photos,
   index,
+  userId,
   onClose,
   onMove,
   onFavorite,
@@ -84,6 +239,7 @@ function Lightbox({
 }: {
   photos: Photo[];
   index: number;
+  userId: string;
   onClose: () => void;
   onMove: (delta: number) => void;
   onFavorite: () => void;
@@ -92,9 +248,26 @@ function Lightbox({
 }) {
   const photo = photos[index]!;
   const { data: url } = useSignedUrl(photo.file_path);
+  const [showPanel, setShowPanel] = useState(true);
+
+  async function download() {
+    if (!url) return;
+    try {
+      const blob = await (await fetch(url)).blob();
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = photo.file_path.split("/").pop() || "foto";
+      a.click();
+      URL.revokeObjectURL(href);
+    } catch {
+      window.open(url, "_blank");
+    }
+  }
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 p-4"
+      className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm md:flex-row"
       onKeyDown={(e) => {
         if (e.key === "Escape") onClose();
         if (e.key === "ArrowRight") onMove(1);
@@ -103,37 +276,62 @@ function Lightbox({
       tabIndex={-1}
       ref={(el) => el?.focus()}
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-4 top-4 text-background"
-        onClick={onClose}
-        aria-label="Cerrar"
-      >
-        <X />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute left-3 text-background"
-        onClick={() => onMove(-1)}
-        aria-label="Anterior"
-      >
-        <ChevronLeft />
-      </Button>
-      <div className="max-h-full max-w-3xl text-center">
-        {url && (
+      <div className="relative flex min-h-0 flex-1 items-center justify-center p-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-3 top-3 z-10 rounded-full bg-background/60"
+          onClick={onClose}
+          aria-label="Cerrar"
+        >
+          <X />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/60"
+          onClick={() => onMove(-1)}
+          aria-label="Anterior"
+        >
+          <ChevronLeft />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-background/60"
+          onClick={() => onMove(1)}
+          aria-label="Siguiente"
+        >
+          <ChevronRight />
+        </Button>
+        {url ? (
           <img
             src={url}
             alt={photo.caption ?? "Recuerdo"}
-            className="mx-auto max-h-[75vh] rounded-xl object-contain"
+            className="max-h-full max-w-full rounded-xl object-contain"
           />
+        ) : (
+          <Skeleton className="h-64 w-64 rounded-xl" />
         )}
-        <p className="mt-3 text-sm text-background/90">{photo.caption}</p>
-        <div className="mt-3 flex justify-center gap-2">
+      </div>
+
+      <aside className="surface m-3 flex max-h-[45vh] w-auto flex-col gap-4 rounded-2xl p-4 md:my-4 md:mr-4 md:max-h-none md:w-80">
+        {photo.caption && <p className="text-sm">{photo.caption}</p>}
+        <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="rounded-full" onClick={onFavorite}>
             <Star className={photo.is_favorite ? "mr-1 size-4 fill-primary text-primary" : "mr-1 size-4"} />
             Favorita
+          </Button>
+          <Button variant="secondary" size="sm" className="rounded-full" onClick={download}>
+            <Download className="mr-1 size-4" /> Descargar
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full md:hidden"
+            onClick={() => setShowPanel((v) => !v)}
+          >
+            <Heart className="mr-1 size-4" /> {showPanel ? "Ocultar" : "Reacciones"}
           </Button>
           {canDelete && (
             <Button variant="secondary" size="sm" className="rounded-full" onClick={onDelete}>
@@ -141,16 +339,10 @@ function Lightbox({
             </Button>
           )}
         </div>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-3 text-background"
-        onClick={() => onMove(1)}
-        aria-label="Siguiente"
-      >
-        <ChevronRight />
-      </Button>
+        <div className={`${showPanel ? "flex" : "hidden"} min-h-0 flex-1 md:flex`}>
+          <PhotoPanel key={photo.id} photo={photo} userId={userId} />
+        </div>
+      </aside>
     </div>
   );
 }
@@ -165,6 +357,7 @@ function GalleryPage() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [albumOpen, setAlbumOpen] = useState(false);
   const [albumName, setAlbumName] = useState("");
+  const { foto } = Route.useSearch();
 
   const { data: albums } = useQuery({
     queryKey: ["albums"],
@@ -190,6 +383,16 @@ function GalleryPage() {
   const visible = (photos ?? []).filter(
     (p) => (album === "todos" || p.album_id === album) && (!onlyFav || p.is_favorite),
   );
+
+  // Abre directamente la foto que viene en un aviso (/galeria?foto=…).
+  useEffect(() => {
+    if (!foto || !photos) return;
+    setAlbum("todos");
+    setOnlyFav(false);
+    const i = photos.findIndex((p) => p.id === foto);
+    if (i >= 0) setLightbox(i);
+  }, [foto, photos]);
+
 
   async function handleFiles(files: FileList | null) {
     if (!files?.length || !user) return;
@@ -332,10 +535,11 @@ function GalleryPage() {
         </div>
       )}
 
-      {lightbox !== null && visible[lightbox] && (
+      {lightbox !== null && visible[lightbox] && user && (
         <Lightbox
           photos={visible}
           index={lightbox}
+          userId={user.id}
           onClose={() => setLightbox(null)}
           onMove={(d) => setLightbox((i) => ((i ?? 0) + d + visible.length) % visible.length)}
           onFavorite={() => toggleFavorite(visible[lightbox]!)}

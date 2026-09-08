@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfiles, type Profile } from "@/hooks/use-profiles";
+import { notifyPartner } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,11 +94,12 @@ function VideosPage() {
       // Notificar a la pareja
       const other = profiles?.find((p: Profile) => p.id !== user.id);
       if (other) {
-        await supabase.from("notifications").insert({
-          user_id: other.id,
+        await notifyPartner({
+          toUserId: other.id,
           type: "video",
           title: "Nuevo video diario",
           message: `${profiles?.find((p: Profile) => p.id === user.id)?.name} subió un video: ${titulo.trim()}`,
+          link: "/videos",
         });
       }
     },
@@ -125,11 +127,12 @@ function VideosPage() {
       // Obtener dueño del video para notificar
       const video = videos?.find((v: VideoRow) => v.id === videoId);
       if (video && video.user_id !== user.id) {
-        await supabase.from("notifications").insert({
-          user_id: video.user_id,
+        await notifyPartner({
+          toUserId: video.user_id,
           type: "comentario_video",
           title: "Comentaron tu video",
           message: titulo,
+          link: `/videos#video-${videoId}`,
         });
       }
     },
@@ -258,7 +261,9 @@ function VideoCard({
   onComentar: (contenido: string) => void;
 }) {
   const [comentario, setComentario] = useState("");
-  const [showComentarios, setShowComentarios] = useState(false);
+  const [showComentarios, setShowComentarios] = useState(
+    () => typeof window !== "undefined" && window.location.hash === `#video-${video.id}`,
+  );
   
   const { data: url } = useSignedUrl(video.file_path);
   
@@ -290,7 +295,7 @@ function VideoCard({
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card id={`video-${video.id}`} className="overflow-hidden target:ring-2 target:ring-primary">
       <div className="aspect-video bg-black">
         {url && (
           <video src={url} controls className="h-full w-full" />
