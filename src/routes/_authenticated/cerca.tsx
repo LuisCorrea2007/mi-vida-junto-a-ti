@@ -282,7 +282,12 @@ function DistanceAndMap({ userId }: { userId: string }) {
   }, [qc]);
 
   const both = people.length === 2;
+  const mePerson = people.find((p) => p.mine);
+  const otherPerson = people.find((p) => !p.mine);
   const km = both ? distanceKm(people[0]!.lat, people[0]!.lng, people[1]!.lat, people[1]!.lng) : null;
+  const { data: driving } = useDrivingRoute(mePerson, otherPerson);
+  const accuracy = me?.location_accuracy ?? null;
+
 
   return (
     <section className="surface overflow-hidden">
