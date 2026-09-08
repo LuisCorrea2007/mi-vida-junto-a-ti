@@ -45,7 +45,7 @@ function AttachmentItem({ attachment, canDelete, onDelete }: {
           <p className="text-sm font-medium truncate">Nota de voz</p>
           <p className="text-xs text-muted-foreground">{formatSize(attachment.file_size)}</p>
         </div>
-        <audio src={url} controls className="h-8" />
+        <audio src={url ?? undefined} controls className="h-8" />
         <Button variant="ghost" size="icon" onClick={handleDownload}>
           <Download className="size-4" />
         </Button>
