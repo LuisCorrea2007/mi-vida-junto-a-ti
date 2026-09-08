@@ -313,6 +313,38 @@ export type Database = {
         }
         Relationships: []
       }
+      fun_comments: {
+        Row: {
+          content: string
+          created_at: string
+          fun_item_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          fun_item_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          fun_item_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fun_comments_fun_item_id_fkey"
+            columns: ["fun_item_id"]
+            isOneToOne: false
+            referencedRelation: "fun_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fun_items: {
         Row: {
           answer: string | null
@@ -320,6 +352,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_favorite: boolean
           options: string[] | null
           updated_at: string
           user_id: string
@@ -330,6 +363,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_favorite?: boolean
           options?: string[] | null
           updated_at?: string
           user_id: string
@@ -340,11 +374,79 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_favorite?: boolean
           options?: string[] | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      fun_ratings: {
+        Row: {
+          created_at: string
+          fun_item_id: string
+          id: string
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fun_item_id: string
+          id?: string
+          score: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fun_item_id?: string
+          id?: string
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fun_ratings_fun_item_id_fkey"
+            columns: ["fun_item_id"]
+            isOneToOne: false
+            referencedRelation: "fun_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fun_reactions: {
+        Row: {
+          created_at: string
+          fun_item_id: string
+          id: string
+          reaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          fun_item_id: string
+          id?: string
+          reaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          fun_item_id?: string
+          id?: string
+          reaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fun_reactions_fun_item_id_fkey"
+            columns: ["fun_item_id"]
+            isOneToOne: false
+            referencedRelation: "fun_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       milestones: {
         Row: {
@@ -693,6 +795,7 @@ export type Database = {
           id: string
           latitude: number | null
           location: string | null
+          location_accuracy: number | null
           location_shares_until: string | null
           location_updated_at: string | null
           longitude: number | null
@@ -707,6 +810,7 @@ export type Database = {
           id: string
           latitude?: number | null
           location?: string | null
+          location_accuracy?: number | null
           location_shares_until?: string | null
           location_updated_at?: string | null
           longitude?: number | null
@@ -721,6 +825,7 @@ export type Database = {
           id?: string
           latitude?: number | null
           location?: string | null
+          location_accuracy?: number | null
           location_shares_until?: string | null
           location_updated_at?: string | null
           longitude?: number | null

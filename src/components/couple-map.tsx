@@ -47,7 +47,13 @@ function FitPeople({ people }: { people: MapPerson[] }) {
   return null;
 }
 
-export default function CoupleMap({ people }: { people: MapPerson[] }) {
+export default function CoupleMap({
+  people,
+  route,
+}: {
+  people: MapPerson[];
+  route?: [number, number][] | null;
+}) {
   const center: [number, number] = people[0] ? [people[0].lat, people[0].lng] : [-2.17, -79.92];
   return (
     <MapContainer
@@ -66,6 +72,12 @@ export default function CoupleMap({ people }: { people: MapPerson[] }) {
         <Polyline
           positions={people.map((p) => [p.lat, p.lng] as [number, number])}
           pathOptions={{ color: "oklch(0.685 0.105 38)", weight: 3, dashArray: "6 8", opacity: 0.9 }}
+        />
+      )}
+      {route && route.length > 1 && (
+        <Polyline
+          positions={route}
+          pathOptions={{ color: "oklch(0.79 0.1 80)", weight: 5, opacity: 0.85, lineCap: "round" }}
         />
       )}
       {people.map((p) => (

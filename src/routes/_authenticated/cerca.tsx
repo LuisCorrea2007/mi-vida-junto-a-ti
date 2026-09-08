@@ -1,7 +1,17 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Clock, HeartPulse, LocateFixed, LocateOff, MapPin, Send, Timer } from "lucide-react";
+import {
+  Car,
+  Clock,
+  HeartPulse,
+  LocateFixed,
+  LocateOff,
+  MapPin,
+  Navigation as NavigationIcon,
+  Send,
+  Timer,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -71,6 +81,58 @@ function distancePhrase(km: number) {
   if (km < 50) return "En la misma ciudad, cerquita";
   if (km < 500) return "Lejos, pero no tanto";
   return "Lejos de ojos, cerca del corazón";
+}
+
+type DrivingRoute = { km: number; minutes: number; line: [number, number][] };
+
+/** Distancia y tiempo por carretera (servicio público de rutas). */
+function useDrivingRoute(a: MapPerson | undefined, b: MapPerson | undefined) {
+  const key = a && b ? `${a.lat.toFixed(4)},${a.lng.toFixed(4)}-${b.lat.toFixed(4)},${b.lng.toFixed(4)}` : null;
+  return useQuery({
+    queryKey: ["driving-route", key],
+    enabled: !!key,
+    staleTime: 5 * 60_000,
+    retry: false,
+    queryFn: async (): Promise<DrivingRoute | null> => {
+      const url = `https://router.project-osrm.org/route/v1/driving/${a!.lng},${a!.lat};${b!.lng},${b!.lat}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const json = (await res.json()) as {
+        routes?: { distance: number; duration: number; geometry: { coordinates: [number, number][] } }[];
+      };
+      const route = json.routes?.[0];
+      if (!route) return null;
+      return {
+        km: route.distance / 1000,
+        minutes: Math.max(1, Math.round(route.duration / 60)),
+        line: route.geometry.coordinates.map(([lng, lat]) => [lat, lng] as [number, number]),
+      };
+    },
+  });
+}
+
+function travelMinutesLabel(minutes: number) {
+  if (minutes < 60) return `${minutes} min en auto`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h} h${m ? ` ${m} min` : ""} en auto`;
+}
+
+function uberLink(from: MapPerson, to: MapPerson) {
+  const params = new URLSearchParams({
+    action: "setPickup",
+    "pickup[latitude]": String(from.lat),
+    "pickup[longitude]": String(from.lng),
+    "pickup[nickname]": "Donde estoy",
+    "dropoff[latitude]": String(to.lat),
+    "dropoff[longitude]": String(to.lng),
+    "dropoff[nickname]": to.name,
+  });
+  return `https://m.uber.com/ul/?${params.toString()}`;
+}
+
+function mapsLink(from: MapPerson, to: MapPerson) {
+  return `https://www.google.com/maps/dir/?api=1&origin=${from.lat},${from.lng}&destination=${to.lat},${to.lng}&travelmode=driving`;
 }
 
 function timeAgo(iso: string | null) {
@@ -177,6 +239,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
         .update({
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
+          location_accuracy: pos.coords.accuracy ?? null,
           location_updated_at: new Date().toISOString(),
           ...(opts.silent ? {} : { location_shares_until: until }),
         })
@@ -230,7 +293,12 @@ function DistanceAndMap({ userId }: { userId: string }) {
   }, [qc]);
 
   const both = people.length === 2;
+  const mePerson = people.find((p) => p.mine);
+  const otherPerson = people.find((p) => !p.mine);
   const km = both ? distanceKm(people[0]!.lat, people[0]!.lng, people[1]!.lat, people[1]!.lng) : null;
+  const { data: driving } = useDrivingRoute(mePerson, otherPerson);
+  const accuracy = me?.location_accuracy ?? null;
+
 
   return (
     <section className="surface overflow-hidden">
@@ -242,6 +310,26 @@ function DistanceAndMap({ userId }: { userId: string }) {
           <>
             <h1 className="mt-2 font-display text-5xl font-semibold">{distanceLabel(km)}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{distancePhrase(km)}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {driving
+                ? `${distanceLabel(driving.km)} por carretera · ${travelMinutesLabel(driving.minutes)}`
+                : "En línea recta"}
+              {accuracy && accuracy > 80 ? ` · aprox. ±${Math.round(accuracy)} m` : ""}
+            </p>
+            {mePerson && otherPerson && (
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <Button asChild className="rounded-full">
+                  <a href={uberLink(mePerson, otherPerson)} target="_blank" rel="noopener noreferrer">
+                    <Car className="mr-1 size-4" /> Pedir Uber para verla
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="rounded-full">
+                  <a href={mapsLink(mePerson, otherPerson)} target="_blank" rel="noopener noreferrer">
+                    <NavigationIcon className="mr-1 size-4" /> Abrir en Maps
+                  </a>
+                </Button>
+              </div>
+            )}
           </>
         ) : (
           <h1 className="mt-3 font-display text-2xl font-semibold">
@@ -261,7 +349,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
       <div className="relative h-72 bg-muted sm:h-96">
         {people.length > 0 ? (
           <Suspense fallback={<Skeleton className="size-full rounded-none" />}>
-            <CoupleMap people={people} />
+            <CoupleMap people={people} route={driving?.line ?? null} />
           </Suspense>
         ) : (
           <div className="flex size-full flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground">
