@@ -6,7 +6,9 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
+  Flame,
   Gift,
+  Hourglass,
   Heart,
   Images,
   Laugh,
@@ -53,6 +55,9 @@ const NAV = [
   { to: "/dedicatorias", label: "Dedicatorias", icon: Gift },
   { to: "/diario", label: "Diario", icon: Heart },
   { to: "/diversion", label: "Diversión", icon: Laugh },
+  { to: "/capsulas", label: "Cápsulas", icon: Hourglass },
+  { to: "/retos", label: "Retos", icon: Flame },
+  { to: "/canciones", label: "Canciones", icon: Music },
   { to: "/libro", label: "Libro", icon: BookOpen },
 ] as const;
 
