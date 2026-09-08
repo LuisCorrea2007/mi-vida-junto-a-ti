@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarHeart, Heart, Images, NotebookPen, Stars, Laugh, Video } from "lucide-react";
+import { Activity, CalendarHeart, Heart, Images, NotebookPen, Stars, Laugh, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { anniversaryOf, useProfiles } from "@/hooks/use-profiles";
@@ -268,5 +268,66 @@ function Panel() {
         </Button>
       </section>
     </div>
+  );
+}
+
+/** Qué ha hecho la otra persona últimamente (a partir de los avisos recibidos). */
+function ActivityWidget({ userId }: { userId: string }) {
+  const navigate = useNavigate();
+  const { data: activity } = useQuery({
+    queryKey: ["activity", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("id, title, message, link, created_at, type")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  return (
+    <section className="surface p-6">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-xl font-semibold">Lo último de tu pareja</h2>
+        <Link to="/cerca" className="text-xs text-primary hover:underline">
+          ¿Qué hace ahora?
+        </Link>
+      </div>
+      {activity?.length ? (
+        <ul className="mt-4 divide-y divide-border/60">
+          {activity.map((a) => (
+            <li key={a.id}>
+              <button
+                className="flex w-full items-start gap-3 py-3 text-left hover:opacity-80"
+                onClick={() => a.link && navigate({ href: a.link })}
+              >
+                <Activity className="mt-0.5 size-4 shrink-0 text-primary" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium">{a.title}</span>
+                  {a.message && (
+                    <span className="block truncate text-xs text-muted-foreground">{a.message}</span>
+                  )}
+                </span>
+                <span className="shrink-0 text-[11px] text-muted-foreground">
+                  {new Date(a.created_at).toLocaleString("es", {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="py-8 text-center text-sm text-muted-foreground">
+          Aquí verás lo que tu pareja suba, comente o cambie.
+        </p>
+      )}
+    </section>
   );
 }
