@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CitasRouteImport } from './routes/citas'
+import { Route as FotosRouteImport } from './routes/fotos'
 import { Route as AuthenticatedAjustesRouteImport } from './routes/_authenticated/ajustes'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
@@ -38,6 +40,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitasRoute = CitasRouteImport.update({
+  id: '/citas',
+  path: '/citas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FotosRoute = FotosRouteImport.update({
+  id: '/fotos',
+  path: '/fotos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAjustesRoute = AuthenticatedAjustesRouteImport.update({
@@ -110,6 +122,8 @@ const AuthenticatedNotasIdRoute = AuthenticatedNotasIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/citas': typeof CitasRoute
+  '/fotos': typeof FotosRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/cerca': typeof AuthenticatedCercaRoute
@@ -127,6 +141,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/citas': typeof CitasRoute
+  '/fotos': typeof FotosRoute
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/cerca': typeof AuthenticatedCercaRoute
@@ -146,6 +162,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/citas': typeof CitasRoute
+  '/fotos': typeof FotosRoute
   '/_authenticated/ajustes': typeof AuthenticatedAjustesRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
@@ -165,6 +183,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/citas'
+    | '/fotos'
     | '/ajustes'
     | '/calendario'
     | '/cerca'
@@ -182,6 +202,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/citas'
+    | '/fotos'
     | '/ajustes'
     | '/calendario'
     | '/cerca'
@@ -200,6 +222,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/citas'
+    | '/fotos'
     | '/_authenticated/ajustes'
     | '/_authenticated/calendario'
     | '/_authenticated/cerca'
@@ -219,6 +243,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CitasRoute: typeof CitasRoute
+  FotosRoute: typeof FotosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -242,6 +268,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/citas': {
+      id: '/citas'
+      path: '/citas'
+      fullPath: '/citas'
+      preLoaderRoute: typeof CitasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fotos': {
+      id: '/fotos'
+      path: '/fotos'
+      fullPath: '/fotos'
+      preLoaderRoute: typeof FotosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/ajustes': {
@@ -377,6 +417,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CitasRoute: CitasRoute,
+  FotosRoute: FotosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
