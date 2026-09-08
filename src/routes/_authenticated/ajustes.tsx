@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Upload } from "lucide-react";
+import { Check, Copy, HeartHandshake, Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { useMyProfile } from "@/hooks/use-profiles";
+import { useMyProfile, useProfiles } from "@/hooks/use-profiles";
+import { useCouple } from "@/hooks/use-couple";
 import { compressImage, uploadMedia, useSignedUrl, validateImage } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 
 export const Route = createFileRoute("/_authenticated/ajustes")({
   head: () => ({
@@ -32,6 +34,58 @@ function SettingsPage() {
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
   const [form, setForm] = useState({ name: "", anniversary: "", location: "" });
   const [busy, setBusy] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [copied, setCopied] = useState(false);
+  const { data: couple } = useCouple(user?.id);
+  const { data: profiles } = useProfiles();
+  const partner = profiles?.find((p) => p.id === couple?.partnerId);
+
+  const createSpace = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Sin sesión");
+      const { data, error } = await supabase
+        .from("couples")
+        .insert({ created_by: user.id, code: crypto.randomUUID() })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const { error: memberError } = await supabase
+        .from("couple_members")
+        .insert({ couple_id: data.id, user_id: user.id });
+      if (memberError) throw memberError;
+    },
+    onSuccess: () => {
+      toast.success("Espacio creado. Comparte el código con tu pareja.");
+      qc.invalidateQueries({ queryKey: ["couple"] });
+    },
+    onError: () => toast.error("No pudimos crear el espacio"),
+  });
+
+  const joinSpace = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error("Sin sesión");
+      const code = joinCode.trim();
+      if (!/^[0-9a-f-]{36}$/i.test(code)) throw new Error("Ese código no es válido");
+      const { error } = await supabase
+        .from("couple_members")
+        .insert({ couple_id: code, user_id: user.id });
+      if (error) throw new Error("No pudimos unirte: revisa el código o ya tiene dos personas");
+    },
+    onSuccess: () => {
+      setJoinCode("");
+      toast.success("¡Listo! Ya comparten el mismo espacio.");
+      qc.invalidateQueries();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  async function copyCode() {
+    if (!couple?.coupleId) return;
+    await navigator.clipboard.writeText(couple.coupleId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
 
   useEffect(() => {
     if (profile) {
@@ -162,8 +216,74 @@ function SettingsPage() {
         </Button>
       </section>
 
+      <section className="surface space-y-4 p-6">
+        <div className="flex items-center gap-2">
+          <HeartHandshake className="size-5 text-primary" />
+          <h2 className="font-display text-xl font-semibold">Su espacio de pareja</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Todo lo que guardan aquí es privado. Solo lo verán las dos personas vinculadas a este
+          espacio.
+        </p>
+
+        {!couple?.coupleId ? (
+          <div className="space-y-5">
+            <div>
+              <Button
+                className="rounded-full"
+                onClick={() => createSpace.mutate()}
+                disabled={createSpace.isPending}
+              >
+                Crear nuestro espacio
+              </Button>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Crea el espacio y comparte el código con tu pareja.
+              </p>
+            </div>
+            <div className="space-y-2 border-t pt-5">
+              <Label htmlFor="jc">Ya tengo un código</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="jc"
+                  placeholder="Pega aquí el código"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                />
+                <Button
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => joinSpace.mutate()}
+                  disabled={joinSpace.isPending}
+                >
+                  Unirme
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : partner ? (
+          <p className="text-sm">
+            Vinculado con <span className="font-semibold">{partner.name ?? "tu pareja"}</span>. Ya
+            se ven todo entre ustedes.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            <Label>Código de invitación</Label>
+            <div className="flex gap-2">
+              <Input readOnly value={couple.coupleId} className="font-mono text-xs" />
+              <Button variant="outline" className="rounded-full" onClick={copyCode}>
+                {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Envíale este código a tu pareja para que se una.
+            </p>
+          </div>
+        )}
+      </section>
+
       <section className="surface p-6">
         <h2 className="font-display text-xl font-semibold">Almacenamiento</h2>
+
         <p className="mt-2 text-sm text-muted-foreground">
           {storage ? `${storage.count} fotos · ${storage.mb} MB usados` : "Calculando…"}
         </p>
