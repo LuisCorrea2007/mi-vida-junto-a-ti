@@ -299,6 +299,26 @@ function DistanceAndMap({ userId }: { userId: string }) {
           <>
             <h1 className="mt-2 font-display text-5xl font-semibold">{distanceLabel(km)}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{distancePhrase(km)}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {driving
+                ? `${distanceLabel(driving.km)} por carretera · ${travelMinutesLabel(driving.minutes)}`
+                : "En línea recta"}
+              {accuracy && accuracy > 80 ? ` · aprox. ±${Math.round(accuracy)} m` : ""}
+            </p>
+            {mePerson && otherPerson && (
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <Button asChild className="rounded-full">
+                  <a href={uberLink(mePerson, otherPerson)} target="_blank" rel="noopener noreferrer">
+                    <Car className="mr-1 size-4" /> Pedir Uber para verla
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="rounded-full">
+                  <a href={mapsLink(mePerson, otherPerson)} target="_blank" rel="noopener noreferrer">
+                    <Navigation className="mr-1 size-4" /> Abrir en Maps
+                  </a>
+                </Button>
+              </div>
+            )}
           </>
         ) : (
           <h1 className="mt-3 font-display text-2xl font-semibold">
