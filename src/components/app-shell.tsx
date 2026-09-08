@@ -4,7 +4,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   BellRing,
+  BookOpen,
   CalendarHeart,
+  Gift,
   Heart,
   Images,
   Laugh,
@@ -24,6 +26,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMyProfile } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
 import { enablePush, pushSupported } from "@/lib/notify";
+import { GlobalSearch } from "@/components/global-search";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -47,8 +50,10 @@ const NAV = [
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
   { to: "/cerca", label: "Ahora", icon: MapPin },
   { to: "/deseos", label: "Deseos", icon: Stars },
+  { to: "/dedicatorias", label: "Dedicatorias", icon: Gift },
   { to: "/diario", label: "Diario", icon: Heart },
   { to: "/diversion", label: "Diversión", icon: Laugh },
+  { to: "/libro", label: "Libro", icon: BookOpen },
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
@@ -290,7 +295,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-1">
-            
+            {mounted && user && <GlobalSearch />}
             {mounted && user && <NotificationBell userId={user.id} />}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

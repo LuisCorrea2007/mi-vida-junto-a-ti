@@ -203,3 +203,25 @@
   color: var(--foreground);
   border-color: var(--border);
 }
+
+/* Impresión del libro de recuerdos */
+@media print {
+  header,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+  }
+  main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  .surface {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+}

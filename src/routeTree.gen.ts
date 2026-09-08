@@ -15,10 +15,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAjustesRouteImport } from './routes/_authenticated/ajustes'
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
+import { Route as AuthenticatedDedicatoriasRouteImport } from './routes/_authenticated/dedicatorias'
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
 import { Route as AuthenticatedDiversionRouteImport } from './routes/_authenticated/diversion'
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
+import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedNotasIndexRouteImport } from './routes/_authenticated/notas.index'
@@ -53,6 +55,12 @@ const AuthenticatedCercaRoute = AuthenticatedCercaRouteImport.update({
   path: '/cerca',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDedicatoriasRoute =
+  AuthenticatedDedicatoriasRouteImport.update({
+    id: '/dedicatorias',
+    path: '/dedicatorias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDeseosRoute = AuthenticatedDeseosRouteImport.update({
   id: '/deseos',
   path: '/deseos',
@@ -71,6 +79,11 @@ const AuthenticatedDiversionRoute = AuthenticatedDiversionRouteImport.update({
 const AuthenticatedGaleriaRoute = AuthenticatedGaleriaRouteImport.update({
   id: '/galeria',
   path: '/galeria',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLibroRoute = AuthenticatedLibroRouteImport.update({
+  id: '/libro',
+  path: '/libro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
@@ -100,10 +113,12 @@ export interface FileRoutesByFullPath {
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/cerca': typeof AuthenticatedCercaRoute
+  '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
+  '/libro': typeof AuthenticatedLibroRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/notas/$id': typeof AuthenticatedNotasIdRoute
@@ -115,10 +130,12 @@ export interface FileRoutesByTo {
   '/ajustes': typeof AuthenticatedAjustesRoute
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/cerca': typeof AuthenticatedCercaRoute
+  '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
+  '/libro': typeof AuthenticatedLibroRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/notas/$id': typeof AuthenticatedNotasIdRoute
@@ -132,10 +149,12 @@ export interface FileRoutesById {
   '/_authenticated/ajustes': typeof AuthenticatedAjustesRoute
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
+  '/_authenticated/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
   '/_authenticated/diversion': typeof AuthenticatedDiversionRoute
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
+  '/_authenticated/libro': typeof AuthenticatedLibroRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/notas/$id': typeof AuthenticatedNotasIdRoute
@@ -149,10 +168,12 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/calendario'
     | '/cerca'
+    | '/dedicatorias'
     | '/deseos'
     | '/diario'
     | '/diversion'
     | '/galeria'
+    | '/libro'
     | '/panel'
     | '/videos'
     | '/notas/$id'
@@ -164,10 +185,12 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/calendario'
     | '/cerca'
+    | '/dedicatorias'
     | '/deseos'
     | '/diario'
     | '/diversion'
     | '/galeria'
+    | '/libro'
     | '/panel'
     | '/videos'
     | '/notas/$id'
@@ -180,10 +203,12 @@ export interface FileRouteTypes {
     | '/_authenticated/ajustes'
     | '/_authenticated/calendario'
     | '/_authenticated/cerca'
+    | '/_authenticated/dedicatorias'
     | '/_authenticated/deseos'
     | '/_authenticated/diario'
     | '/_authenticated/diversion'
     | '/_authenticated/galeria'
+    | '/_authenticated/libro'
     | '/_authenticated/panel'
     | '/_authenticated/videos'
     | '/_authenticated/notas/$id'
@@ -240,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCercaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dedicatorias': {
+      id: '/_authenticated/dedicatorias'
+      path: '/dedicatorias'
+      fullPath: '/dedicatorias'
+      preLoaderRoute: typeof AuthenticatedDedicatoriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/deseos': {
       id: '/_authenticated/deseos'
       path: '/deseos'
@@ -266,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/galeria'
       fullPath: '/galeria'
       preLoaderRoute: typeof AuthenticatedGaleriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/libro': {
+      id: '/_authenticated/libro'
+      path: '/libro'
+      fullPath: '/libro'
+      preLoaderRoute: typeof AuthenticatedLibroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/panel': {
@@ -303,10 +342,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAjustesRoute: typeof AuthenticatedAjustesRoute
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
   AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
+  AuthenticatedDedicatoriasRoute: typeof AuthenticatedDedicatoriasRoute
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
   AuthenticatedDiversionRoute: typeof AuthenticatedDiversionRoute
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
+  AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedNotasIdRoute: typeof AuthenticatedNotasIdRoute
@@ -317,10 +358,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAjustesRoute: AuthenticatedAjustesRoute,
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedCercaRoute: AuthenticatedCercaRoute,
+  AuthenticatedDedicatoriasRoute: AuthenticatedDedicatoriasRoute,
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
   AuthenticatedDiversionRoute: AuthenticatedDiversionRoute,
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
+  AuthenticatedLibroRoute: AuthenticatedLibroRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedNotasIdRoute: AuthenticatedNotasIdRoute,
