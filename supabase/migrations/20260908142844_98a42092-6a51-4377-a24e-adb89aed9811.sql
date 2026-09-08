@@ -1,0 +1,16 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.note_replies;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.note_reactions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.note_attachments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.photos;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.photo_comments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.photo_reactions;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.events;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.wishes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.wish_comments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.wish_votes;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.fun_items;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.videos_diarios;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.video_comentarios;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.milestones;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.albums;
