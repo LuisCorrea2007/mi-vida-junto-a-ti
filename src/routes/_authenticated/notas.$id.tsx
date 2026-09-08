@@ -304,6 +304,7 @@ function NoteDetail() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { data: profiles } = useProfiles();
+  useRealtime("notes", "note_replies", "note_reactions", "note_attachments");
   const [reply, setReply] = useState("");
 
   const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";

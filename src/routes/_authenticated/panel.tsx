@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Activity, CalendarHeart, Heart, Images, NotebookPen, Stars, Laugh, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useRealtime } from "@/hooks/use-realtime";
+import { Recuerdos } from "@/components/recuerdos";
 import { anniversaryOf, useProfiles } from "@/hooks/use-profiles";
 import { DAILY_QUESTIONS, ROMANTIC_QUOTES, pickOfTheDay } from "@/lib/content";
 import { useSignedUrl } from "@/lib/media";
@@ -60,6 +62,7 @@ function PhotoTile({ path, caption }: { path: string; caption: string | null }) 
 function Panel() {
   const { user } = useAuth();
   const { data: profiles } = useProfiles();
+  useRealtime("notes", "photos", "events", "wishes", "notifications");
   const elapsed = useElapsed(anniversaryOf(profiles));
   const quote = pickOfTheDay(ROMANTIC_QUOTES);
   const question = pickOfTheDay(DAILY_QUESTIONS, 3);
