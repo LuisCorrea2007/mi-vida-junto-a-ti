@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,6 +81,15 @@ function AuthPage() {
     });
     return () => data.subscription.unsubscribe();
   }, []);
+
+  async function signInWith(email: string, password: string) {
+    if (!passSchema.safeParse(password).success) { toast.error("Mínimo 8 caracteres"); return; }
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) { toast.error("Contraseña incorrecta"); return; }
+    navigate({ to: "/panel", replace: true });
+  }
 
   async function signIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -321,6 +330,7 @@ function AuthPage() {
             Continuar con Google
           </Button>
         </div>
+        )}
       </div>
     </div>
   );
