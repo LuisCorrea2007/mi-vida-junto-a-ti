@@ -12,10 +12,11 @@ export type Profile = {
   longitude: number | null;
   location_updated_at: string | null;
   location_shares_until: string | null;
+  location_accuracy: number | null;
 };
 
 const COLUMNS =
-  "id, name, email, avatar_url, anniversary_date, location, latitude, longitude, location_updated_at, location_shares_until";
+  "id, name, email, avatar_url, anniversary_date, location, latitude, longitude, location_updated_at, location_shares_until, location_accuracy";
 
 export function useProfiles() {
   return useQuery({
