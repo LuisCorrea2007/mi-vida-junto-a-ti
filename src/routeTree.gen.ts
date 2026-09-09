@@ -28,6 +28,7 @@ import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedNotasIndexRouteImport } from './routes/_authenticated/notas.index'
 import { Route as AuthenticatedNotasIdRouteImport } from './routes/_authenticated/notas.$id'
 
@@ -126,6 +127,11 @@ const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedNotasIndexRoute = AuthenticatedNotasIndexRouteImport.update({
   id: '/notas/',
   path: '/notas/',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/videos': typeof AuthenticatedVideosRoute
+  '/api/chat': typeof ApiChatRoute
   '/notas/$id': typeof AuthenticatedNotasIdRoute
   '/notas/': typeof AuthenticatedNotasIndexRoute
 }
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/videos': typeof AuthenticatedVideosRoute
+  '/api/chat': typeof ApiChatRoute
   '/notas/$id': typeof AuthenticatedNotasIdRoute
   '/notas': typeof AuthenticatedNotasIndexRoute
 }
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
+  '/api/chat': typeof ApiChatRoute
   '/_authenticated/notas/$id': typeof AuthenticatedNotasIdRoute
   '/_authenticated/notas/': typeof AuthenticatedNotasIndexRoute
 }
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/retos'
     | '/videos'
+    | '/api/chat'
     | '/notas/$id'
     | '/notas/'
   fileRoutesByTo: FileRoutesByTo
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/retos'
     | '/videos'
+    | '/api/chat'
     | '/notas/$id'
     | '/notas'
   id:
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/_authenticated/panel'
     | '/_authenticated/retos'
     | '/_authenticated/videos'
+    | '/api/chat'
     | '/_authenticated/notas/$id'
     | '/_authenticated/notas/'
   fileRoutesById: FileRoutesById
@@ -281,6 +293,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CitasRoute: typeof CitasRoute
   FotosRoute: typeof FotosRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/notas/': {
       id: '/_authenticated/notas/'
       path: '/notas'
@@ -482,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CitasRoute: CitasRoute,
   FotosRoute: FotosRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
