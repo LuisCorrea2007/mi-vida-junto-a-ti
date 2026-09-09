@@ -1,7 +1,7 @@
 /** Envío de avisos al celular (solo en el servidor). */
 export async function sendPushTo(
   toUserId: string,
-  payload: { title: string; message?: string | null; link?: string | null },
+  payload: { title: string; message?: string | null | undefined; link?: string | null | undefined },
 ): Promise<{ sent: number }> {
   const privateKey = process.env["VAPID_PRIVATE_KEY"];
   const publicKey = process.env["VAPID_PUBLIC_KEY"];
