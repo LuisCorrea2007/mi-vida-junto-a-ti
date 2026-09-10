@@ -308,7 +308,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
           <Skeleton className="mx-auto mt-4 h-12 w-40" />
         ) : km !== null ? (
           <>
-            <h1 className="mt-2 font-display text-5xl font-semibold">{distanceLabel(km)}</h1>
+            <h1 className="mt-2 font-display text-4xl font-semibold sm:text-5xl">{distanceLabel(km)}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{distancePhrase(km)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {driving
@@ -453,7 +453,7 @@ function Heartbeat({ userId }: { userId: string }) {
   });
   const cooling = Date.now() - sentAt < 60_000;
   return (
-    <section className="surface flex items-center justify-between gap-4 p-5">
+    <section className="surface flex flex-col items-stretch justify-between gap-4 p-5 sm:flex-row sm:items-center">
       <div>
         <h2 className="font-display text-lg font-semibold">Mándale un latido</h2>
         <p className="text-xs text-muted-foreground">
@@ -462,7 +462,7 @@ function Heartbeat({ userId }: { userId: string }) {
       </div>
       <Button
         size="lg"
-        className="shrink-0 rounded-full px-5"
+        className="w-full shrink-0 rounded-full px-5 sm:w-auto"
         onClick={() => beat.mutate()}
         disabled={beat.isPending || cooling || !other}
       >
@@ -564,7 +564,7 @@ function EphemeralChat({ userId }: { userId: string }) {
 
   return (
     <section id="chat" className="surface flex flex-col overflow-hidden p-0">
-      <div className="flex items-center justify-between gap-3 border-b px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-5">
         <div className="flex items-center gap-3">
           <Avatar className="size-9 border border-border">
             <AvatarImage src={partnerAvatar ?? undefined} alt="" />
@@ -619,7 +619,7 @@ function EphemeralChat({ userId }: { userId: string }) {
                   )}
                   <div
                     className={cn(
-                      "group max-w-[78%] px-4 py-2 shadow-[var(--shadow-soft)]",
+                      "group max-w-[86%] break-words px-4 py-2 shadow-[var(--shadow-soft)] sm:max-w-[78%]",
                       mine
                         ? "rounded-2xl rounded-br-md bg-primary text-primary-foreground"
                         : "rounded-2xl rounded-bl-md bg-muted",
