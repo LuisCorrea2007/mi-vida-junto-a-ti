@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import type { ChatStatus, UIMessage } from "ai";
 import { ArrowLeft, HeartHandshake, Lock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { notifyPartner } from "@/lib/notify";
-import { threadTitleFrom, toolLabel } from "@/lib/advisor";
+import { threadTitleFrom } from "@/lib/advisor";
 import {
   Conversation,
   ConversationContent,
@@ -23,18 +22,50 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-  ToolOutput,
-  type ToolPart,
-} from "@/components/ai-elements/tool";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Search = { inicio?: string };
+
+type PuterToolCall = {
+  id: string;
+  function: { name: string; arguments: string };
+};
+
+type PuterMessage = {
+  role: string;
+  content?: unknown;
+  tool_calls?: PuterToolCall[];
+  tool_call_id?: string;
+};
+
+type PuterResponse =
+  | string
+  | {
+      message?: PuterMessage;
+      content?: unknown;
+      toString?: () => string;
+    };
+
+type PuterApi = {
+  auth: {
+    isSignedIn: () => boolean;
+    signIn: (options?: { attempt_temp_user_creation?: boolean }) => Promise<unknown>;
+  };
+  ai: {
+    chat: (
+      messages: string | PuterMessage[],
+      testMode?: boolean,
+      options?: Record<string, unknown>,
+    ) => Promise<PuterResponse>;
+  };
+};
+
+declare global {
+  interface Window {
+    puter?: PuterApi;
+  }
+}
 
 export const Route = createFileRoute("/_authenticated/consejero/$id")({
   validateSearch: (search: Record<string, unknown>): Search =>
@@ -58,12 +89,431 @@ export const Route = createFileRoute("/_authenticated/consejero/$id")({
 type Thread = { id: string; user_id: string; title: string; is_shared: boolean };
 type Row = { id: string; role: string; parts: unknown; user_id: string; created_at: string };
 
+const ADVISOR_TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "crear_nota",
+      description:
+        "Guarda una nota en la sección Notas. Úsala SOLO después de que el usuario haya confirmado explícitamente que quiere guardarla.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string", description: "Título corto de la nota" },
+          content: { type: "string", description: "Contenido completo de la nota" },
+        },
+        required: ["title", "content"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "crear_dedicatoria",
+      description:
+        "Guarda una dedicatoria de texto. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          content: { type: "string" },
+        },
+        required: ["title", "content"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "agendar_evento",
+      description:
+        "Agrega un plan al calendario. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          date: { type: "string", description: "Fecha YYYY-MM-DD" },
+          time: { type: "string", description: "Hora HH:MM, opcional" },
+          location: { type: "string", description: "Lugar, opcional" },
+          description: { type: "string", description: "Descripción, opcional" },
+        },
+        required: ["title", "date"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "crear_capsula",
+      description:
+        "Crea una cápsula del tiempo. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          content: { type: "string" },
+          open_at: {
+            type: "string",
+            description: "Fecha de apertura en ISO 8601 o YYYY-MM-DD",
+          },
+        },
+        required: ["title", "content", "open_at"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "crear_reto",
+      description:
+        "Crea un reto para la pareja. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          description: { type: "string" },
+        },
+        required: ["title"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "agregar_cancion",
+      description:
+        "Agrega una canción a Canciones. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          artist: { type: "string" },
+          url: { type: "string" },
+          note: { type: "string" },
+        },
+        required: ["title"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "agregar_frase",
+      description:
+        "Guarda una frase especial. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          content: { type: "string" },
+          author: { type: "string" },
+        },
+        required: ["content"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "registrar_animo",
+      description:
+        "Registra el ánimo del usuario. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          emoji: { type: "string" },
+          label: { type: "string" },
+          note: { type: "string" },
+        },
+        required: ["emoji", "label"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "avisar_pareja",
+      description:
+        "Envía un aviso a la pareja dentro de Nuestro Espacio. Úsala SOLO después de confirmación explícita del usuario.",
+      parameters: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          message: { type: "string" },
+          link: { type: "string", description: "Ruta interna de la app, opcional" },
+        },
+        required: ["title", "message"],
+      },
+    },
+  },
+] as const;
+
 function rowsToMessages(rows: Row[]): UIMessage[] {
   return rows.map((r) => ({
     id: r.id,
     role: r.role as UIMessage["role"],
     parts: (Array.isArray(r.parts) ? r.parts : []) as UIMessage["parts"],
   }));
+}
+
+function messageText(message: UIMessage) {
+  return message.parts
+    .filter((part) => part.type === "text")
+    .map((part) => part.text)
+    .join("\n")
+    .trim();
+}
+
+function newTextMessage(role: "user" | "assistant", text: string): UIMessage {
+  return {
+    id: `advisor-${role}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    role,
+    parts: [{ type: "text", text }],
+  };
+}
+
+function asString(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function optionalString(value: unknown) {
+  const text = asString(value);
+  return text || null;
+}
+
+function extractPuterText(response: PuterResponse): string {
+  if (typeof response === "string") return response.trim();
+  const content = response.message?.content ?? response.content;
+  if (typeof content === "string") return content.trim();
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (
+          part &&
+          typeof part === "object" &&
+          "text" in part &&
+          typeof (part as { text?: unknown }).text === "string"
+        ) {
+          return (part as { text: string }).text;
+        }
+        return "";
+      })
+      .join("\n")
+      .trim();
+  }
+  const rendered = response.toString?.();
+  return rendered && rendered !== "[object Object]" ? rendered.trim() : "";
+}
+
+async function buildAdvisorSystem(userId: string) {
+  const [{ data: profiles }, { data: moods }, { data: events }, { data: capsules }] =
+    await Promise.all([
+      supabase.from("profiles").select("id, name, location, anniversary_date").order("created_at"),
+      supabase
+        .from("moods")
+        .select("user_id, emoji, label, note, created_at")
+        .order("created_at", { ascending: false })
+        .limit(8),
+      supabase
+        .from("events")
+        .select("title, date, time, location, category")
+        .gte("date", new Date().toISOString().slice(0, 10))
+        .order("date")
+        .limit(6),
+      supabase
+        .from("time_capsules")
+        .select("title, open_at")
+        .is("opened_at", null)
+        .order("open_at")
+        .limit(4),
+    ]);
+
+  const myProfile = profiles?.find((profile) => profile.id === userId);
+  const partner = profiles?.find((profile) => profile.id !== userId);
+  const nameOf = (id: string) =>
+    id === userId ? (myProfile?.name ?? "yo") : (partner?.name ?? "mi pareja");
+  const anniversary = profiles?.find((profile) => profile.anniversary_date)?.anniversary_date;
+
+  return [
+    "Eres el Consejero de una pareja dentro de la app privada 'Nuestro Espacio'. Hablas siempre en español cercano, respetuoso y cálido, en segunda persona.",
+    "Tu trabajo es escuchar, ayudar a entender emociones y dar consejos concretos y personalizados para ESTA pareja. Evita respuestas genéricas.",
+    "Haz una pregunta a la vez cuando necesites entender mejor. No juzgues ni tomes partido.",
+    "No inventes recuerdos, conversaciones, fechas ni hechos que no aparezcan en el contexto o en los mensajes.",
+    "REGLA DE ACCIONES: nunca llames una herramienta en el mismo turno en el que propones guardar, crear, agendar o avisar algo. Primero explica lo que harías y pide confirmación. Solo usa una herramienta cuando el último mensaje del usuario confirme explícitamente que quiere que lo hagas.",
+    "Después de ejecutar una herramienta, explica brevemente qué se hizo y en qué sección de la app puede verlo.",
+    "Nunca afirmes que una acción se completó si la herramienta devolvió un error.",
+    "Nunca des consejos médicos o legales. Si detectas violencia o peligro, recomienda buscar ayuda profesional o de emergencia adecuada.",
+    `Hoy es ${new Date().toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}.`,
+    `Quien te escribe: ${myProfile?.name ?? "sin nombre"}${myProfile?.location ? ` (${myProfile.location})` : ""}.`,
+    partner
+      ? `Su pareja: ${partner.name ?? "sin nombre"}${partner.location ? ` (${partner.location})` : ""}.`
+      : "Todavía no hay pareja vinculada en la app.",
+    anniversary ? `Aniversario: ${anniversary}.` : "",
+    moods?.length
+      ? `Ánimos recientes: ${moods
+          .map(
+            (mood) =>
+              `${nameOf(mood.user_id)} ${mood.emoji} ${mood.label}${mood.note ? ` (${mood.note})` : ""}`,
+          )
+          .join("; ")}.`
+      : "",
+    events?.length
+      ? `Próximos planes: ${events
+          .map((event) => `${event.title} el ${event.date}${event.time ? ` a las ${event.time}` : ""}`)
+          .join("; ")}.`
+      : "No tienen planes próximos en el calendario.",
+    capsules?.length
+      ? `Cápsulas del tiempo pendientes: ${capsules
+          .map((capsule) => `${capsule.title} (abre ${capsule.open_at})`)
+          .join("; ")}.`
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+async function executeAdvisorTool(name: string, rawArgs: string, userId: string) {
+  let args: Record<string, unknown> = {};
+  try {
+    args = rawArgs ? (JSON.parse(rawArgs) as Record<string, unknown>) : {};
+  } catch {
+    throw new Error(`La IA envió datos inválidos para ${name}.`);
+  }
+
+  if (name === "crear_nota") {
+    const title = asString(args.title);
+    const content = asString(args.content);
+    if (!title || !content) throw new Error("La nota necesita título y contenido.");
+    const { error } = await supabase.from("notes").insert({ user_id: userId, title, content });
+    if (error) throw error;
+    return "Nota guardada correctamente en Notas.";
+  }
+
+  if (name === "crear_dedicatoria") {
+    const title = asString(args.title);
+    const content = asString(args.content);
+    if (!title || !content) throw new Error("La dedicatoria necesita título y contenido.");
+    const { error } = await supabase
+      .from("dedications")
+      .insert({ user_id: userId, kind: "text", title, content });
+    if (error) throw error;
+    return "Dedicatoria guardada correctamente en Dedicatorias.";
+  }
+
+  if (name === "agendar_evento") {
+    const title = asString(args.title);
+    const date = asString(args.date);
+    if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new Error("El evento necesita un título y una fecha válida YYYY-MM-DD.");
+    }
+    const { error } = await supabase.from("events").insert({
+      user_id: userId,
+      title,
+      date,
+      time: optionalString(args.time),
+      location: optionalString(args.location),
+      description: optionalString(args.description),
+      category: "cita",
+    });
+    if (error) throw error;
+    return "Plan agregado correctamente al Calendario.";
+  }
+
+  if (name === "crear_capsula") {
+    const title = asString(args.title);
+    const content = asString(args.content);
+    const rawOpenAt = asString(args.open_at);
+    const parsed = rawOpenAt ? new Date(rawOpenAt) : null;
+    if (!title || !content || !parsed || Number.isNaN(parsed.getTime())) {
+      throw new Error("La cápsula necesita título, contenido y una fecha de apertura válida.");
+    }
+    const { error } = await supabase.from("time_capsules").insert({
+      user_id: userId,
+      title,
+      content,
+      open_at: parsed.toISOString(),
+    });
+    if (error) throw error;
+    return "Cápsula creada correctamente en Cápsulas.";
+  }
+
+  if (name === "crear_reto") {
+    const title = asString(args.title);
+    if (!title) throw new Error("El reto necesita un título.");
+    const { error } = await supabase.from("challenges").insert({
+      user_id: userId,
+      title,
+      description: optionalString(args.description),
+    });
+    if (error) throw error;
+    return "Reto creado correctamente en Retos.";
+  }
+
+  if (name === "agregar_cancion") {
+    const title = asString(args.title);
+    if (!title) throw new Error("La canción necesita un título.");
+    const { error } = await supabase.from("songs").insert({
+      user_id: userId,
+      title,
+      artist: optionalString(args.artist),
+      url: optionalString(args.url),
+      note: optionalString(args.note),
+    });
+    if (error) throw error;
+    return "Canción agregada correctamente en Canciones.";
+  }
+
+  if (name === "agregar_frase") {
+    const content = asString(args.content);
+    if (!content) throw new Error("La frase no puede estar vacía.");
+    const { error } = await supabase.from("quotes").insert({
+      user_id: userId,
+      content,
+      author: optionalString(args.author),
+    });
+    if (error) throw error;
+    return "Frase guardada correctamente.";
+  }
+
+  if (name === "registrar_animo") {
+    const emoji = asString(args.emoji);
+    const label = asString(args.label);
+    if (!emoji || !label) throw new Error("El ánimo necesita emoji y descripción.");
+    const { error } = await supabase.from("moods").insert({
+      user_id: userId,
+      emoji,
+      label,
+      note: optionalString(args.note),
+    });
+    if (error) throw error;
+    return "Ánimo registrado correctamente.";
+  }
+
+  if (name === "avisar_pareja") {
+    const title = asString(args.title);
+    const message = asString(args.message);
+    if (!title || !message) throw new Error("El aviso necesita título y mensaje.");
+    await notifyPartner(userId, {
+      type: "consejero",
+      title,
+      message,
+      link: optionalString(args.link) ?? "/consejero",
+    });
+    return "Aviso enviado correctamente a tu pareja.";
+  }
+
+  throw new Error(`Acción desconocida: ${name}`);
+}
+
+function readablePuterError(error: unknown) {
+  const candidate = error as { error?: string; msg?: string; message?: string } | null;
+  if (candidate?.error === "popup_blocked") {
+    return "El navegador bloqueó la autorización de la IA. Permite ventanas emergentes y vuelve a enviar el mensaje.";
+  }
+  if (candidate?.error === "auth_window_closed") {
+    return "Se cerró la autorización de la IA. Vuelve a enviar el mensaje y acepta para continuar.";
+  }
+  return candidate?.msg || candidate?.message || "La IA gratuita no pudo responder. Intenta nuevamente.";
 }
 
 function ConsejeroThread() {
@@ -134,7 +584,7 @@ function ConsejeroThread() {
             {thread?.title ?? "Charla"}
           </h1>
           <p className="text-[11px] text-muted-foreground">
-            {thread?.is_shared ? "Los dos ven esta charla" : "Solo tú ves esta charla"}
+            {thread?.is_shared ? "Los dos ven esta charla" : "Solo tú ves esta charla"} · IA externa sin clave
           </p>
         </div>
         {thread?.user_id === user?.id && (
@@ -186,29 +636,12 @@ function ChatWindow({
 }) {
   const qc = useQueryClient();
   const [text, setText] = useState("");
+  const [messages, setMessages] = useState<UIMessage[]>(initialMessages);
+  const [status, setStatus] = useState<ChatStatus>("ready");
+  const [chatError, setChatError] = useState<string | null>(null);
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
   const savedRef = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)));
   const autoSentRef = useRef(false);
-
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport<UIMessage>({
-        api: "/api/chat",
-        headers: async () => {
-          const { data } = await supabase.auth.getSession();
-          const token = data.session?.access_token ?? "";
-          return { Authorization: `Bearer ${token}` };
-        },
-      }),
-    [],
-  );
-
-  const { messages, sendMessage, status, setMessages, error } = useChat<UIMessage>({
-    id: threadId,
-    messages: initialMessages,
-    transport,
-    onError: (e) => toast.error(e.message || "El Consejero no pudo responder"),
-  });
 
   const busy = status === "submitted" || status === "streaming";
 
@@ -269,12 +702,43 @@ function ChatWindow({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isShared, setMessages, threadId, userId]);
+  }, [isShared, threadId, userId]);
 
   async function send(value: string) {
     const clean = value.trim();
     if (!clean || busy) return;
+
+    const puter = window.puter;
+    if (!puter) {
+      const message = "La IA gratuita todavía no cargó. Recarga la página e intenta de nuevo.";
+      setChatError(message);
+      setStatus("error");
+      toast.error(message);
+      return;
+    }
+
+    // La autenticación de Puter se inicia directamente desde el gesto del usuario
+    // para que el navegador no bloquee la ventana. No requiere API key del proyecto.
+    try {
+      if (!puter.auth.isSignedIn()) {
+        await puter.auth.signIn({ attempt_temp_user_creation: true });
+      }
+    } catch (error) {
+      const message = readablePuterError(error);
+      setChatError(message);
+      setStatus("error");
+      toast.error(message);
+      return;
+    }
+
     setText("");
+    setChatError(null);
+    setStatus("submitted");
+
+    const userMessage = newTextMessage("user", clean);
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
+
     if (messages.length === 0) {
       await supabase
         .from("advisor_threads")
@@ -283,15 +747,74 @@ function ChatWindow({
       qc.invalidateQueries({ queryKey: ["advisor-thread", threadId] });
       qc.invalidateQueries({ queryKey: ["advisor-threads"] });
     }
-    await sendMessage({ text: clean });
-    areaRef.current?.focus();
+
+    try {
+      const system = await buildAdvisorSystem(userId);
+      const history: PuterMessage[] = nextMessages
+        .slice(-30)
+        .map((message) => ({ role: message.role, content: messageText(message) }))
+        .filter((message) => asString(message.content));
+      const conversation: PuterMessage[] = [{ role: "system", content: system }, ...history];
+
+      const first = await puter.ai.chat(conversation, false, {
+        model: "gpt-5.6-luna",
+        stream: false,
+        temperature: 0.7,
+        max_tokens: 1400,
+        tools: ADVISOR_TOOLS,
+      });
+
+      const toolCalls = typeof first === "string" ? [] : (first.message?.tool_calls ?? []);
+      let answer = "";
+
+      if (toolCalls.length > 0 && typeof first !== "string" && first.message) {
+        conversation.push(first.message);
+        for (const call of toolCalls) {
+          let result: string;
+          try {
+            result = await executeAdvisorTool(call.function.name, call.function.arguments, userId);
+          } catch (error) {
+            result = `ERROR: ${error instanceof Error ? error.message : "No se pudo completar la acción."}`;
+          }
+          conversation.push({ role: "tool", tool_call_id: call.id, content: result });
+        }
+        await qc.invalidateQueries();
+
+        const final = await puter.ai.chat(conversation, false, {
+          model: "gpt-5.6-luna",
+          stream: false,
+          temperature: 0.7,
+          max_tokens: 1200,
+        });
+        answer = extractPuterText(final);
+      } else {
+        answer = extractPuterText(first);
+      }
+
+      if (!answer) throw new Error("La IA respondió sin texto.");
+      setMessages((current) => [...current, newTextMessage("assistant", answer)]);
+      setStatus("ready");
+    } catch (error) {
+      const message = readablePuterError(error);
+      setChatError(message);
+      setStatus("error");
+      toast.error(message);
+    } finally {
+      areaRef.current?.focus();
+    }
   }
 
-  // Manda solo el atajo con el que se abrió la charla.
+  // Si la charla se abrió con un atajo y Puter ya está autorizado, se envía solo.
+  // Si aún no lo está, deja el texto listo para que el usuario pulse enviar y el
+  // navegador permita la autorización desde ese gesto.
   useEffect(() => {
     if (!autoSend || autoSentRef.current || messages.length > 0) return;
     autoSentRef.current = true;
-    send(autoSend);
+    if (window.puter?.auth.isSignedIn()) {
+      void send(autoSend);
+    } else {
+      setText(autoSend);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSend]);
 
@@ -307,48 +830,26 @@ function ChatWindow({
             <ConversationEmptyState
               icon={<HeartHandshake className="size-8 text-primary" />}
               title="Cuéntame cómo te sientes"
-              description="Lo que escribas aquí queda entre ustedes. Puedo escuchar, aconsejar y también escribir notas o agendar planes si me lo pides."
+              description="El Consejero usa IA externa sin una API key de Lovable. La primera vez puede pedir una autorización gratuita de Puter."
             />
           ) : (
-            messages.map((m) => (
-              <Message from={m.role} key={m.id}>
+            messages.map((message) => (
+              <Message from={message.role} key={message.id}>
                 <MessageContent>
-                  {m.parts.map((part, i) => {
-                    const key = `${m.id}-${i}`;
+                  {message.parts.map((part, index) => {
                     if (part.type === "text") {
-                      return <MessageResponse key={key}>{part.text}</MessageResponse>;
+                      return (
+                        <MessageResponse key={`${message.id}-${index}`}>{part.text}</MessageResponse>
+                      );
                     }
                     if (part.type === "reasoning") {
                       return (
-                        <p key={key} className="text-xs italic text-muted-foreground">
+                        <p
+                          key={`${message.id}-${index}`}
+                          className="text-xs italic text-muted-foreground"
+                        >
                           {part.text}
                         </p>
-                      );
-                    }
-                    if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
-                      const tp = part as ToolPart;
-                      return (
-                        <Tool defaultOpen={false} key={key}>
-                          <ToolHeader
-                            title={toolLabel(tp.type)}
-                            {...(tp.type === "dynamic-tool"
-                              ? { type: tp.type, state: tp.state, toolName: tp.toolName }
-                              : { type: tp.type, state: tp.state })}
-                          />
-                          <ToolContent>
-                            <ToolInput input={tp.input} />
-                            <ToolOutput
-                              errorText={"errorText" in tp ? tp.errorText : undefined}
-                              output={
-                                "output" in tp && tp.output ? (
-                                  <pre className="overflow-x-auto text-xs">
-                                    {JSON.stringify(tp.output, null, 2)}
-                                  </pre>
-                                ) : undefined
-                              }
-                            />
-                          </ToolContent>
-                        </Tool>
                       );
                     }
                     return null;
@@ -358,11 +859,7 @@ function ChatWindow({
             ))
           )}
           {status === "submitted" && <Shimmer>Pensando en ustedes…</Shimmer>}
-          {error && (
-            <p className="text-xs text-destructive">
-              {error.message || "Algo falló al responder. Intenta otra vez."}
-            </p>
-          )}
+          {chatError && <p className="text-xs text-destructive">{chatError}</p>}
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
@@ -371,14 +868,14 @@ function ChatWindow({
         <PromptInput
           onSubmit={(message, event) => {
             event.preventDefault();
-            send(message.text || text);
+            void send(message.text || text);
           }}
         >
           <PromptInputTextarea
             ref={areaRef}
             autoFocus
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(event) => setText(event.target.value)}
             placeholder="Cuéntame qué pasó hoy…"
           />
           <PromptInputFooter className="justify-end">
