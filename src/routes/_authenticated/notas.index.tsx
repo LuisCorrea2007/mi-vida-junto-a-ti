@@ -191,7 +191,7 @@ function NotesPage() {
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-52 flex-1">
+        <div className="relative min-w-0 basis-full sm:min-w-52 sm:basis-auto sm:flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
@@ -201,7 +201,7 @@ function NotesPage() {
           />
         </div>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-44">
+          <SelectTrigger className="w-full sm:w-44">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
