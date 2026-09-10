@@ -59,11 +59,11 @@ function Landing() {
       </header>
 
       <section className="warm-gradient relative overflow-hidden">
-        <div className="mx-auto max-w-3xl px-4 py-24 text-center">
+        <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-24">
           <p className="animate-fade-up text-xs font-medium uppercase tracking-[0.28em] text-primary">
             privado · sin ruido · para dos
           </p>
-          <h1 className="animate-fade-up mt-5 font-display text-5xl font-semibold leading-tight text-foreground sm:text-6xl">
+          <h1 className="animate-fade-up mt-5 font-display text-4xl font-semibold leading-tight text-foreground sm:text-6xl">
             Todo lo nuestro, en un<span className="text-gradient"> solo lugar</span>
           </h1>
           <p className="animate-fade-up mx-auto mt-6 max-w-xl text-base text-muted-foreground">
@@ -71,10 +71,10 @@ function Landing() {
             citas que planean y los hitos que quieren recordar siempre.
           </p>
           <div className="animate-fade-up mt-9 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="rounded-full px-8 shadow-[var(--shadow-lift)]">
+            <Button asChild size="lg" className="w-full rounded-full px-6 shadow-[var(--shadow-lift)] min-[420px]:w-auto sm:px-8">
               <Link to="/auth">Crear nuestro espacio</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full px-8">
+            <Button asChild size="lg" variant="outline" className="w-full rounded-full px-6 min-[420px]:w-auto sm:px-8">
               <Link to="/auth">Ya tenemos cuenta</Link>
             </Button>
           </div>
