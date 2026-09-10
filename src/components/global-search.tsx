@@ -48,7 +48,7 @@ async function searchAll(q: string): Promise<Result[]> {
   for (const d of deds.data ?? [])
     out.push({ kind: "Dedicatorias", label: "Dedicatoria", icon: Mail, id: d.id, title: d.title, to: `/dedicatorias#ded-${d.id}` });
   for (const p of photos.data ?? [])
-    out.push({ kind: "Fotos", label: "Foto", icon: Images, id: p.id, title: p.caption ?? "Foto", to: "/galeria" });
+    out.push({ kind: "Fotos", label: "Foto", icon: Images, id: p.id, title: p.caption ?? "Foto", to: `/galeria?foto=${p.id}` });
   for (const v of videos.data ?? [])
     out.push({ kind: "Videos", label: "Video", icon: Video, id: v.id, title: v.titulo, to: `/videos#video-${v.id}` });
   for (const e of events.data ?? [])
@@ -59,12 +59,12 @@ async function searchAll(q: string): Promise<Result[]> {
       id: e.id,
       title: e.title,
       sub: new Date(`${e.date}T00:00:00`).toLocaleDateString("es", { day: "numeric", month: "long" }),
-      to: "/calendario",
+      to: `/calendario#${e.id}`,
     });
   for (const w of wishes.data ?? [])
-    out.push({ kind: "Deseos", label: "Deseo", icon: Stars, id: w.id, title: w.title, to: "/deseos" });
+    out.push({ kind: "Deseos", label: "Deseo", icon: Stars, id: w.id, title: w.title, to: `/deseos#${w.id}` });
   for (const f of fun.data ?? [])
-    out.push({ kind: "Diversión", label: "Diversión", icon: Laugh, id: f.id, title: f.content.slice(0, 60), to: "/diversion" });
+    out.push({ kind: "Diversión", label: "Diversión", icon: Laugh, id: f.id, title: f.content.slice(0, 60), to: `/diversion#${f.id}` });
   return out;
 }
 
@@ -132,7 +132,7 @@ export function GlobalSearch() {
         <Search className="size-5" />
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="top-[15%] max-w-lg translate-y-0 p-0">
+        <DialogContent className="top-4 max-w-lg translate-y-0 p-0 sm:top-[15%]">
           <DialogTitle className="sr-only">Buscar</DialogTitle>
           <div className="flex items-center gap-2 border-b border-border/60 px-4 py-3">
             {isFetching ? (
@@ -145,7 +145,7 @@ export function GlobalSearch() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Busca notas, fotos, videos, deseos…"
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
             {q && (
               <button onClick={() => setQ("")} aria-label="Limpiar">
