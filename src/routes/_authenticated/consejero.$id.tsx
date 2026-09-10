@@ -781,7 +781,8 @@ function ChatWindow({
         .slice(-30)
         .map((message) => ({ role: message.role, content: messageText(message) }))
         .filter((message) => asString(message.content));
-      const conversation: PuterMessage[] = [{ role: "system", content: system }, ...history];\n      const actionConfirmed = hasExplicitActionConfirmation(messages, clean);
+      const conversation: PuterMessage[] = [{ role: "system", content: system }, ...history];
+      const actionConfirmed = hasExplicitActionConfirmation(messages, clean);
 
       const first = await puter.ai.chat(conversation, false, {
         model: "gpt-5.6-luna",
