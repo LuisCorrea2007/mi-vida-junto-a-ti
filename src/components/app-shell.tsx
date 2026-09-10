@@ -65,7 +65,10 @@ const NAV = [
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
-const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;\n\n/** En escritorio mantenemos visibles las secciones más usadas y agrupamos el resto. */\nconst DESKTOP_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria", "/calendario"] as const;
+const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;
+
+/** En escritorio mantenemos visibles las secciones más usadas y agrupamos el resto. */
+const DESKTOP_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria", "/calendario"] as const;
 
 function isRouteActive(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
@@ -141,6 +144,7 @@ function NotificationBell({ userId }: { userId: string }) {
       const { data, error } = await supabase
         .from("notifications")
         .select("id, title, message, link, is_read, created_at")
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
@@ -290,6 +294,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
+  const desktopPrimary = NAV.filter((item) =>
+    (DESKTOP_PRIMARY as readonly string[]).includes(item.to),
+  );
+  const desktopSecondary = NAV.filter(
+    (item) => !(DESKTOP_PRIMARY as readonly string[]).includes(item.to),
+  );
+  const desktopMoreActive =
+    desktopSecondary.some((item) => isRouteActive(pathname, item.to)) ||
+    pathname === "/ajustes";
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
@@ -412,7 +426,7 @@ function MobileNav({ pathname }: { pathname: string }) {
               <span
                 className={cn(
                   "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
-                  pathname === item.to && "bg-primary/15",
+                  isRouteActive(pathname, item.to) && "bg-primary/15",
                 )}
               >
                 <item.icon className="size-5" />
