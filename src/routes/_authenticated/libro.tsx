@@ -139,7 +139,7 @@ function BookPage() {
       ) : (
         <div className="space-y-8 print:space-y-10">
           {/* Portada */}
-          <section className="surface warm-gradient break-inside-avoid p-10 text-center print:rounded-none">
+          <section className="surface warm-gradient break-inside-avoid p-5 text-center sm:p-10 print:rounded-none">
             <BookOpen className="mx-auto size-8 text-primary" />
             <p className="mt-4 text-xs uppercase tracking-[0.3em] text-primary">Nuestro Espacio · {year}</p>
             <h2 className="mt-3 font-display text-4xl font-semibold sm:text-5xl">{names}</h2>
@@ -154,7 +154,7 @@ function BookPage() {
                 {days != null && ` · ${days.toLocaleString("es")} días de amor`}
               </p>
             )}
-            <div className="mx-auto mt-6 grid max-w-md grid-cols-4 gap-3 text-center">
+            <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3 text-center min-[420px]:grid-cols-4">
               {[
                 { icon: Images, n: data.photos.length, label: "Fotos" },
                 { icon: NotebookPen, n: data.notes.length, label: "Notas" },
