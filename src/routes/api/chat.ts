@@ -290,7 +290,7 @@ export const Route = createFileRoute("/api/chat")({
           const result = streamText({
             model: createAdvisorModel(apiKey, request),
             system,
-            messages: convertToModelMessages(messages as UIMessage[]),
+            messages: await convertToModelMessages(messages as UIMessage[]),
             tools,
             stopWhen: stepCountIs(50),
             providerOptions: ADVISOR_PROVIDER_OPTIONS as never,
