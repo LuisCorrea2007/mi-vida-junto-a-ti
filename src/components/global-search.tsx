@@ -3,11 +3,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   CalendarHeart,
+  Flame,
+  Heart,
+  Hourglass,
   Images,
   Laugh,
   Loader2,
   Mail,
+  MessageCircleHeart,
+  Music,
   NotebookPen,
+  Quote,
   Search,
   Star,
   Stars,
@@ -29,11 +35,39 @@ type Result = {
   to: string;
 };
 
-const KIND_ORDER = ["Notas", "Dedicatorias", "Fotos", "Videos", "Citas", "Deseos", "Diversión"];
+const KIND_ORDER = [
+  "Notas",
+  "Dedicatorias",
+  "Fotos",
+  "Videos",
+  "Citas",
+  "Deseos",
+  "Diversión",
+  "Canciones",
+  "Frases",
+  "Cápsulas",
+  "Retos",
+  "Diario",
+  "Consejero",
+];
 
 async function searchAll(q: string): Promise<Result[]> {
   const like = `%${q}%`;
-  const [notes, deds, photos, videos, events, wishes, fun] = await Promise.all([
+  const [
+    notes,
+    deds,
+    photos,
+    videos,
+    events,
+    wishes,
+    fun,
+    songs,
+    quotes,
+    capsules,
+    challenges,
+    milestones,
+    advisorThreads,
+  ] = await Promise.all([
     supabase.from("notes").select("id, title, category").ilike("title", like).limit(6),
     supabase.from("dedications").select("id, title, kind").ilike("title", like).limit(6),
     supabase.from("photos").select("id, caption").ilike("caption", like).limit(6),
@@ -41,6 +75,12 @@ async function searchAll(q: string): Promise<Result[]> {
     supabase.from("events").select("id, title, date").ilike("title", like).limit(6),
     supabase.from("wishes").select("id, title").ilike("title", like).limit(6),
     supabase.from("fun_items").select("id, content, category").ilike("content", like).limit(6),
+    supabase.from("songs").select("id, title, artist").ilike("title", like).limit(6),
+    supabase.from("quotes").select("id, content, author").ilike("content", like).limit(6),
+    supabase.from("time_capsules").select("id, title, open_at").ilike("title", like).limit(6),
+    supabase.from("challenges").select("id, title, description").ilike("title", like).limit(6),
+    supabase.from("milestones").select("id, title, date").ilike("title", like).limit(6),
+    supabase.from("advisor_threads").select("id, title, is_shared").ilike("title", like).limit(6),
   ]);
   const out: Result[] = [];
   for (const n of notes.data ?? [])
@@ -64,7 +104,73 @@ async function searchAll(q: string): Promise<Result[]> {
   for (const w of wishes.data ?? [])
     out.push({ kind: "Deseos", label: "Deseo", icon: Stars, id: w.id, title: w.title, to: `/deseos#${w.id}` });
   for (const f of fun.data ?? [])
-    out.push({ kind: "Diversión", label: "Diversión", icon: Laugh, id: f.id, title: f.content.slice(0, 60), to: `/diversion#${f.id}` });
+    out.push({
+      kind: "Diversión",
+      label: "Diversión",
+      icon: Laugh,
+      id: f.id,
+      title: f.content.slice(0, 60),
+      to: `/diversion#fun-${f.id}`,
+    });
+  for (const s of songs.data ?? [])
+    out.push({
+      kind: "Canciones",
+      label: "Canción",
+      icon: Music,
+      id: s.id,
+      title: s.title,
+      sub: s.artist,
+      to: `/canciones#${s.id}`,
+    });
+  for (const q of quotes.data ?? [])
+    out.push({
+      kind: "Frases",
+      label: "Frase",
+      icon: Quote,
+      id: q.id,
+      title: q.content.slice(0, 70),
+      sub: q.author,
+      to: `/canciones#quote-${q.id}`,
+    });
+  for (const cap of capsules.data ?? [])
+    out.push({
+      kind: "Cápsulas",
+      label: "Cápsula",
+      icon: Hourglass,
+      id: cap.id,
+      title: cap.title,
+      sub: new Date(cap.open_at).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" }),
+      to: `/capsulas#${cap.id}`,
+    });
+  for (const challenge of challenges.data ?? [])
+    out.push({
+      kind: "Retos",
+      label: "Reto",
+      icon: Flame,
+      id: challenge.id,
+      title: challenge.title,
+      sub: challenge.description,
+      to: `/retos#${challenge.id}`,
+    });
+  for (const milestone of milestones.data ?? [])
+    out.push({
+      kind: "Diario",
+      label: "Momento",
+      icon: Heart,
+      id: milestone.id,
+      title: milestone.title,
+      sub: new Date(`${milestone.date}T00:00:00`).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" }),
+      to: `/diario#${milestone.id}`,
+    });
+  for (const thread of advisorThreads.data ?? [])
+    out.push({
+      kind: "Consejero",
+      label: thread.is_shared ? "Charla compartida" : "Charla privada",
+      icon: MessageCircleHeart,
+      id: thread.id,
+      title: thread.title,
+      to: `/consejero/${thread.id}`,
+    });
   return out;
 }
 
@@ -80,7 +186,7 @@ async function loadFavorites(): Promise<Result[]> {
   for (const d of deds.data ?? [])
     out.push({ kind: "Dedicatorias", label: "Dedicatoria", icon: Mail, id: d.id, title: d.title, to: `/dedicatorias#ded-${d.id}` });
   for (const p of photos.data ?? [])
-    out.push({ kind: "Fotos", label: "Foto", icon: Images, id: p.id, title: p.caption ?? "Foto", to: "/galeria" });
+    out.push({ kind: "Fotos", label: "Foto", icon: Images, id: p.id, title: p.caption ?? "Foto", to: `/galeria?foto=${p.id}` });
   return out;
 }
 
@@ -144,7 +250,7 @@ export function GlobalSearch() {
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Busca notas, fotos, videos, deseos…"
+              placeholder="Busca en todo su espacio…"
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
             {q && (
