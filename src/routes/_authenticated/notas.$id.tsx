@@ -264,7 +264,7 @@ function DocumentCard({
           {formatSize(attachment.file_size) ? " · " : ""}
           {author} · {whenLabel(attachment.created_at)}
         </p>
-        <div className="mt-2 flex gap-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline" className="h-7 rounded-full px-3 text-xs" disabled={!url}>
             <a href={url ?? "#"} target="_blank" rel="noopener noreferrer">
               <Eye className="mr-1 size-3.5" /> Ver
@@ -560,7 +560,7 @@ function NoteDetail() {
         <ArrowLeft className="size-4" /> Notas
       </Link>
 
-      <article className="surface animate-fade-up p-7">
+      <article className="surface animate-fade-up p-4 sm:p-7">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{labelFor(NOTE_CATEGORIES, note.category)}</Badge>
           <span className="text-xs text-muted-foreground">
@@ -670,7 +670,7 @@ function NoteDetail() {
 
           {linkOpen && (
             <form
-              className="mt-3 flex gap-2"
+              className="mt-3 flex flex-col gap-2 sm:flex-row"
               onSubmit={(e) => {
                 e.preventDefault();
                 addLink.mutate();
