@@ -280,6 +280,33 @@ function optionalString(value: unknown) {
   return text || null;
 }
 
+function hasExplicitActionConfirmation(history: UIMessage[], currentText: string) {
+  const normalized = currentText
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+  const affirmative =
+    /^(si|dale|hazlo|hazla|guardalo|guardala|agendalo|agendala|crealo|creala|envialo|enviala|registralo|registrala|confirmo)(\b|[,.!])/i.test(
+      normalized,
+    ) || /^(si\s+por\s+favor|si\s+hazlo|si\s+guardalo|si\s+guardala)$/i.test(normalized);
+
+  if (!affirmative) return false;
+
+  const previousAssistant = [...history].reverse().find((message) => message.role === "assistant");
+  if (!previousAssistant) return false;
+
+  const previousText = messageText(previousAssistant)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+  return /(quieres que|confirmas|confirmame|puedo (guard|agend|cre|envi|registr)|lo (guardo|agendo|creo|envio|registro)|la (guardo|agendo|creo|envio|registro))/i.test(
+    previousText,
+  );
+}
+
 function extractPuterText(response: PuterResponse): string {
   if (typeof response === "string") return response.trim();
   const content = response.message?.content ?? response.content;
@@ -573,7 +600,7 @@ function ConsejeroThread() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button asChild variant="ghost" size="icon-sm" aria-label="Volver">
           <Link to="/consejero">
             <ArrowLeft className="size-4" />
@@ -588,7 +615,7 @@ function ConsejeroThread() {
           </p>
         </div>
         {thread?.user_id === user?.id && (
-          <Button variant="outline" size="sm" className="rounded-full" onClick={toggleShared}>
+          <Button variant="outline" size="sm" className="w-full justify-center rounded-full sm:w-auto" onClick={toggleShared}>
             {thread?.is_shared ? (
               <>
                 <Lock className="mr-1 size-3.5" /> Hacer privada
@@ -754,11 +781,14 @@ function ChatWindow({
         .slice(-30)
         .map((message) => ({ role: message.role, content: messageText(message) }))
         .filter((message) => asString(message.content));
-      const conversation: PuterMessage[] = [{ role: "system", content: system }, ...history];
+      const conversation: PuterMessage[] = [{ role: "system", content: system }, ...history];\n      const actionConfirmed = hasExplicitActionConfirmation(messages, clean);
 
       const first = await puter.ai.chat(conversation, false, {
         model: "gpt-5.6-luna",
         stream: false,
+        normalize: true,
+        reasoning_effort: "low",
+        verbosity: "medium",
         temperature: 0.7,
         max_tokens: 1400,
         tools: ADVISOR_TOOLS,
@@ -771,10 +801,15 @@ function ChatWindow({
         conversation.push(first.message);
         for (const call of toolCalls) {
           let result: string;
-          try {
-            result = await executeAdvisorTool(call.function.name, call.function.arguments, userId);
-          } catch (error) {
-            result = `ERROR: ${error instanceof Error ? error.message : "No se pudo completar la acción."}`;
+          if (!actionConfirmed) {
+            result =
+              "ERROR: La aplicación bloqueó la acción porque aún falta una confirmación explícita del usuario. Pide confirmación y no afirmes que se realizó.";
+          } else {
+            try {
+              result = await executeAdvisorTool(call.function.name, call.function.arguments, userId);
+            } catch (error) {
+              result = `ERROR: ${error instanceof Error ? error.message : "No se pudo completar la acción."}`;
+            }
           }
           conversation.push({ role: "tool", tool_call_id: call.id, content: result });
         }
@@ -783,6 +818,9 @@ function ChatWindow({
         const final = await puter.ai.chat(conversation, false, {
           model: "gpt-5.6-luna",
           stream: false,
+          normalize: true,
+          reasoning_effort: "low",
+          verbosity: "medium",
           temperature: 0.7,
           max_tokens: 1200,
         });
@@ -823,9 +861,9 @@ function ChatWindow({
   }, [threadId, status]);
 
   return (
-    <div className="surface flex h-[70vh] min-h-[26rem] flex-col overflow-hidden">
+    <div className="surface flex h-[calc(100dvh-12rem)] min-h-[24rem] max-h-[52rem] min-w-0 flex-col overflow-hidden lg:h-[min(72vh,52rem)]">
       <Conversation className="flex-1">
-        <ConversationContent className="gap-6">
+        <ConversationContent className="gap-4 p-3 sm:gap-6 sm:p-4">
           {messages.length === 0 ? (
             <ConversationEmptyState
               icon={<HeartHandshake className="size-8 text-primary" />}
