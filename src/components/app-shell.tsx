@@ -65,7 +65,7 @@ const NAV = [
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
-const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;
+const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;\n\n/** En escritorio mantenemos visibles las secciones más usadas y agrupamos el resto. */\nconst DESKTOP_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria", "/calendario"] as const;
 
 function PushBanner({ userId }: { userId: string }) {
   const [show, setShow] = useState(false);
@@ -191,7 +191,7 @@ function NotificationBell({ userId }: { userId: string }) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0">
+      <PopoverContent align="end" className="w-[min(20rem,calc(100vw-1rem))] p-0">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <p className="font-display text-sm font-semibold">Notificaciones</p>
           {unread > 0 && (
@@ -277,30 +277,63 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4">
-          <Link to="/panel" className="flex items-center gap-2">
+        <div className="mx-auto flex h-16 max-w-6xl min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
+          <Link to="/panel" className="flex shrink-0 items-center gap-2">
             <Heart className="size-5 fill-primary text-primary" />
-            <span className="font-display text-lg font-semibold tracking-tight">
+            <span className="hidden font-display text-base font-semibold tracking-tight min-[390px]:inline lg:text-lg">
               Nuestro Espacio
             </span>
           </Link>
 
-          <nav className="ml-6 hidden items-center gap-1 md:flex">
-            {NAV.map((item) => (
+          <nav className="ml-2 hidden min-w-0 items-center gap-1 lg:flex xl:ml-4">
+            {desktopPrimary.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                  "rounded-full px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground xl:px-3",
                   pathname === item.to && "bg-accent text-accent-foreground",
                 )}
               >
                 {item.label}
               </Link>
             ))}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "rounded-full px-2.5 text-muted-foreground xl:px-3",
+                    desktopMoreActive && "bg-accent text-accent-foreground",
+                  )}
+                >
+                  <LayoutGrid className="size-4" />
+                  Más
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-52">
+                {desktopSecondary.map((item) => (
+                  <DropdownMenuItem key={item.to} asChild>
+                    <Link to={item.to}>
+                      <item.icon className="mr-2 size-4" />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/ajustes">
+                    <Settings className="mr-2 size-4" />
+                    Ajustes
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
             {mounted && user && <GlobalSearch />}
             {mounted && user && <NotificationBell userId={user.id} />}
             <DropdownMenu>
@@ -335,7 +368,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       {mounted && user && <PushBanner userId={user.id} />}
 
-      <main className="mx-auto max-w-6xl px-4 pb-28 pt-8 md:pb-16">{children}</main>
+      <main className="mx-auto min-w-0 max-w-6xl px-3 pb-28 pt-5 sm:px-4 sm:pt-8 lg:pb-16">{children}</main>
 
       <MobileNav pathname={pathname} />
     </div>
@@ -355,7 +388,7 @@ function MobileNav({ pathname }: { pathname: string }) {
     );
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
       <ul className="mx-auto flex max-w-md items-stretch px-2 py-1">
         {primary.map((item) => (
           <li key={item.to} className="flex min-w-0 flex-1">
