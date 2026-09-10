@@ -242,7 +242,7 @@ function RetosPage() {
               );
               const total = completions.filter((x) => x.challenge_id === c.id).length;
               return (
-                <li key={c.id} className="surface p-5">
+                <li key={c.id} id={c.id} className="surface scroll-mt-24 p-5 target:ring-2 target:ring-primary">
                   <p className="font-display text-lg font-semibold">{c.title}</p>
                   {c.description && (
                     <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
