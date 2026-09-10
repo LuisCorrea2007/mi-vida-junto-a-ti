@@ -160,7 +160,7 @@ function DiaryPage() {
       ) : (
         <ol className="relative space-y-6 border-l border-border pl-6">
           {milestones.map((m) => (
-            <li key={m.id} className="animate-fade-up relative">
+            <li key={m.id} id={m.id} className="animate-fade-up relative scroll-mt-24 target:ring-2 target:ring-primary">
               <span className="absolute -left-[31px] top-2 size-3 rounded-full bg-primary ring-4 ring-background" />
               <div className="surface p-5">
                 <div className="flex items-start justify-between gap-3">
