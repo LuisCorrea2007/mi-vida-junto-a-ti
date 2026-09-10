@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   LogOut,
   MapPin,
+  MessageCircleHeart,
   Music,
   NotebookPen,
   Settings,
@@ -47,6 +48,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/panel", label: "Panel", icon: Sparkles },
+  { to: "/consejero", label: "Consejero", icon: MessageCircleHeart },
   { to: "/notas", label: "Notas", icon: NotebookPen },
   { to: "/galeria", label: "Galería", icon: Images },
   { to: "/videos", label: "Videos", icon: Video },
@@ -63,7 +65,7 @@ const NAV = [
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
-const MOBILE_PRIMARY = ["/panel", "/notas", "/galeria", "/cerca"] as const;
+const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;
 
 function PushBanner({ userId }: { userId: string }) {
   const [show, setShow] = useState(false);
@@ -252,13 +254,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => setMounted(true), []);
   const hash = useRouterState({ select: (s) => s.location.hash });
 
-  // Mantiene al día el aviso al celular en este dispositivo si ya estaba permitido.
   useEffect(() => {
     if (!user || !pushSupported() || Notification.permission !== "granted") return;
     enablePush(user.id).catch(() => {});
   }, [user]);
 
-  // Lleva hasta el elemento exacto cuando el enlace trae un ancla (p. ej. un comentario).
   useEffect(() => {
     if (!hash) return;
     const id = window.setTimeout(() => {
