@@ -412,7 +412,7 @@ END:VCALENDAR`;
           listed.map((e) => {
             const mine = responses?.find((r) => r.event_id === e.id && r.user_id === user?.id);
             return (
-              <article key={e.id} className="surface animate-fade-up p-5">
+              <article key={e.id} id={e.id} className="surface animate-fade-up p-5 target:ring-2 target:ring-primary">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{labelFor(EVENT_CATEGORIES, e.category)}</Badge>
                   <span className="text-xs text-muted-foreground">
