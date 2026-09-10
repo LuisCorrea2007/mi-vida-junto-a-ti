@@ -130,7 +130,7 @@ function Panel() {
 
   return (
     <div className="space-y-8">
-      <section className="surface warm-gradient animate-fade-up p-8 text-center">
+      <section className="surface warm-gradient animate-fade-up p-5 text-center sm:p-8">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">
           {greeting(me?.name)}
         </p>
@@ -200,7 +200,7 @@ function Panel() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="surface p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold">Próximas citas</h2>
             <Link to="/calendario" className="text-xs text-primary hover:underline">
               Ver todo
@@ -234,7 +234,7 @@ function Panel() {
         </section>
 
         <section className="surface p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold">Últimas notas</h2>
             <Link to="/notas" className="text-xs text-primary hover:underline">
               Ver todo
@@ -272,7 +272,7 @@ function Panel() {
       </div>
 
       <section className="surface p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-xl font-semibold">Recuerdos recientes</h2>
           <Link to="/galeria" className="text-xs text-primary hover:underline">
             Ver galería
@@ -296,7 +296,7 @@ function Panel() {
       <div className="grid gap-6 lg:grid-cols-2">
         <NextCapsule />
         <section className="surface p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold">Reto de hoy</h2>
             <Link to="/retos" className="text-xs text-primary hover:underline">
               Ver retos
@@ -348,7 +348,7 @@ function ActivityWidget({ userId }: { userId: string }) {
 
   return (
     <section className="surface p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-display text-xl font-semibold">Lo último de tu pareja</h2>
         <Link to="/cerca" className="text-xs text-primary hover:underline">
           ¿Qué hace ahora?
@@ -359,7 +359,7 @@ function ActivityWidget({ userId }: { userId: string }) {
           {activity.map((a) => (
             <li key={a.id}>
               <button
-                className="flex w-full items-start gap-3 py-3 text-left hover:opacity-80"
+                className="flex w-full min-w-0 flex-wrap items-start gap-3 py-3 text-left hover:opacity-80 sm:flex-nowrap"
                 onClick={() => a.link && navigate({ href: a.link })}
               >
                 <Activity className="mt-0.5 size-4 shrink-0 text-primary" />
