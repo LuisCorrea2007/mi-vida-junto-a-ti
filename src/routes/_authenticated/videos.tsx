@@ -165,7 +165,7 @@ function VideosPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="font-display text-3xl font-semibold flex items-center gap-2">
+        <h1 className="flex items-center gap-2 font-display text-2xl font-semibold sm:text-3xl">
           <Video className="size-7" /> Videos Diarios
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -199,7 +199,7 @@ function VideosPage() {
             onChange={handleFileSelect}
           />
           <Button
-            className="rounded-full"
+            className="w-full rounded-full sm:w-auto"
             onClick={() => fileInputRef.current?.click()}
             disabled={subiendo || !titulo.trim()}
           >
@@ -297,15 +297,15 @@ function VideoCard({
   };
 
   return (
-    <Card id={`video-${video.id}`} className="overflow-hidden target:ring-2 target:ring-primary">
+    <Card id={`video-${video.id}`} className="scroll-mt-24 overflow-hidden target:ring-2 target:ring-primary">
       <div className="aspect-video bg-black">
         {url && (
           <video src={url} controls className="h-full w-full" />
         )}
       </div>
       <CardContent className="p-4 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
             <h3 className="font-display text-lg font-semibold">{video.titulo}</h3>
             <p className="text-xs text-muted-foreground">
               Por {nameOf(video.user_id)} • {formatSize(video.file_size)}
@@ -320,11 +320,11 @@ function VideoCard({
           </Badge>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="rounded-full flex-1"
+            className="min-w-0 flex-1 rounded-full"
             onClick={handleDownload}
           >
             <Download className="mr-1 size-4" /> Descargar
@@ -356,7 +356,7 @@ function VideoCard({
               <p className="text-sm text-muted-foreground">Sin comentarios</p>
             )}
             <div className="flex gap-2">
-              <Input
+              <Input className="min-w-0" 
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
                 placeholder="Escribe un comentario..."
