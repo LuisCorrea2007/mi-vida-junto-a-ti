@@ -12,7 +12,7 @@ const PushInput = z.object({
 /** Envía un aviso al celular de la pareja (solo si comparten espacio). */
 export const sendPushToPartner = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => PushInput.parse(input))
+  .validator((input: unknown) => PushInput.parse(input))
   .handler(async ({ data, context }) => {
     if (data.toUserId === context.userId) return { sent: 0 };
     const { data: allowed } = await context.supabase.rpc("same_space", { _user: data.toUserId });
