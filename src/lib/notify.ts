@@ -14,16 +14,52 @@ export type NotifyInput = {
   link?: string | null;
 };
 
-/** Crea el aviso en la campana y lo manda al celular de la pareja. */
-export async function notifyPartner(input: NotifyInput) {
+type LegacyNotifyInput = Omit<NotifyInput, "toUserId">;
+
+/**
+ * Crea el aviso en la campana y lo manda al celular de la pareja.
+ *
+ * También admite la firma antigua notifyPartner(currentUserId, input), usada
+ * por la pantalla del Consejero. En esa variante buscamos al otro perfil de
+ * la pareja antes de crear el aviso, evitando notificar al propio usuario.
+ */
+export async function notifyPartner(input: NotifyInput): Promise<void>;
+export async function notifyPartner(currentUserId: string, input: LegacyNotifyInput): Promise<void>;
+export async function notifyPartner(
+  inputOrCurrentUserId: NotifyInput | string,
+  legacyInput?: LegacyNotifyInput,
+): Promise<void> {
+  let input: NotifyInput;
+
+  if (typeof inputOrCurrentUserId === "string") {
+    if (!legacyInput) return;
+
+    const { data: partner, error: partnerError } = await supabase
+      .from("profiles")
+      .select("id")
+      .neq("id", inputOrCurrentUserId)
+      .order("created_at")
+      .limit(1)
+      .maybeSingle();
+
+    if (partnerError || !partner?.id) return;
+
+    input = { ...legacyInput, toUserId: partner.id };
+  } else {
+    input = inputOrCurrentUserId;
+  }
+
   const message = input.message?.slice(0, 300) ?? null;
-  await supabase.from("notifications").insert({
+  const { error } = await supabase.from("notifications").insert({
     user_id: input.toUserId,
     type: input.type,
     title: input.title,
     message,
     link: input.link ?? null,
   });
+
+  if (error) throw error;
+
   try {
     await sendPushToPartner({
       data: { toUserId: input.toUserId, title: input.title, message, link: input.link ?? null },
