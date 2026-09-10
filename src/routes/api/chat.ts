@@ -9,7 +9,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-import { ADVISOR_PROVIDER_OPTIONS, createAdvisorModel } from "@/lib/ai-gateway.server";
+import { createAdvisorModel } from "@/lib/ai-gateway.server";
 
 type Body = { messages?: unknown };
 
@@ -47,7 +47,6 @@ export const Route = createFileRoute("/api/chat")({
         const me = auth.user;
         if (!me) return new Response("Sin sesión", { status: 401 });
 
-        // Contexto real de la pareja para que los consejos no sean genéricos.
         const [{ data: profiles }, { data: moods }, { data: events }, { data: capsules }] =
           await Promise.all([
             supabase
@@ -280,33 +279,34 @@ export const Route = createFileRoute("/api/chat")({
               "Manda un aviso al celular de la pareja con el mensaje que pida quien escribe.",
             inputSchema: z.object({ titulo: z.string(), mensaje: z.string() }),
             execute: async ({ titulo, mensaje }) => {
-              const result = await notifyPartner(titulo.slice(0, 140), mensaje, "/consejero");
-              return result;
+              return notifyPartner(titulo.slice(0, 140), mensaje, "/consejero");
             },
           }),
         };
 
         try {
+          const model = createAdvisorModel(apiKey, request);
+          const modelMessages = await convertToModelMessages(messages as UIMessage[]);
           const result = streamText({
-            model: createAdvisorModel(apiKey, request),
+            model,
             system,
-            messages: await convertToModelMessages(messages as UIMessage[]),
+            messages: modelMessages,
             tools,
             stopWhen: stepCountIs(50),
-            providerOptions: ADVISOR_PROVIDER_OPTIONS as never,
             abortSignal: request.signal,
           });
 
           return result.toUIMessageStreamResponse({
             originalMessages: messages as UIMessage[],
-            sendReasoning: true,
+            sendReasoning: false,
           });
         } catch (error) {
           if (error instanceof Error && error.name === "AbortError") {
             return new Response(null, { status: 499 });
           }
           const message = error instanceof Error ? error.message : "Error inesperado";
-          return new Response(message, { status: 500 });
+          console.error("[Consejero] /api/chat error:", error);
+          return new Response(`Error del Consejero: ${message}`, { status: 500 });
         }
       },
     },
