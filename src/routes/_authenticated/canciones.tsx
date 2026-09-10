@@ -270,7 +270,7 @@ function CancionesPage() {
         {songs.length ? (
           <ul className="grid gap-4 sm:grid-cols-2">
             {songs.map((s) => (
-              <li key={s.id} id={s.id} className="surface p-5">
+              <li key={s.id} id={s.id} className="surface scroll-mt-24 p-5 target:ring-2 target:ring-primary">
                 <div className="flex items-start gap-3">
                   <Music className="mt-1 size-4 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
@@ -375,7 +375,7 @@ function CancionesPage() {
         {quotes.length > 0 && (
           <ul className="mt-6 space-y-3">
             {quotes.map((q) => (
-              <li key={q.id} className="flex items-start gap-3 rounded-xl bg-muted/50 p-4">
+              <li key={q.id} id={`quote-${q.id}`} className="scroll-mt-24 flex items-start gap-3 rounded-xl bg-muted/50 p-4 target:ring-2 target:ring-primary">
                 <QuoteIcon className="mt-0.5 size-4 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm italic">“{q.content}”</p>
