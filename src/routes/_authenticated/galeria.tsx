@@ -269,7 +269,7 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm md:flex-row"
+      className="fixed inset-0 z-50 flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-background/95 backdrop-blur-sm md:flex-row"
       onKeyDown={(e) => {
         if (e.key === "Escape") onClose();
         if (e.key === "ArrowRight") onMove(1);
@@ -317,7 +317,7 @@ function Lightbox({
         )}
       </div>
 
-      <aside className="surface m-3 flex max-h-[45vh] w-auto flex-col gap-4 rounded-2xl p-4 md:my-4 md:mr-4 md:max-h-none md:w-80">
+      <aside className="surface mx-3 mb-3 flex max-h-[46dvh] min-w-0 flex-col gap-4 rounded-2xl p-4 md:my-4 md:ml-0 md:mr-4 md:max-h-none md:w-80">
         {photo.caption && <p className="text-sm">{photo.caption}</p>}
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="rounded-full" onClick={onFavorite}>
@@ -495,7 +495,7 @@ function GalleryPage() {
 
       <div className="flex flex-wrap gap-3">
         <Select value={album} onValueChange={setAlbum}>
-          <SelectTrigger className="w-52">
+          <SelectTrigger className="w-full sm:w-52">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
