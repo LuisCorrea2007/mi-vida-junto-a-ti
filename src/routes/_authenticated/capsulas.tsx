@@ -200,7 +200,7 @@ function CapsulasPage() {
         {ready.length ? (
           <div className="grid gap-4 sm:grid-cols-2">
             {ready.map((c) => (
-              <article key={c.id} id={c.id} className="surface p-5">
+              <article key={c.id} id={c.id} className="surface scroll-mt-24 p-5 target:ring-2 target:ring-primary">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-display text-lg font-semibold">{c.title}</p>
@@ -249,7 +249,7 @@ function CapsulasPage() {
         {sealed.length ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sealed.map((c) => (
-              <article key={c.id} className="surface sealed p-5 text-center">
+              <article key={c.id} id={c.id} className="surface sealed scroll-mt-24 p-5 text-center target:ring-2 target:ring-primary">
                 <Lock className="mx-auto size-6 text-primary" />
                 <p className="mt-3 font-display text-lg font-semibold">
                   {c.user_id === user?.id ? c.title : "Cápsula sellada"}
