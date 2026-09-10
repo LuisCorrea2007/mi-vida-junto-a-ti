@@ -104,11 +104,30 @@
     border-color: var(--color-border);
   }
 
+  html,
   body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100dvh;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  main,
+  section,
+  article {
+    min-width: 0;
+  }
+
+  img,
+  video,
+  iframe {
+    max-width: 100%;
   }
 
   h1,
