@@ -266,7 +266,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hash) return;
     const id = window.setTimeout(() => {
-      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const targetId = hash.startsWith("#") ? hash.slice(1) : hash;
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 350);
     return () => window.clearTimeout(id);
   }, [hash, pathname]);
