@@ -628,7 +628,7 @@ function FunCard({
     <Card
       id={`fun-${item.id}`}
       className={cn(
-        "animate-fade-up transition-shadow",
+        "animate-fade-up scroll-mt-24 transition-shadow target:ring-2 target:ring-primary",
         highlighted && "ring-2 ring-primary shadow-[0_0_35px_-8px_var(--primary)]",
       )}
     >
