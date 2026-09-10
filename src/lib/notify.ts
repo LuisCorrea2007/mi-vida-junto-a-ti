@@ -20,8 +20,8 @@ type LegacyNotifyInput = Omit<NotifyInput, "toUserId">;
  * Crea el aviso en la campana y lo manda al celular de la pareja.
  *
  * También admite la firma antigua notifyPartner(currentUserId, input), usada
- * por la pantalla del Consejero. En esa variante buscamos al otro perfil de
- * la pareja antes de crear el aviso, evitando notificar al propio usuario.
+ * por la pantalla del Consejero. En esa variante resolvemos al otro miembro
+ * del mismo espacio de pareja antes de crear el aviso.
  */
 export async function notifyPartner(input: NotifyInput): Promise<void>;
 export async function notifyPartner(currentUserId: string, input: LegacyNotifyInput): Promise<void>;
@@ -34,17 +34,21 @@ export async function notifyPartner(
   if (typeof inputOrCurrentUserId === "string") {
     if (!legacyInput) return;
 
-    const { data: partner, error: partnerError } = await supabase
-      .from("profiles")
-      .select("id")
-      .neq("id", inputOrCurrentUserId)
-      .order("created_at")
-      .limit(1)
-      .maybeSingle();
+    const { data: members, error: membersError } = await supabase
+      .from("couple_members")
+      .select("couple_id, user_id");
 
-    if (partnerError || !partner?.id) return;
+    if (membersError) return;
 
-    input = { ...legacyInput, toUserId: partner.id };
+    const mine = (members ?? []).find((member) => member.user_id === inputOrCurrentUserId);
+    if (!mine) return;
+
+    const partner = (members ?? []).find(
+      (member) => member.couple_id === mine.couple_id && member.user_id !== inputOrCurrentUserId,
+    );
+    if (!partner) return;
+
+    input = { ...legacyInput, toUserId: partner.user_id };
   } else {
     input = inputOrCurrentUserId;
   }
