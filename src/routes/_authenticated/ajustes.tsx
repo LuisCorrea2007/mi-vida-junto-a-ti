@@ -247,7 +247,7 @@ function SettingsPage() {
             </div>
             <div className="space-y-2 border-t pt-5">
               <Label htmlFor="jc">Ya tengo un código</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 min-[420px]:flex-row">
                 <Input
                   id="jc"
                   placeholder="Pega aquí el código"
@@ -273,8 +273,8 @@ function SettingsPage() {
         ) : (
           <div className="space-y-2">
             <Label>Código de invitación</Label>
-            <div className="flex gap-2">
-              <Input readOnly value={couple.coupleId} className="font-mono text-xs" />
+            <div className="flex flex-col gap-2 min-[420px]:flex-row">
+              <Input readOnly value={couple.coupleId} className="min-w-0 font-mono text-xs" />
               <Button variant="outline" className="rounded-full" onClick={copyCode}>
                 {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
               </Button>
