@@ -138,7 +138,7 @@ function CapsulasPage() {
     <div className="space-y-8">
       {hearts}
 
-      <section className="surface warm-gradient p-8 text-center">
+      <section className="surface warm-gradient p-5 text-center sm:p-8">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">Para el futuro</p>
         <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">Cápsulas del tiempo</h1>
         <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
