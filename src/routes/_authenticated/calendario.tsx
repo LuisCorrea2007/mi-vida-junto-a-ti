@@ -404,7 +404,7 @@ END:VCALENDAR`;
         {isLoading ? (
           <Skeleton className="h-24 rounded-2xl" />
         ) : listed.length === 0 ? (
-          <div className="surface flex flex-col items-center gap-2 p-12 text-center">
+          <div className="surface flex flex-col items-center gap-2 p-8 text-center sm:p-12">
             <CalendarHeart className="size-7 text-primary" />
             <p className="text-sm text-muted-foreground">Nada agendado. Propongan algo rico.</p>
           </div>
@@ -465,7 +465,7 @@ END:VCALENDAR`;
                   </Button>
                 </div>
                 {e.user_id !== user?.id && (
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant={mine?.response_status === "aceptada" ? "default" : "outline"}
