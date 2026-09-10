@@ -632,7 +632,7 @@ function DedicationDetail({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-2xl">
+          <DialogTitle className="flex flex-wrap items-center gap-2 pr-7 font-display text-xl sm:text-2xl">
             <Badge variant="secondary">{KIND_META[d.kind].label}</Badge>
             {d.title}
           </DialogTitle>
@@ -647,7 +647,7 @@ function DedicationDetail({
         </DialogHeader>
 
         {d.kind === "carta" && (
-          <div className="rounded-2xl border border-primary/25 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_60%)] p-6 sm:p-8">
+          <div className="rounded-2xl border border-primary/25 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_60%)] p-4 sm:p-8">
             <Mail className="mb-4 size-6 text-primary" />
             <p className="whitespace-pre-wrap font-display text-lg italic leading-relaxed">
               {d.content}
