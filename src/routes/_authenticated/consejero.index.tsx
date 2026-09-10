@@ -85,7 +85,7 @@ function ConsejeroIndex() {
 
   return (
     <div className="space-y-8">
-      <section className="surface warm-gradient animate-fade-up p-8 text-center">
+      <section className="surface warm-gradient animate-fade-up p-5 text-center sm:p-8">
         <HeartHandshake className="mx-auto size-8 text-primary" />
         <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">Consejero</h1>
         <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
