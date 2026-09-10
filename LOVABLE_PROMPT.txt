@@ -1,0 +1,33 @@
+Repara y deja TERMINADO el Consejero de este proyecto. No rediseñes la UI ni empieces de cero.
+
+Contexto: `POST /api/chat` ya delega la IA a `supabase/functions/advisor-chat` porque el preview de TanStack no tenía `LOVABLE_API_KEY`. El error anterior era `Falta la clave de IA`. NO pongas ninguna API key en frontend, `.env` público, `VITE_*` ni GitHub.
+
+Haz todo en una sola pasada:
+
+1. Despliega/sincroniza `supabase/functions/advisor-chat/index.ts` al proyecto Supabase/Lovable Cloud conectado.
+2. Verifica que `LOVABLE_API_KEY` exista como secret disponible para esa Edge Function. Nunca muestres su valor.
+3. Mantén `supabase/config.toml` con `[functions.advisor-chat] verify_jwt = false`; la función valida el bearer token con Supabase.
+4. Prueba el chat real desde `/consejero` con una sesión autenticada. No basta con que compile.
+5. Mantén `google/gemini-3.7-flash` salvo que el gateway indique que ese modelo no está disponible.
+6. Si recibes 402, repórtalo como falta de créditos de IA y no intentes meter otra API key ni hacer hacks.
+7. Recupera la funcionalidad de herramientas del Consejero dentro de la Edge Function, conservando la interfaz existente de tool parts:
+   - crear_nota
+   - crear_dedicatoria
+   - agendar_evento
+   - crear_capsula
+   - crear_reto
+   - agregar_cancion
+   - agregar_frase
+   - registrar_animo
+   - avisar_pareja
+8. Las herramientas deben usar el Supabase client autenticado con el bearer del usuario. Nunca aceptar un `user_id` arbitrario enviado por el modelo; el propietario debe ser el usuario autenticado y la pareja debe resolverse desde la relación existente.
+9. Las acciones persistentes deben requerir confirmación explícita del usuario antes de ejecutarse. El modelo solo debe decir que una acción se realizó cuando la herramienta devuelva éxito.
+10. `avisar_pareja` debe insertar la notificación para la pareja y el push debe ser best-effort, sin hacer fallar toda la acción si el push no está disponible.
+11. Conserva el historial `advisor_messages`, los hilos privados/compartidos y realtime existentes.
+12. No elimines rutas ni componentes que ya funcionan.
+13. Ejecuta typecheck/build y corrige errores.
+14. Al terminar, prueba al menos: saludo, respuesta con contexto de pareja, creación de nota tras confirmación y aviso a pareja tras confirmación.
+
+Criterio final: `/consejero` debe responder sin pedir ninguna API key al usuario y las acciones deben quedar realmente guardadas en Supabase. Si el único bloqueo restante es que Lovable todavía no tiene créditos de IA, no cambies la arquitectura: deja indicado exactamente que es un 402 de créditos.
+
+Lee también `LOVABLE_FIX.md` antes de modificar archivos; contiene el plan y los criterios de aceptación.
