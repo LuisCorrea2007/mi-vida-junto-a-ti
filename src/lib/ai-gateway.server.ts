@@ -17,7 +17,7 @@ export function createRunIdFetch(initialRunId?: string) {
   };
 }
 
-/** Modelo de Lovable AI para el consejero (API de respuestas, con razonamiento). */
+/** Modelo soportado por Lovable AI Gateway para el Consejero. */
 export function createAdvisorModel(apiKey: string, request?: Request) {
   const initialRunId = request?.headers.get(RUN_ID_HEADER)?.trim() || undefined;
   const runIdFetch = createRunIdFetch(initialRunId);
@@ -30,15 +30,16 @@ export function createAdvisorModel(apiKey: string, request?: Request) {
     },
     fetch: runIdFetch.fetch as typeof fetch,
   });
-  return provider.responses("openai/gpt-6-astra");
+
+  // Lovable's current gateway exposes curated model IDs. The previous
+  // openai/gpt-6-astra ID is not a supported gateway model and causes the
+  // advisor endpoint to fail before a stream can be created.
+  return provider.responses("google/gemini-3.7-flash");
 }
 
-export const ADVISOR_PROVIDER_OPTIONS = {
-  openai: {
-    forceReasoning: true,
-    reasoningEffort: "medium",
-    reasoningSummary: "auto",
-    store: false,
-    include: ["reasoning.encrypted_content"],
-  },
-} as const;
+/**
+ * Keep gateway options minimal and portable. Reasoning-specific OpenAI
+ * options were removed because they are not guaranteed to be accepted by
+ * every model exposed through the Lovable gateway.
+ */
+export const ADVISOR_PROVIDER_OPTIONS = undefined;
