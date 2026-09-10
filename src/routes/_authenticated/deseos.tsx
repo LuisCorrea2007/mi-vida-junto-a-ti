@@ -177,7 +177,7 @@ function WishesPage() {
           <h1 className="font-display text-3xl font-semibold">Deseos</h1>
           <p className="text-sm text-muted-foreground">Todo lo que quieren hacer juntos, priorizado.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant={showDone ? "default" : "outline"}
             className="rounded-full"
@@ -284,7 +284,7 @@ function WishesPage() {
             const voted = votes?.some((v) => v.wish_id === w.id && v.user_id === user?.id);
             const wc = comments?.filter((c) => c.wish_id === w.id) ?? [];
             return (
-              <article key={w.id} className="surface animate-fade-up p-5">
+              <article key={w.id} id={w.id} className="surface animate-fade-up p-5 target:ring-2 target:ring-primary">
                 <div className="flex items-start gap-4">
                   <button
                     onClick={() => toggleVote.mutate(w.id)}
@@ -363,7 +363,7 @@ function WishesPage() {
                             {c.content}
                           </p>
                         ))}
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <Input
                             value={comment}
                             maxLength={1000}
