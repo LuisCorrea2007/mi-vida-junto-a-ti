@@ -193,6 +193,7 @@ async function loadFavorites(): Promise<Result[]> {
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -206,10 +207,19 @@ export function GlobalSearch() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    if (!open) {
+      setDebouncedQ("");
+      return;
+    }
+    const id = window.setTimeout(() => setDebouncedQ(q.trim()), 220);
+    return () => window.clearTimeout(id);
+  }, [open, q]);
+
   const { data: results, isFetching } = useQuery({
-    queryKey: ["buscar", q],
+    queryKey: ["buscar", debouncedQ],
     enabled: open,
-    queryFn: () => (q.trim() ? searchAll(q.trim()) : loadFavorites()),
+    queryFn: () => (debouncedQ ? searchAll(debouncedQ) : loadFavorites()),
   });
 
   const grouped = useMemo(() => {
