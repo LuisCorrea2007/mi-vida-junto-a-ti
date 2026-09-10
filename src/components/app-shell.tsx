@@ -67,6 +67,10 @@ const NAV = [
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
 const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;\n\n/** En escritorio mantenemos visibles las secciones más usadas y agrupamos el resto. */\nconst DESKTOP_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria", "/calendario"] as const;
 
+function isRouteActive(pathname: string, to: string) {
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
 function PushBanner({ userId }: { userId: string }) {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -292,7 +296,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 to={item.to}
                 className={cn(
                   "rounded-full px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground xl:px-3",
-                  pathname === item.to && "bg-accent text-accent-foreground",
+                  isRouteActive(pathname, item.to) && "bg-accent text-accent-foreground",
                 )}
               >
                 {item.label}
@@ -379,7 +383,7 @@ function MobileNav({ pathname }: { pathname: string }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const primary = NAV.filter((n) => (MOBILE_PRIMARY as readonly string[]).includes(n.to));
   const secondary = NAV.filter((n) => !(MOBILE_PRIMARY as readonly string[]).includes(n.to));
-  const moreActive = secondary.some((n) => n.to === pathname) || pathname === "/ajustes";
+  const moreActive = secondary.some((n) => isRouteActive(pathname, n.to)) || pathname === "/ajustes";
 
   const itemClass = (active: boolean) =>
     cn(
@@ -392,7 +396,7 @@ function MobileNav({ pathname }: { pathname: string }) {
       <ul className="mx-auto flex max-w-md items-stretch px-2 py-1">
         {primary.map((item) => (
           <li key={item.to} className="flex min-w-0 flex-1">
-            <Link to={item.to} className={itemClass(pathname === item.to)}>
+            <Link to={item.to} className={itemClass(isRouteActive(pathname, item.to))}>
               <span
                 className={cn(
                   "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
@@ -429,7 +433,7 @@ function MobileNav({ pathname }: { pathname: string }) {
                     onClick={() => setMoreOpen(false)}
                     className={cn(
                       "flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                      pathname === item.to && "bg-accent text-primary",
+                      isRouteActive(pathname, item.to) && "bg-accent text-primary",
                     )}
                   >
                     <item.icon className="size-5" />
