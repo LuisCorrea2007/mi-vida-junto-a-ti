@@ -265,11 +265,22 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hash) return;
-    const id = window.setTimeout(() => {
-      const targetId = hash.startsWith("#") ? hash.slice(1) : hash;
-      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 350);
-    return () => window.clearTimeout(id);
+    const targetId = hash.startsWith("#") ? hash.slice(1) : hash;
+    let timer = 0;
+    let attempts = 0;
+
+    const scrollWhenReady = () => {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      attempts += 1;
+      if (attempts < 6) timer = window.setTimeout(scrollWhenReady, 220);
+    };
+
+    timer = window.setTimeout(scrollWhenReady, 80);
+    return () => window.clearTimeout(timer);
   }, [hash, pathname]);
 
   async function signOut() {
