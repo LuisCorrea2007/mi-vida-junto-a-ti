@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, CalendarHeart, Heart, Images, NotebookPen, Stars, Laugh, Video } from "lucide-react";
+import { Activity, CalendarHeart, Heart, Images, NotebookPen, Stars, Laugh, Video, MessageCircleHeart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useRealtime } from "@/hooks/use-realtime";
@@ -161,6 +161,26 @@ function Panel() {
         <p className="mx-auto mt-6 max-w-md text-sm italic text-muted-foreground">“{quote}”</p>
       </section>
 
+      <section className="surface warm-gradient p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="rounded-2xl bg-primary/15 p-3">
+              <MessageCircleHeart className="size-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-primary">Consejo del día</p>
+              <h2 className="mt-1 font-display text-xl font-semibold">Habla con el Consejero</h2>
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+                Cuéntale cómo te sientes, qué pasó entre ustedes o qué quieres mejorar. Te responderá teniendo en cuenta su relación.
+              </p>
+            </div>
+          </div>
+          <Button asChild className="rounded-full shrink-0">
+            <Link to="/consejero">Pedir consejo</Link>
+          </Button>
+        </div>
+      </section>
+
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {[
           { label: "Notas", value: stats?.notas, icon: NotebookPen, to: "/notas" as const },
@@ -297,8 +317,6 @@ function Panel() {
       {user && <ActivityWidget userId={user.id} />}
 
       <Recuerdos />
-
-
 
       <section className="surface p-6 text-center">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">Pregunta de hoy</p>
