@@ -19,6 +19,7 @@ import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCancionesRouteImport } from './routes/_authenticated/canciones'
 import { Route as AuthenticatedCapsulasRouteImport } from './routes/_authenticated/capsulas'
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
+import { Route as AuthenticatedConexionRouteImport } from './routes/_authenticated/conexion'
 import { Route as AuthenticatedDedicatoriasRouteImport } from './routes/_authenticated/dedicatorias'
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
@@ -81,6 +82,11 @@ const AuthenticatedCapsulasRoute = AuthenticatedCapsulasRouteImport.update({
 const AuthenticatedCercaRoute = AuthenticatedCercaRouteImport.update({
   id: '/cerca',
   path: '/cerca',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConexionRoute = AuthenticatedConexionRouteImport.update({
+  id: '/conexion',
+  path: '/conexion',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDedicatoriasRoute =
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/canciones': typeof AuthenticatedCancionesRoute
   '/capsulas': typeof AuthenticatedCapsulasRoute
   '/cerca': typeof AuthenticatedCercaRoute
+  '/conexion': typeof AuthenticatedConexionRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/canciones': typeof AuthenticatedCancionesRoute
   '/capsulas': typeof AuthenticatedCapsulasRoute
   '/cerca': typeof AuthenticatedCercaRoute
+  '/conexion': typeof AuthenticatedConexionRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/_authenticated/canciones': typeof AuthenticatedCancionesRoute
   '/_authenticated/capsulas': typeof AuthenticatedCapsulasRoute
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
+  '/_authenticated/conexion': typeof AuthenticatedConexionRoute
   '/_authenticated/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/canciones'
     | '/capsulas'
     | '/cerca'
+    | '/conexion'
     | '/dedicatorias'
     | '/deseos'
     | '/diario'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/canciones'
     | '/capsulas'
     | '/cerca'
+    | '/conexion'
     | '/dedicatorias'
     | '/deseos'
     | '/diario'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/canciones'
     | '/_authenticated/capsulas'
     | '/_authenticated/cerca'
+    | '/_authenticated/conexion'
     | '/_authenticated/dedicatorias'
     | '/_authenticated/deseos'
     | '/_authenticated/diario'
@@ -392,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/cerca'
       fullPath: '/cerca'
       preLoaderRoute: typeof AuthenticatedCercaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conexion': {
+      id: '/_authenticated/conexion'
+      path: '/conexion'
+      fullPath: '/conexion'
+      preLoaderRoute: typeof AuthenticatedConexionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dedicatorias': {
@@ -501,6 +520,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCancionesRoute: typeof AuthenticatedCancionesRoute
   AuthenticatedCapsulasRoute: typeof AuthenticatedCapsulasRoute
   AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
+  AuthenticatedConexionRoute: typeof AuthenticatedConexionRoute
   AuthenticatedDedicatoriasRoute: typeof AuthenticatedDedicatoriasRoute
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
@@ -522,6 +542,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCancionesRoute: AuthenticatedCancionesRoute,
   AuthenticatedCapsulasRoute: AuthenticatedCapsulasRoute,
   AuthenticatedCercaRoute: AuthenticatedCercaRoute,
+  AuthenticatedConexionRoute: AuthenticatedConexionRoute,
   AuthenticatedDedicatoriasRoute: AuthenticatedDedicatoriasRoute,
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
