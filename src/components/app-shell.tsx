@@ -8,6 +8,7 @@ import {
   CalendarHeart,
   Flame,
   Gift,
+  Handshake,
   Hourglass,
   Heart,
   Images,
