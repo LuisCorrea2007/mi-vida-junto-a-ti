@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { notifyPartner } from "@/lib/notify";
 
 // ===================== CHECK-INS =====================
 export type CheckIn = {
@@ -43,8 +44,18 @@ export function useCheckIns() {
       if (error) throw error;
       return data as CheckIn;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["checkins"] });
+      // Notificar a la pareja usando la firma con userId
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            title: "Nuevo check-in de tu pareja",
+            body: `${data.emotion} · Energía: ${data.energy_level}/10`,
+            tag: `checkin-${data.id}`,
+          });
+        } catch {}
+      }
     },
   });
 
@@ -98,8 +109,17 @@ export function useAgreements() {
       if (error) throw error;
       return data as Agreement;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["agreements"] });
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            title: "Nuevo acuerdo propuesto",
+            body: data.title,
+            tag: `agreement-${data.id}`,
+          });
+        } catch {}
+      }
     },
   });
 
@@ -114,8 +134,17 @@ export function useAgreements() {
       if (error) throw error;
       return data as Agreement;
     },
-    onSuccess: () => {
+    onSuccess: async (data, { updates }) => {
       qc.invalidateQueries({ queryKey: ["agreements"] });
+      if (user?.id && updates.status === "cumplido") {
+        try {
+          await notifyPartner(user.id, {
+            title: "¡Acuerdo cumplido! 🎉",
+            body: data.title,
+            tag: `agreement-done-${data.id}`,
+          });
+        } catch {}
+      }
     },
   });
 
@@ -180,8 +209,18 @@ export function useDeepQuestions() {
       if (error) throw error;
       return data as QuestionResponse;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       qc.invalidateQueries({ queryKey: ["question_responses"] });
+      // Notificar para que la pareja vea que respondiste (sin revelar la respuesta)
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            title: "Tu pareja respondió una pregunta",
+            body: "Descúbrela si ya respondiste también",
+            tag: "question-response",
+          });
+        } catch {}
+      }
     },
   });
 
@@ -238,8 +277,17 @@ export function useCouplePlans() {
       if (error) throw error;
       return data as CouplePlan;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["couple_plans"] });
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            title: "Nuevo plan propuesto",
+            body: data.title,
+            tag: `plan-${data.id}`,
+          });
+        } catch {}
+      }
     },
   });
 
@@ -253,8 +301,17 @@ export function useCouplePlans() {
       if (error) throw error;
       return data as PlanVote;
     },
-    onSuccess: () => {
+    onSuccess: async (_, { planId, voteType }) => {
       qc.invalidateQueries({ queryKey: ["couple_plans"] });
+      if (user?.id && voteType === "yes") {
+        try {
+          await notifyPartner(user.id, {
+            title: "¡A tu pareja le gusta un plan!",
+            body: "Revisa si coinciden sus votos",
+            tag: `plan-vote-${planId}`,
+          });
+        } catch {}
+      }
     },
   });
 

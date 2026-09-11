@@ -1,0 +1,1 @@
+import{c as e}from"./consejero._id-eoTwd-tZ.js";export{e as default};

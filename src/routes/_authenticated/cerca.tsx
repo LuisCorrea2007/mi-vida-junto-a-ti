@@ -160,6 +160,7 @@ function remaining(expiresAt: string) {
   return h > 0 ? `${h} h ${m} min` : `${m} min`;
 }
 
+/** Lee la posición actual con alta precisión. */
 function readPosition() {
   if (!("geolocation" in navigator)) throw new Error("Este dispositivo no comparte ubicación");
   return new Promise<GeolocationPosition>((resolve, reject) =>
@@ -169,6 +170,92 @@ function readPosition() {
       maximumAge: 30_000,
     }),
   );
+}
+
+/** Hook para seguimiento continuo de ubicación con watchPosition */
+function useLiveLocationTracking(
+  userId: string | null,
+  isSharing: boolean,
+) {
+  const qc = useQueryClient();
+  const watchIdRef = useRef<number | null>(null);
+  const lastUpdateRef = useRef<number>(0);
+  const lastPositionRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  // Configuración del seguimiento
+  const MIN_DISTANCE_METERS = 20; // Solo actualizar si se mueve más de 20m
+  const MIN_TIME_MS = 10_000; // Mínimo 10 segundos entre actualizaciones
+
+  useEffect(() => {
+    if (!isSharing || !userId) {
+      // Detener seguimiento si no está compartiendo
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      return;
+    }
+
+    // Iniciar watchPosition para seguimiento continuo
+    if ("geolocation" in navigator) {
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        (position) => {
+          const now = Date.now();
+          const { latitude, longitude, accuracy } = position.coords;
+
+          // Verificar si pasó suficiente tiempo
+          const timeElapsed = now - lastUpdateRef.current;
+          if (timeElapsed < MIN_TIME_MS) return;
+
+          // Verificar si se movió suficiente distancia
+          if (lastPositionRef.current) {
+            const dist = distanceKm(
+              lastPositionRef.current.lat,
+              lastPositionRef.current.lng,
+              latitude,
+              longitude
+            ) * 1000; // convertir a metros
+            if (dist < MIN_DISTANCE_METERS) return;
+          }
+
+          // Actualizar posición en Supabase
+          lastUpdateRef.current = now;
+          lastPositionRef.current = { lat: latitude, lng: longitude };
+
+          supabase
+            .from("profiles")
+            .update({
+              latitude,
+              longitude,
+              location_accuracy: accuracy ?? null,
+              location_updated_at: new Date().toISOString(),
+            })
+            .eq("id", userId)
+            .then(({ error }) => {
+              if (!error) {
+                qc.invalidateQueries({ queryKey: ["profiles"] });
+              }
+            });
+        },
+        (error) => {
+          console.error("Error en seguimiento de ubicación:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 20_000,
+          maximumAge: 10_000,
+        }
+      );
+    }
+
+    // Limpieza al desmontar o dejar de compartir
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+    };
+  }, [isSharing, userId, qc]);
 }
 
 function PersonChip({ p, mine }: { p: Profile | undefined; mine: boolean }) {
@@ -230,6 +317,9 @@ function DistanceAndMap({ userId }: { userId: string }) {
   const people = useMapPeople(me, partner);
   const sharing = isSharingLocation(me);
 
+  // Usar seguimiento en vivo con watchPosition
+  useLiveLocationTracking(userId, sharing);
+
   const share = useMutation({
     mutationFn: async (opts: { hours: number; silent?: boolean }) => {
       const pos = await readPosition();
@@ -270,14 +360,8 @@ function DistanceAndMap({ userId }: { userId: string }) {
     },
   });
 
-  // Mientras compartes y tienes la página abierta, refrescamos tu posición cada 2 minutos.
-  const shareRef = useRef(share);
-  shareRef.current = share;
-  useEffect(() => {
-    if (!sharing) return;
-    const id = window.setInterval(() => shareRef.current.mutate({ hours: 0, silent: true }), 120_000);
-    return () => window.clearInterval(id);
-  }, [sharing]);
+  // Eliminar el intervalo anterior ya que ahora usamos watchPosition
+  // El seguimiento continuo se maneja en useLiveLocationTracking
 
   // Actualiza la vista cuando la pareja cambia su ubicación.
   useEffect(() => {

@@ -1,0 +1,18 @@
+{
+  "name": "Nuestro Espacio",
+  "short_name": "Nuestro Espacio",
+  "description": "El rincón privado de los dos: notas, fotos, videos, citas y más.",
+  "id": "/panel",
+  "start_url": "/panel",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#26141e",
+  "theme_color": "#26141e",
+  "lang": "es",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
