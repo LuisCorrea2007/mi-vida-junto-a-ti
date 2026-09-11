@@ -52,6 +52,7 @@ const NAV = [
   { to: "/consejero", label: "Consejero", icon: MessageCircleHeart },
   { to: "/notas", label: "Notas", icon: NotebookPen },
   { to: "/galeria", label: "Galería", icon: Images },
+  { to: "/conexion", label: "Conexión", icon: Handshake },
   { to: "/videos", label: "Videos", icon: Video },
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
   { to: "/cerca", label: "Ahora", icon: MapPin },
