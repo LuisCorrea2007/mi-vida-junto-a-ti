@@ -51,6 +51,7 @@ export function useCheckIns() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "Nuevo check-in de tu pareja",
             message: `${data.emotion} · Energía: ${data.energy_level}/10`,
           });
@@ -115,6 +116,7 @@ export function useAgreements() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "Nuevo acuerdo propuesto",
             message: data.title,
           });
@@ -140,6 +142,7 @@ export function useAgreements() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "¡Acuerdo cumplido! 🎉",
             message: data.title,
           });
@@ -216,6 +219,7 @@ export function useDeepQuestions() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "Tu pareja respondió una pregunta",
             message: "Descúbrela si ya respondiste también",
           });
@@ -283,6 +287,7 @@ export function useCouplePlans() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "Nuevo plan propuesto",
             message: data.title,
           });
@@ -307,6 +312,7 @@ export function useCouplePlans() {
         try {
           await notifyPartner(user.id, {
             type: "conexion",
+            link: "/conexion",
             title: "¡A tu pareja le gusta un plan!",
             message: "Revisa si coinciden sus votos",
           });
