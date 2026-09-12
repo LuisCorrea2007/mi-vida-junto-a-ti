@@ -30,7 +30,7 @@ export function useCheckIns() {
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as CheckIn[];
     },
   });
 
@@ -42,7 +42,7 @@ export function useCheckIns() {
         .select()
         .single();
       if (error) throw error;
-      return data as CheckIn;
+      return data as unknown as CheckIn;
     },
     onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["checkins"] });
@@ -50,9 +50,9 @@ export function useCheckIns() {
       if (user?.id) {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "Nuevo check-in de tu pareja",
-            body: `${data.emotion} · Energía: ${data.energy_level}/10`,
-            tag: `checkin-${data.id}`,
+            message: `${data.emotion} · Energía: ${data.energy_level}/10`,
           });
         } catch {}
       }
@@ -95,7 +95,7 @@ export function useAgreements() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as Agreement[];
     },
   });
 
@@ -107,16 +107,16 @@ export function useAgreements() {
         .select()
         .single();
       if (error) throw error;
-      return data as Agreement;
+      return data as unknown as Agreement;
     },
     onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["agreements"] });
       if (user?.id) {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "Nuevo acuerdo propuesto",
-            body: data.title,
-            tag: `agreement-${data.id}`,
+            message: data.title,
           });
         } catch {}
       }
@@ -132,16 +132,16 @@ export function useAgreements() {
         .select()
         .single();
       if (error) throw error;
-      return data as Agreement;
+      return data as unknown as Agreement;
     },
     onSuccess: async (data, { updates }) => {
       qc.invalidateQueries({ queryKey: ["agreements"] });
       if (user?.id && updates.status === "cumplido") {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "¡Acuerdo cumplido! 🎉",
-            body: data.title,
-            tag: `agreement-done-${data.id}`,
+            message: data.title,
           });
         } catch {}
       }
@@ -182,7 +182,7 @@ export function useDeepQuestions() {
         .order("is_daily", { ascending: false })
         .order("created_at");
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as DeepQuestion[];
     },
   });
 
@@ -195,7 +195,7 @@ export function useDeepQuestions() {
         .select("*")
         .eq("user_id", user!.id);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as QuestionResponse[];
     },
   });
 
@@ -207,7 +207,7 @@ export function useDeepQuestions() {
         .select()
         .single();
       if (error) throw error;
-      return data as QuestionResponse;
+      return data as unknown as QuestionResponse;
     },
     onSuccess: async () => {
       qc.invalidateQueries({ queryKey: ["question_responses"] });
@@ -215,9 +215,9 @@ export function useDeepQuestions() {
       if (user?.id) {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "Tu pareja respondió una pregunta",
-            body: "Descúbrela si ya respondiste también",
-            tag: "question-response",
+            message: "Descúbrela si ya respondiste también",
           });
         } catch {}
       }
@@ -263,7 +263,7 @@ export function useCouplePlans() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as CouplePlan[];
     },
   });
 
@@ -275,16 +275,16 @@ export function useCouplePlans() {
         .select()
         .single();
       if (error) throw error;
-      return data as CouplePlan;
+      return data as unknown as CouplePlan;
     },
     onSuccess: async (data) => {
       qc.invalidateQueries({ queryKey: ["couple_plans"] });
       if (user?.id) {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "Nuevo plan propuesto",
-            body: data.title,
-            tag: `plan-${data.id}`,
+            message: data.title,
           });
         } catch {}
       }
@@ -299,16 +299,16 @@ export function useCouplePlans() {
         .select()
         .single();
       if (error) throw error;
-      return data as PlanVote;
+      return data as unknown as PlanVote;
     },
     onSuccess: async (_, { planId, voteType }) => {
       qc.invalidateQueries({ queryKey: ["couple_plans"] });
       if (user?.id && voteType === "yes") {
         try {
           await notifyPartner(user.id, {
+            type: "conexion",
             title: "¡A tu pareja le gusta un plan!",
-            body: "Revisa si coinciden sus votos",
-            tag: `plan-vote-${planId}`,
+            message: "Revisa si coinciden sus votos",
           });
         } catch {}
       }
