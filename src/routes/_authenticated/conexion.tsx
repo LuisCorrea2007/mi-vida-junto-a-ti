@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Heart, Handshake, Brain, CalendarHeart, Send, Plus, Check } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
 import { useCheckIns, useAgreements, useDeepQuestions, useCouplePlans } from "@/hooks/use-conexion";
 import { useRealtime } from "@/hooks/use-realtime";
 import { Button } from "@/components/ui/button";
