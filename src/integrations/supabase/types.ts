@@ -76,6 +76,38 @@ export type Database = {
         }
         Relationships: []
       }
+      agreement_comments: {
+        Row: {
+          agreement_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          agreement_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          agreement_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_comments_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "couple_agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       albums: {
         Row: {
           created_at: string
@@ -186,6 +218,75 @@ export type Database = {
         }
         Relationships: []
       }
+      couple_agreements: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          review_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          review_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          review_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      couple_checkins: {
+        Row: {
+          created_at: string
+          emotion: string
+          energy_level: number
+          id: string
+          need: string | null
+          note: string | null
+          support_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emotion: string
+          energy_level?: number
+          id?: string
+          need?: string | null
+          note?: string | null
+          support_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emotion?: string
+          energy_level?: number
+          id?: string
+          need?: string | null
+          note?: string | null
+          support_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       couple_members: {
         Row: {
           couple_id: string
@@ -214,6 +315,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      couple_plans: {
+        Row: {
+          budget: string
+          created_at: string
+          description: string | null
+          id: string
+          location_type: string
+          mood: string
+          planned_date: string | null
+          status: string
+          time_available: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_type?: string
+          mood?: string
+          planned_date?: string | null
+          status?: string
+          time_available?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_type?: string
+          mood?: string
+          planned_date?: string | null
+          status?: string
+          time_available?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       couples: {
         Row: {
@@ -348,6 +494,30 @@ export type Database = {
           updated_at?: string
           url?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      deep_questions: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_daily: boolean
+          question: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_daily?: boolean
+          question: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_daily?: boolean
+          question?: string
         }
         Relationships: []
       }
@@ -934,6 +1104,38 @@ export type Database = {
           },
         ]
       }
+      plan_votes: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          user_id: string
+          vote_type?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_votes_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "couple_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           anniversary_date: string | null
@@ -1002,6 +1204,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      question_responses: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          is_favorite: boolean
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "deep_questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quotes: {
         Row: {

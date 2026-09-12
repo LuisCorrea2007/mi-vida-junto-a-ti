@@ -408,8 +408,8 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
   }
 
   if (name === "crear_nota") {
-    const title = asString(args.title);
-    const content = asString(args.content);
+    const title = asString(args['title']);
+    const content = asString(args['content']);
     if (!title || !content) throw new Error("La nota necesita título y contenido.");
     const { error } = await supabase.from("notes").insert({ user_id: userId, title, content });
     if (error) throw error;
@@ -417,8 +417,8 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
   }
 
   if (name === "crear_dedicatoria") {
-    const title = asString(args.title);
-    const content = asString(args.content);
+    const title = asString(args['title']);
+    const content = asString(args['content']);
     if (!title || !content) throw new Error("La dedicatoria necesita título y contenido.");
     const { error } = await supabase
       .from("dedications")
@@ -428,8 +428,8 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
   }
 
   if (name === "agendar_evento") {
-    const title = asString(args.title);
-    const date = asString(args.date);
+    const title = asString(args['title']);
+    const date = asString(args['date']);
     if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       throw new Error("El evento necesita un título y una fecha válida YYYY-MM-DD.");
     }
@@ -437,9 +437,9 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
       user_id: userId,
       title,
       date,
-      time: optionalString(args.time),
-      location: optionalString(args.location),
-      description: optionalString(args.description),
+      time: optionalString(args['time']),
+      location: optionalString(args['location']),
+      description: optionalString(args['description']),
       category: "cita",
     });
     if (error) throw error;
@@ -447,9 +447,9 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
   }
 
   if (name === "crear_capsula") {
-    const title = asString(args.title);
-    const content = asString(args.content);
-    const rawOpenAt = asString(args.open_at);
+    const title = asString(args['title']);
+    const content = asString(args['content']);
+    const rawOpenAt = asString(args['open_at']);
     const parsed = rawOpenAt ? new Date(rawOpenAt) : null;
     if (!title || !content || !parsed || Number.isNaN(parsed.getTime())) {
       throw new Error("La cápsula necesita título, contenido y una fecha de apertura válida.");
@@ -465,66 +465,66 @@ async function executeAdvisorTool(name: string, rawArgs: string, userId: string)
   }
 
   if (name === "crear_reto") {
-    const title = asString(args.title);
+    const title = asString(args['title']);
     if (!title) throw new Error("El reto necesita un título.");
     const { error } = await supabase.from("challenges").insert({
       user_id: userId,
       title,
-      description: optionalString(args.description),
+      description: optionalString(args['description']),
     });
     if (error) throw error;
     return "Reto creado correctamente en Retos.";
   }
 
   if (name === "agregar_cancion") {
-    const title = asString(args.title);
+    const title = asString(args['title']);
     if (!title) throw new Error("La canción necesita un título.");
     const { error } = await supabase.from("songs").insert({
       user_id: userId,
       title,
-      artist: optionalString(args.artist),
-      url: optionalString(args.url),
-      note: optionalString(args.note),
+      artist: optionalString(args['artist']),
+      url: optionalString(args['url']),
+      note: optionalString(args['note']),
     });
     if (error) throw error;
     return "Canción agregada correctamente en Canciones.";
   }
 
   if (name === "agregar_frase") {
-    const content = asString(args.content);
+    const content = asString(args['content']);
     if (!content) throw new Error("La frase no puede estar vacía.");
     const { error } = await supabase.from("quotes").insert({
       user_id: userId,
       content,
-      author: optionalString(args.author),
+      author: optionalString(args['author']),
     });
     if (error) throw error;
     return "Frase guardada correctamente.";
   }
 
   if (name === "registrar_animo") {
-    const emoji = asString(args.emoji);
-    const label = asString(args.label);
+    const emoji = asString(args['emoji']);
+    const label = asString(args['label']);
     if (!emoji || !label) throw new Error("El ánimo necesita emoji y descripción.");
     const { error } = await supabase.from("moods").insert({
       user_id: userId,
       emoji,
       label,
-      note: optionalString(args.note),
+      note: optionalString(args['note']),
     });
     if (error) throw error;
     return "Ánimo registrado correctamente.";
   }
 
   if (name === "avisar_pareja") {
-    const title = asString(args.title);
-    const message = asString(args.message);
+    const title = asString(args['title']);
+    const message = asString(args['message']);
     if (!title || !message) throw new Error("El aviso necesita título y mensaje.");
     await notifyPartner(userId, {
       type: "consejero",
       title,
       message,
-      link: optionalString(args.link) ?? "/consejero",
+      link: optionalString(args['link']) ?? "/consejero",
     });
     return "Aviso enviado correctamente a tu pareja.";
   }
@@ -582,7 +582,10 @@ function ConsejeroThread() {
       .from("advisor_threads")
       .update({ is_shared: next })
       .eq("id", thread.id);
-    if (error) return toast.error("No se pudo cambiar");
+    if (error) {
+      toast.error("No se pudo cambiar");
+      return;
+    }
     qc.invalidateQueries({ queryKey: ["advisor-thread", id] });
     qc.invalidateQueries({ queryKey: ["advisor-threads"] });
     if (next) {

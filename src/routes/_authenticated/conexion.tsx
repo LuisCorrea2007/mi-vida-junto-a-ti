@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Heart, Handshake, Brain, CalendarHeart, Send, Plus, Check } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
 import { useCheckIns, useAgreements, useDeepQuestions, useCouplePlans } from "@/hooks/use-conexion";
+import { useRealtime } from "@/hooks/use-realtime";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -278,6 +278,13 @@ function PlansSection() {
 }
 
 function ConexionPage() {
+  useRealtime(
+    "couple_checkins",
+    "couple_agreements",
+    "question_responses",
+    "couple_plans",
+    "plan_votes",
+  );
   return (
     <div className="mx-auto max-w-3xl p-4">
       <div className="mb-6 text-center"><h1 className="text-2xl font-bold">Conexión</h1><p className="text-muted-foreground">Nuevas formas de conectar como pareja</p></div>
