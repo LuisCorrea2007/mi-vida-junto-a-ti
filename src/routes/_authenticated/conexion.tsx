@@ -279,6 +279,13 @@ function PlansSection() {
 }
 
 function ConexionPage() {
+  useRealtime(
+    "couple_checkins",
+    "couple_agreements",
+    "question_responses",
+    "couple_plans",
+    "plan_votes",
+  );
   return (
     <div className="mx-auto max-w-3xl p-4">
       <div className="mb-6 text-center"><h1 className="text-2xl font-bold">Conexión</h1><p className="text-muted-foreground">Nuevas formas de conectar como pareja</p></div>
