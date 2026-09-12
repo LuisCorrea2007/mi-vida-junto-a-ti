@@ -6,9 +6,7 @@
     "directory": "../public"
   },
   "name": "espacio-nuestro",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": [],
   "no_bundle": true,
   "rules": [
     {
