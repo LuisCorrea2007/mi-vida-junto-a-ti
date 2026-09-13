@@ -129,17 +129,17 @@ function Panel() {
   const me = profiles?.find((p) => p.id === user?.id);
 
   return (
-    <div className="space-y-8">
-      <section className="surface warm-gradient animate-fade-up p-5 text-center sm:p-8">
+    <div className="space-y-6 lg:space-y-8">
+      <section className="surface warm-gradient animate-fade-up relative overflow-hidden p-6 text-left sm:p-10 lg:min-h-72">
         <p className="text-xs uppercase tracking-[0.25em] text-primary">
           {greeting(me?.name)}
         </p>
         {elapsed ? (
           <>
-            <h1 className="mt-3 font-display text-4xl font-semibold sm:text-5xl">
+            <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold sm:text-6xl">
               {elapsed.dias.toLocaleString("es")} días juntos
             </h1>
-            <p className="mt-2 font-mono text-sm text-muted-foreground">
+            <p className="mt-3 font-mono text-sm text-muted-foreground">
               {elapsed.horas}h {elapsed.minutos}m {elapsed.segundos}s
             </p>
           </>
@@ -158,10 +158,10 @@ function Panel() {
               : `Faltan ${anniversaryIn} ${anniversaryIn === 1 ? "día" : "días"} para su aniversario 💗`}
           </p>
         )}
-        <p className="mx-auto mt-6 max-w-md text-sm italic text-muted-foreground">“{quote}”</p>
+        <p className="mt-8 max-w-xl text-sm italic text-muted-foreground">“{quote}”</p>
       </section>
 
-      <section className="surface warm-gradient p-6">
+      <section className="surface p-6 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
             <div className="rounded-2xl bg-primary/15 p-3">
@@ -181,7 +181,7 @@ function Panel() {
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {[
           { label: "Notas", value: stats?.notas, icon: NotebookPen, to: "/notas" as const },
           { label: "Fotos", value: stats?.fotos, icon: Images, to: "/galeria" as const },
@@ -190,8 +190,8 @@ function Panel() {
           { label: "Diversión", value: "∞", icon: Laugh, to: "/diversion" as const },
           { label: "Videos", value: "", icon: Video, to: "/videos" as const },
         ].map((s) => (
-          <Link key={s.label} to={s.to} className="surface p-4 transition-shadow hover:shadow-[var(--shadow-lift)]">
-            <s.icon className="size-4 text-primary" />
+          <Link key={s.label} to={s.to} className="surface group p-4">
+            <s.icon className="size-4 text-primary transition-transform duration-200 group-hover:scale-110" />
             <p className="mt-3 font-display text-2xl font-semibold">{s.value ?? "—"}</p>
             <p className="text-xs text-muted-foreground">{s.label}</p>
           </Link>
