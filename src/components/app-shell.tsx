@@ -308,16 +308,47 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-sidebar-border bg-sidebar/90 p-4 backdrop-blur-xl lg:flex">
+        <Link to="/panel" className="mb-6 flex items-center gap-3 px-2 py-2">
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-primary shadow-[var(--shadow-glow)]">
+            <Heart className="size-5 fill-primary-foreground text-primary-foreground" />
+          </span>
+          <span className="font-display text-lg font-semibold text-sidebar-foreground">Nuestro Espacio</span>
+        </Link>
+        <ScrollArea className="min-h-0 flex-1 pr-2">
+          <nav className="space-y-1">
+            {NAV.map((item) => (
+              <Link key={item.to} to={item.to} className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                isRouteActive(pathname, item.to) && "bg-sidebar-accent text-primary shadow-[inset_0_0_18px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
+              )}>
+                <item.icon className="size-4.5" />
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </ScrollArea>
+        <Link to="/ajustes" className="mt-4 flex items-center gap-3 rounded-2xl border border-sidebar-border bg-card/40 p-3 transition-colors hover:bg-sidebar-accent">
+          <Avatar className="size-9 border border-primary/25">
+            <AvatarImage src={avatar ?? undefined} alt={profile?.name ?? "Perfil"} />
+            <AvatarFallback className="bg-secondary text-xs">{(profile?.name ?? "?").slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{profile?.name ?? "Mi perfil"}</span><span className="block text-[11px] text-muted-foreground">Ajustes</span></span>
+          <Settings className="size-4 text-muted-foreground" />
+        </Link>
+      </aside>
+
+      <div className="lg:pl-64">
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-4">
-          <Link to="/panel" className="flex shrink-0 items-center gap-2">
+          <Link to="/panel" className="flex shrink-0 items-center gap-2 lg:hidden">
             <Heart className="size-5 fill-primary text-primary" />
             <span className="hidden font-display text-base font-semibold tracking-tight min-[390px]:inline lg:text-lg">
               Nuestro Espacio
             </span>
           </Link>
 
-          <nav className="ml-2 hidden min-w-0 items-center gap-1 lg:flex xl:ml-4">
+          <nav className="ml-2 hidden min-w-0 items-center gap-1">
             {desktopPrimary.map((item) => (
               <Link
                 key={item.to}
@@ -365,6 +396,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </DropdownMenu>
           </nav>
 
+          <p className="hidden font-display text-lg font-semibold lg:block">{NAV.find((item) => isRouteActive(pathname, item.to))?.label ?? "Nuestro Espacio"}</p>
           <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
             {mounted && user && <GlobalSearch />}
             {mounted && user && <NotificationBell userId={user.id} />}
@@ -400,7 +432,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       {mounted && user && <PushBanner userId={user.id} />}
 
-      <main className="mx-auto min-w-0 max-w-6xl px-3 pb-28 pt-5 sm:px-4 sm:pt-8 lg:pb-16">{children}</main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">{children}</main>
+      </div>
 
       <MobileNav pathname={pathname} />
     </div>

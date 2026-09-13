@@ -47,7 +47,7 @@ const FEATURES = [
 function Landing() {
   return (
     <div className="min-h-screen">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-6">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6">
         <span className="flex items-center gap-2 font-display text-lg font-semibold">
           <Heart className="size-5 fill-primary text-primary" /> Nuestro Espacio
         </span>
@@ -58,12 +58,12 @@ function Landing() {
         </div>
       </header>
 
-      <section className="warm-gradient relative overflow-hidden">
-        <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-24">
+      <section className="relative mx-3 overflow-hidden rounded-[2rem] border border-border bg-card/50 shadow-[var(--shadow-lift)] backdrop-blur-xl sm:mx-6">
+        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:py-24">
           <p className="animate-fade-up text-xs font-medium uppercase tracking-[0.28em] text-primary">
             privado · sin ruido · para dos
           </p>
-          <h1 className="animate-fade-up mt-5 font-display text-4xl font-semibold leading-tight text-foreground sm:text-6xl">
+          <h1 className="animate-fade-up mt-5 font-display text-4xl font-semibold leading-tight text-foreground sm:text-7xl">
             Todo lo nuestro, en un<span className="text-gradient"> solo lugar</span>
           </h1>
           <p className="animate-fade-up mx-auto mt-6 max-w-xl text-base text-muted-foreground">
