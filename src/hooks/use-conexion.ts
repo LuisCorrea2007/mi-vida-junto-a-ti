@@ -389,6 +389,31 @@ export function useCouplePlans() {
     },
   });
 
+  const { data: votes } = useQuery({
+    queryKey: ["plan_votes"],
+    queryFn: async (): Promise<PlanVote[]> => {
+      const { data, error } = await supabase.from("plan_votes").select("*");
+      if (error) throw error;
+      return (data ?? []) as PlanVote[];
+    },
+  });
+
+  const updatePlan = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<CouplePlan> }) => {
+      const { error } = await supabase.from("couple_plans").update(updates).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["couple_plans"] }),
+  });
+
+  const deletePlan = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("couple_plans").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["couple_plans"] }),
+  });
+
   const createPlan = useMutation({
     mutationFn: async (input: Omit<CouplePlan, "id" | "user_id" | "created_at" | "updated_at" | "status">) => {
       const { data, error } = await supabase
