@@ -504,6 +504,7 @@ export type Database = {
           id: string
           is_daily: boolean
           question: string
+          user_id: string | null
         }
         Insert: {
           category: string
@@ -511,6 +512,7 @@ export type Database = {
           id?: string
           is_daily?: boolean
           question: string
+          user_id?: string | null
         }
         Update: {
           category?: string
@@ -518,6 +520,7 @@ export type Database = {
           id?: string
           is_daily?: boolean
           question?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -738,6 +741,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gratitudes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_favorite: boolean
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          user_id?: string
+        }
+        Relationships: []
       }
       milestones: {
         Row: {
