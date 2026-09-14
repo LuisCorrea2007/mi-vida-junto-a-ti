@@ -160,6 +160,7 @@ export type DeepQuestion = {
   category: "futuro" | "cariño" | "confianza" | "recuerdos" | "diversion";
   question: string;
   is_daily: boolean;
+  user_id: string | null;
   created_at: string;
 };
 
@@ -189,18 +190,19 @@ export function useDeepQuestions() {
     },
   });
 
-  const { data: responses } = useQuery({
-    queryKey: ["question_responses", user?.id],
+  // Respuestas de los dos (la política de lectura ya limita al espacio de pareja)
+  const { data: allResponses } = useQuery({
+    queryKey: ["question_responses"],
     enabled: !!user,
     queryFn: async (): Promise<QuestionResponse[]> => {
-      const { data, error } = await supabase
-        .from("question_responses")
-        .select("*")
-        .eq("user_id", user!.id);
+      const { data, error } = await supabase.from("question_responses").select("*");
       if (error) throw error;
       return (data ?? []) as QuestionResponse[];
     },
   });
+
+  const responses = (allResponses ?? []).filter((r) => r.user_id === user?.id);
+  const partnerResponses = (allResponses ?? []).filter((r) => r.user_id !== user?.id);
 
   const saveResponse = useMutation({
     mutationFn: async ({ questionId, answer, isFavorite = false }: { questionId: string; answer: string; isFavorite?: boolean }) => {
@@ -214,7 +216,6 @@ export function useDeepQuestions() {
     },
     onSuccess: async () => {
       qc.invalidateQueries({ queryKey: ["question_responses"] });
-      // Notificar para que la pareja vea que respondiste (sin revelar la respuesta)
       if (user?.id) {
         try {
           await notifyPartner(user.id, {
@@ -228,7 +229,122 @@ export function useDeepQuestions() {
     },
   });
 
-  return { questions, responses, saveResponse };
+  const toggleFavorite = useMutation({
+    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
+      const { error } = await supabase
+        .from("question_responses")
+        .update({ is_favorite: isFavorite })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["question_responses"] }),
+  });
+
+  const createQuestion = useMutation({
+    mutationFn: async ({ question, category }: { question: string; category: DeepQuestion["category"] }) => {
+      const { data, error } = await supabase
+        .from("deep_questions")
+        .insert({ question, category, is_daily: false, user_id: user!.id })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as unknown as DeepQuestion;
+    },
+    onSuccess: async (data) => {
+      qc.invalidateQueries({ queryKey: ["deep_questions"] });
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            type: "conexion",
+            link: "/conexion",
+            title: "Nueva pregunta para ustedes",
+            message: data.question,
+          });
+        } catch {}
+      }
+    },
+  });
+
+  const deleteQuestion = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("deep_questions").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["deep_questions"] }),
+  });
+
+  return { questions, responses, partnerResponses, saveResponse, toggleFavorite, createQuestion, deleteQuestion };
+}
+
+// ===================== GRATITUD =====================
+export type Gratitude = {
+  id: string;
+  user_id: string;
+  content: string;
+  is_favorite: boolean;
+  created_at: string;
+};
+
+export function useGratitudes() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+
+  const { data: gratitudes } = useQuery({
+    queryKey: ["gratitudes"],
+    enabled: !!user,
+    queryFn: async (): Promise<Gratitude[]> => {
+      const { data, error } = await supabase
+        .from("gratitudes")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as Gratitude[];
+    },
+  });
+
+  const createGratitude = useMutation({
+    mutationFn: async (content: string) => {
+      const { data, error } = await supabase
+        .from("gratitudes")
+        .insert({ content, user_id: user!.id })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as unknown as Gratitude;
+    },
+    onSuccess: async (data) => {
+      qc.invalidateQueries({ queryKey: ["gratitudes"] });
+      if (user?.id) {
+        try {
+          await notifyPartner(user.id, {
+            type: "conexion",
+            link: "/conexion",
+            title: "Tu pareja te agradeció algo 💗",
+            message: data.content,
+          });
+        } catch {}
+      }
+    },
+  });
+
+  const toggleGratitudeFavorite = useMutation({
+    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
+      const { error } = await supabase.from("gratitudes").update({ is_favorite: isFavorite }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["gratitudes"] }),
+  });
+
+  const deleteGratitude = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("gratitudes").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["gratitudes"] }),
+  });
+
+  return { gratitudes, createGratitude, toggleGratitudeFavorite, deleteGratitude };
 }
 
 // ===================== PLANES PARA DOS =====================
