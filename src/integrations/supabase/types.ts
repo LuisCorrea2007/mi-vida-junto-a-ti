@@ -742,6 +742,30 @@ export type Database = {
           },
         ]
       }
+      gratitudes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_favorite: boolean
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       milestones: {
         Row: {
           created_at: string
