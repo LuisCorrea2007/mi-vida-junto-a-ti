@@ -441,15 +441,17 @@ export function useCouplePlans() {
 
   const votePlan = useMutation({
     mutationFn: async ({ planId, voteType }: { planId: string; voteType: "yes" | "maybe" | "no" }) => {
+      await supabase.from("plan_votes").delete().eq("plan_id", planId).eq("user_id", user!.id);
       const { data, error } = await supabase
         .from("plan_votes")
-        .upsert({ plan_id: planId, user_id: user!.id, vote_type: voteType })
+        .insert({ plan_id: planId, user_id: user!.id, vote_type: voteType })
         .select()
         .single();
       if (error) throw error;
       return data as unknown as PlanVote;
     },
-    onSuccess: async (_, { planId, voteType }) => {
+    onSuccess: async (_, { voteType }) => {
+      qc.invalidateQueries({ queryKey: ["plan_votes"] });
       qc.invalidateQueries({ queryKey: ["couple_plans"] });
       if (user?.id && voteType === "yes") {
         try {
@@ -464,5 +466,5 @@ export function useCouplePlans() {
     },
   });
 
-  return { plans, isLoading, createPlan, votePlan };
+  return { plans, votes, isLoading, createPlan, votePlan, updatePlan, deletePlan };
 }
