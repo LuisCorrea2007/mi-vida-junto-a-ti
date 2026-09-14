@@ -62,7 +62,7 @@ export function useCheckIns() {
     },
   });
 
-  return { myCheckIns, isLoading, createCheckIn };
+  return { myCheckIns, partnerCheckIns, isLoading, createCheckIn };
 }
 
 // ===================== ACUERDOS =====================
