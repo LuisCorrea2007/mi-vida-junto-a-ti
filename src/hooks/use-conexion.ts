@@ -19,20 +19,22 @@ export function useCheckIns() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
-  const { data: myCheckIns, isLoading } = useQuery({
-    queryKey: ["checkins", user?.id],
+  const { data: allCheckIns, isLoading } = useQuery({
+    queryKey: ["checkins"],
     enabled: !!user,
     queryFn: async (): Promise<CheckIn[]> => {
       const { data, error } = await supabase
         .from("couple_checkins")
         .select("*")
-        .eq("user_id", user!.id)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(80);
       if (error) throw error;
       return (data ?? []) as CheckIn[];
     },
   });
+
+  const myCheckIns = (allCheckIns ?? []).filter((c) => c.user_id === user?.id);
+  const partnerCheckIns = (allCheckIns ?? []).filter((c) => c.user_id !== user?.id);
 
   const createCheckIn = useMutation({
     mutationFn: async (input: Omit<CheckIn, "id" | "user_id" | "created_at">) => {
