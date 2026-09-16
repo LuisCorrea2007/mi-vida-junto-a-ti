@@ -302,15 +302,18 @@ function VideosPage() {
   );
 }
 
-function VideoCard({ 
-  video, 
-  profiles, 
-  nameOf, 
-  onComentar 
-}: { 
-  video: VideoRow; 
-  profiles: Profile[]; 
+function VideoCard({
+  video,
+  nameOf,
+  canDelete,
+  onDelete,
+  onComentar,
+}: {
+  video: VideoRow;
+  profiles: Profile[];
   nameOf: (id: string) => string;
+  canDelete: boolean;
+  onDelete: () => void;
   onComentar: (contenido: string) => void;
 }) {
   const [comentario, setComentario] = useState("");
