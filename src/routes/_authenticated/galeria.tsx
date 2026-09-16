@@ -473,6 +473,8 @@ function GalleryPage() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [albumOpen, setAlbumOpen] = useState(false);
   const [albumName, setAlbumName] = useState("");
+  const [query, setQuery] = useState("");
+  const [order, setOrder] = useState<"recientes" | "antiguas">("recientes");
   const { foto } = Route.useSearch();
 
   const { data: albums } = useQuery({
