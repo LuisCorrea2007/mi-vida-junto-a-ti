@@ -233,24 +233,45 @@ function Lightbox({
   photos,
   index,
   userId,
+  albums,
   onClose,
   onMove,
   onFavorite,
   onDelete,
+  onSaveCaption,
+  onMoveAlbum,
   canDelete,
 }: {
   photos: Photo[];
   index: number;
   userId: string;
+  albums: { id: string; name: string }[];
   onClose: () => void;
   onMove: (delta: number) => void;
   onFavorite: () => void;
   onDelete: () => void;
+  onSaveCaption: (text: string) => void;
+  onMoveAlbum: (albumId: string | null) => void;
   canDelete: boolean;
 }) {
   const photo = photos[index]!;
   const { data: url } = useSignedUrl(photo.file_path);
   const [showPanel, setShowPanel] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [caption, setCaption] = useState(photo.caption ?? "");
+  const [slideshow, setSlideshow] = useState(false);
+
+  useEffect(() => {
+    setCaption(photo.caption ?? "");
+    setEditing(false);
+  }, [photo.id, photo.caption]);
+
+  useEffect(() => {
+    if (!slideshow) return;
+    const id = setInterval(() => onMove(1), 4000);
+    return () => clearInterval(id);
+  }, [slideshow, onMove]);
+
 
   async function download() {
     if (!url) return;
