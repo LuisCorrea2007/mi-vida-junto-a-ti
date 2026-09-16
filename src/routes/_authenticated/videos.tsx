@@ -254,6 +254,18 @@ function VideosPage() {
         </CardContent>
       </Card>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          className="w-full sm:w-72"
+          value={busqueda}
+          placeholder="Buscar en los videos…"
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        <span className="text-xs text-muted-foreground">
+          {visibles.length} {visibles.length === 1 ? "video" : "videos"}
+        </span>
+      </div>
+
       {/* Lista de videos */}
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -261,14 +273,16 @@ function VideosPage() {
             <Card key={i} className="h-64 animate-pulse" />
           ))}
         </div>
-      ) : videos && videos.length > 0 ? (
+      ) : visibles.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video: VideoRow) => (
+          {visibles.map((video: VideoRow) => (
             <VideoCard
               key={video.id}
               video={video}
               profiles={profiles ?? []}
               nameOf={nameOf}
+              canDelete={video.user_id === user?.id}
+              onDelete={() => borrarVideo.mutate(video)}
               onComentar={(contenido) =>
                 agregarComentario.mutate({ videoId: video.id, contenido })
               }
