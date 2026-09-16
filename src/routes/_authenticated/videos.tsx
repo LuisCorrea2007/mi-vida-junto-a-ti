@@ -396,6 +396,17 @@ function VideoCard({
             <MessageCircle className="size-4" />
             {comentarios?.length ?? 0}
           </Button>
+          {canDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              aria-label="Borrar video"
+              onClick={onDelete}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
         </div>
 
         {showComentarios && (
