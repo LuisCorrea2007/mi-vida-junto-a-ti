@@ -496,18 +496,43 @@ function GalleryPage() {
     },
   });
 
-  const visible = (photos ?? []).filter(
-    (p) => (album === "todos" || p.album_id === album) && (!onlyFav || p.is_favorite),
-  );
+  const term = query.trim().toLowerCase();
+  const visible = (photos ?? [])
+    .filter(
+      (p) =>
+        (album === "todos" || p.album_id === album) &&
+        (!onlyFav || p.is_favorite) &&
+        (!term || (p.caption ?? "").toLowerCase().includes(term)),
+    )
+    .sort((a, b) =>
+      order === "antiguas"
+        ? a.created_at.localeCompare(b.created_at)
+        : b.created_at.localeCompare(a.created_at),
+    );
 
   // Abre directamente la foto que viene en un aviso (/galeria?foto=…).
   useEffect(() => {
     if (!foto || !photos) return;
     setAlbum("todos");
     setOnlyFav(false);
+    setQuery("");
     const i = photos.findIndex((p) => p.id === foto);
     if (i >= 0) setLightbox(i);
   }, [foto, photos]);
+
+  async function saveCaption(p: Photo, text: string) {
+    const { error } = await supabase.from("photos").update({ caption: text || null }).eq("id", p.id);
+    if (error) { toast.error("Solo quien subió la foto puede describirla"); return; }
+    qc.invalidateQueries({ queryKey: ["photos"] });
+    toast.success("Descripción guardada");
+  }
+
+  async function moveToAlbum(p: Photo, albumId: string | null) {
+    const { error } = await supabase.from("photos").update({ album_id: albumId }).eq("id", p.id);
+    if (error) { toast.error("Solo quien subió la foto puede moverla"); return; }
+    qc.invalidateQueries({ queryKey: ["photos"] });
+    toast.success("Foto movida");
+  }
 
 
   async function handleFiles(files: FileList | null) {
