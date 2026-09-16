@@ -217,6 +217,17 @@ function VideosPage() {
               maxLength={100}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="descripcion">Descripción (opcional)</Label>
+            <Textarea
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Cuéntale qué pasó en ese momento…"
+              maxLength={500}
+              rows={2}
+            />
+          </div>
           <input
             ref={fileInputRef}
             type="file"
