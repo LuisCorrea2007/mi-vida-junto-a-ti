@@ -49,6 +49,8 @@ function VideosPage() {
   const { data: profiles } = useProfiles();
   useRealtime("videos_diarios", "video_comentarios");
   const [titulo, setTitulo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [busqueda, setBusqueda] = useState("");
   const [subiendo, setSubiendo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,6 +89,7 @@ function VideosPage() {
       const { error: dbError } = await supabase.from("videos_diarios").insert({
         user_id: user.id,
         titulo: titulo.trim(),
+        descripcion: descripcion.trim() || null,
         file_path: filePath,
         file_type: file.type,
         file_size: file.size,
