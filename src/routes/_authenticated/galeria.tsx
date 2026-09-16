@@ -647,6 +647,24 @@ function GalleryPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "recientes" | "antiguas")}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+            <SelectItem value="antiguas">Más antiguas</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="relative w-full sm:w-64">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            value={query}
+            placeholder="Buscar por descripción…"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
         <Button
           variant={onlyFav ? "default" : "outline"}
           className="rounded-full"
@@ -654,6 +672,9 @@ function GalleryPage() {
         >
           <Star className="mr-1 size-4" /> Favoritas
         </Button>
+        <div className="flex items-center text-xs text-muted-foreground">
+          {visible.length} {visible.length === 1 ? "foto" : "fotos"}
+        </div>
       </div>
 
       {isLoading ? (
