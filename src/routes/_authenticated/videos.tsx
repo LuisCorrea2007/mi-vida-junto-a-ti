@@ -362,8 +362,12 @@ function VideoCard({
           <div className="min-w-0 flex-1">
             <h3 className="font-display text-lg font-semibold">{video.titulo}</h3>
             <p className="text-xs text-muted-foreground">
-              Por {nameOf(video.user_id)} • {formatSize(video.file_size)}
+              Por {nameOf(video.user_id)} • {formatSize(video.file_size)} •{" "}
+              {new Date(video.created_at).toLocaleDateString("es", { day: "numeric", month: "long" })}
             </p>
+            {video.descripcion && (
+              <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{video.descripcion}</p>
+            )}
           </div>
           <Badge variant="secondary">
             <Clock className="mr-1 size-3" />
