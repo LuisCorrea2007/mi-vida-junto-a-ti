@@ -339,7 +339,43 @@ function Lightbox({
       </div>
 
       <aside className="surface mx-3 mb-3 flex max-h-[46dvh] min-w-0 flex-col gap-4 rounded-2xl p-4 md:my-4 md:ml-0 md:mr-4 md:max-h-none md:w-80">
-        {photo.caption && <p className="text-sm">{photo.caption}</p>}
+        {editing ? (
+          <div className="space-y-2">
+            <Input
+              value={caption}
+              maxLength={300}
+              placeholder="Escribe un recuerdo para esta foto…"
+              onChange={(e) => setCaption(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="rounded-full"
+                onClick={() => {
+                  onSaveCaption(caption.trim());
+                  setEditing(false);
+                }}
+              >
+                Guardar
+              </Button>
+              <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setEditing(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button className="text-left text-sm" onClick={() => setEditing(true)}>
+            {photo.caption || <span className="text-muted-foreground">Añadir una descripción…</span>}
+          </button>
+        )}
+        <p className="text-[11px] text-muted-foreground">
+          {index + 1} de {photos.length} ·{" "}
+          {new Date(photo.created_at).toLocaleDateString("es", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="rounded-full" onClick={onFavorite}>
             <Star className={photo.is_favorite ? "mr-1 size-4 fill-primary text-primary" : "mr-1 size-4"} />
@@ -347,6 +383,31 @@ function Lightbox({
           </Button>
           <Button variant="secondary" size="sm" className="rounded-full" onClick={download}>
             <Download className="mr-1 size-4" /> Descargar
+          </Button>
+          <Button
+            variant={slideshow ? "default" : "secondary"}
+            size="sm"
+            className="rounded-full"
+            onClick={() => setSlideshow((v) => !v)}
+          >
+            {slideshow ? <Pause className="mr-1 size-4" /> : <Play className="mr-1 size-4" />}
+            {slideshow ? "Pausar" : "Pase de fotos"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full"
+            onClick={() => {
+              const text = photo.caption ?? "Mira este recuerdo nuestro 💗";
+              const url = `${window.location.origin}/galeria?foto=${photo.id}`;
+              if (navigator.share) void navigator.share({ title: "Nuestro Espacio", text, url });
+              else {
+                void navigator.clipboard.writeText(url);
+                toast.success("Enlace copiado");
+              }
+            }}
+          >
+            <Share2 className="mr-1 size-4" /> Compartir
           </Button>
           <Button
             variant="secondary"
@@ -362,6 +423,22 @@ function Lightbox({
             </Button>
           )}
         </div>
+        <Select
+          value={photo.album_id ?? "ninguno"}
+          onValueChange={(v) => onMoveAlbum(v === "ninguno" ? null : v)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Álbum" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ninguno">Sin álbum</SelectItem>
+            {albums.map((a) => (
+              <SelectItem key={a.id} value={a.id}>
+                {a.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className={`${showPanel ? "flex" : "hidden"} min-h-0 flex-1 md:flex`}>
           <PhotoPanel key={photo.id} photo={photo} userId={userId} />
         </div>
