@@ -1,7 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Images, Star, Trash2, Upload, X, Download, MessageCircle, Heart } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Heart,
+  Images,
+  MessageCircle,
+  Pause,
+  Play,
+  Search,
+  Share2,
+  Star,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -233,24 +248,45 @@ function Lightbox({
   photos,
   index,
   userId,
+  albums,
   onClose,
   onMove,
   onFavorite,
   onDelete,
+  onSaveCaption,
+  onMoveAlbum,
   canDelete,
 }: {
   photos: Photo[];
   index: number;
   userId: string;
+  albums: { id: string; name: string }[];
   onClose: () => void;
   onMove: (delta: number) => void;
   onFavorite: () => void;
   onDelete: () => void;
+  onSaveCaption: (text: string) => void;
+  onMoveAlbum: (albumId: string | null) => void;
   canDelete: boolean;
 }) {
   const photo = photos[index]!;
   const { data: url } = useSignedUrl(photo.file_path);
   const [showPanel, setShowPanel] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [caption, setCaption] = useState(photo.caption ?? "");
+  const [slideshow, setSlideshow] = useState(false);
+
+  useEffect(() => {
+    setCaption(photo.caption ?? "");
+    setEditing(false);
+  }, [photo.id, photo.caption]);
+
+  useEffect(() => {
+    if (!slideshow) return;
+    const id = setInterval(() => onMove(1), 4000);
+    return () => clearInterval(id);
+  }, [slideshow, onMove]);
+
 
   async function download() {
     if (!url) return;
@@ -318,7 +354,43 @@ function Lightbox({
       </div>
 
       <aside className="surface mx-3 mb-3 flex max-h-[46dvh] min-w-0 flex-col gap-4 rounded-2xl p-4 md:my-4 md:ml-0 md:mr-4 md:max-h-none md:w-80">
-        {photo.caption && <p className="text-sm">{photo.caption}</p>}
+        {editing ? (
+          <div className="space-y-2">
+            <Input
+              value={caption}
+              maxLength={300}
+              placeholder="Escribe un recuerdo para esta foto…"
+              onChange={(e) => setCaption(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                className="rounded-full"
+                onClick={() => {
+                  onSaveCaption(caption.trim());
+                  setEditing(false);
+                }}
+              >
+                Guardar
+              </Button>
+              <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setEditing(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button className="text-left text-sm" onClick={() => setEditing(true)}>
+            {photo.caption || <span className="text-muted-foreground">Añadir una descripción…</span>}
+          </button>
+        )}
+        <p className="text-[11px] text-muted-foreground">
+          {index + 1} de {photos.length} ·{" "}
+          {new Date(photo.created_at).toLocaleDateString("es", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm" className="rounded-full" onClick={onFavorite}>
             <Star className={photo.is_favorite ? "mr-1 size-4 fill-primary text-primary" : "mr-1 size-4"} />
@@ -326,6 +398,31 @@ function Lightbox({
           </Button>
           <Button variant="secondary" size="sm" className="rounded-full" onClick={download}>
             <Download className="mr-1 size-4" /> Descargar
+          </Button>
+          <Button
+            variant={slideshow ? "default" : "secondary"}
+            size="sm"
+            className="rounded-full"
+            onClick={() => setSlideshow((v) => !v)}
+          >
+            {slideshow ? <Pause className="mr-1 size-4" /> : <Play className="mr-1 size-4" />}
+            {slideshow ? "Pausar" : "Pase de fotos"}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full"
+            onClick={() => {
+              const text = photo.caption ?? "Mira este recuerdo nuestro 💗";
+              const url = `${window.location.origin}/galeria?foto=${photo.id}`;
+              if (navigator.share) void navigator.share({ title: "Nuestro Espacio", text, url });
+              else {
+                void navigator.clipboard.writeText(url);
+                toast.success("Enlace copiado");
+              }
+            }}
+          >
+            <Share2 className="mr-1 size-4" /> Compartir
           </Button>
           <Button
             variant="secondary"
@@ -341,6 +438,22 @@ function Lightbox({
             </Button>
           )}
         </div>
+        <Select
+          value={photo.album_id ?? "ninguno"}
+          onValueChange={(v) => onMoveAlbum(v === "ninguno" ? null : v)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Álbum" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ninguno">Sin álbum</SelectItem>
+            {albums.map((a) => (
+              <SelectItem key={a.id} value={a.id}>
+                {a.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className={`${showPanel ? "flex" : "hidden"} min-h-0 flex-1 md:flex`}>
           <PhotoPanel key={photo.id} photo={photo} userId={userId} />
         </div>
@@ -360,6 +473,8 @@ function GalleryPage() {
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [albumOpen, setAlbumOpen] = useState(false);
   const [albumName, setAlbumName] = useState("");
+  const [query, setQuery] = useState("");
+  const [order, setOrder] = useState<"recientes" | "antiguas">("recientes");
   const { foto } = Route.useSearch();
 
   const { data: albums } = useQuery({
@@ -383,18 +498,43 @@ function GalleryPage() {
     },
   });
 
-  const visible = (photos ?? []).filter(
-    (p) => (album === "todos" || p.album_id === album) && (!onlyFav || p.is_favorite),
-  );
+  const term = query.trim().toLowerCase();
+  const visible = (photos ?? [])
+    .filter(
+      (p) =>
+        (album === "todos" || p.album_id === album) &&
+        (!onlyFav || p.is_favorite) &&
+        (!term || (p.caption ?? "").toLowerCase().includes(term)),
+    )
+    .sort((a, b) =>
+      order === "antiguas"
+        ? a.created_at.localeCompare(b.created_at)
+        : b.created_at.localeCompare(a.created_at),
+    );
 
   // Abre directamente la foto que viene en un aviso (/galeria?foto=…).
   useEffect(() => {
     if (!foto || !photos) return;
     setAlbum("todos");
     setOnlyFav(false);
+    setQuery("");
     const i = photos.findIndex((p) => p.id === foto);
     if (i >= 0) setLightbox(i);
   }, [foto, photos]);
+
+  async function saveCaption(p: Photo, text: string) {
+    const { error } = await supabase.from("photos").update({ caption: text || null }).eq("id", p.id);
+    if (error) { toast.error("Solo quien subió la foto puede describirla"); return; }
+    qc.invalidateQueries({ queryKey: ["photos"] });
+    toast.success("Descripción guardada");
+  }
+
+  async function moveToAlbum(p: Photo, albumId: string | null) {
+    const { error } = await supabase.from("photos").update({ album_id: albumId }).eq("id", p.id);
+    if (error) { toast.error("Solo quien subió la foto puede moverla"); return; }
+    qc.invalidateQueries({ queryKey: ["photos"] });
+    toast.success("Foto movida");
+  }
 
 
   async function handleFiles(files: FileList | null) {
@@ -507,6 +647,24 @@ function GalleryPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "recientes" | "antiguas")}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+            <SelectItem value="antiguas">Más antiguas</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="relative w-full sm:w-64">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            value={query}
+            placeholder="Buscar por descripción…"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
         <Button
           variant={onlyFav ? "default" : "outline"}
           className="rounded-full"
@@ -514,6 +672,9 @@ function GalleryPage() {
         >
           <Star className="mr-1 size-4" /> Favoritas
         </Button>
+        <div className="flex items-center text-xs text-muted-foreground">
+          {visible.length} {visible.length === 1 ? "foto" : "fotos"}
+        </div>
       </div>
 
       {isLoading ? (
@@ -543,6 +704,9 @@ function GalleryPage() {
           photos={visible}
           index={lightbox}
           userId={user.id}
+          albums={albums ?? []}
+          onSaveCaption={(t) => void saveCaption(visible[lightbox]!, t)}
+          onMoveAlbum={(a) => void moveToAlbum(visible[lightbox]!, a)}
           onClose={() => setLightbox(null)}
           onMove={(d) => setLightbox((i) => ((i ?? 0) + d + visible.length) % visible.length)}
           onFavorite={() => toggleFavorite(visible[lightbox]!)}

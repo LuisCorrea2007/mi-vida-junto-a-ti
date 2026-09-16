@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Video, Upload, Download, MessageCircle, Clock, Play } from "lucide-react";
+import { Video, Upload, Download, MessageCircle, Clock, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -30,6 +30,7 @@ type VideoRow = {
   id: string;
   user_id: string;
   titulo: string;
+  descripcion: string | null;
   file_path: string;
   file_size: number;
   created_at: string;
@@ -48,6 +49,8 @@ function VideosPage() {
   const { data: profiles } = useProfiles();
   useRealtime("videos_diarios", "video_comentarios");
   const [titulo, setTitulo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [busqueda, setBusqueda] = useState("");
   const [subiendo, setSubiendo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,6 +89,7 @@ function VideosPage() {
       const { error: dbError } = await supabase.from("videos_diarios").insert({
         user_id: user.id,
         titulo: titulo.trim(),
+        descripcion: descripcion.trim() || null,
         file_path: filePath,
         file_type: file.type,
         file_size: file.size,
@@ -108,6 +112,7 @@ function VideosPage() {
     onSuccess: () => {
       toast.success("¡Video subido!");
       setTitulo("");
+      setDescripcion("");
       qc.invalidateQueries({ queryKey: ["videos"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -162,6 +167,27 @@ function VideosPage() {
 
   const nameOf = (uid: string) => profiles?.find((p: Profile) => p.id === uid)?.name ?? "Alguien";
 
+  const borrarVideo = useMutation({
+    mutationFn: async (video: VideoRow) => {
+      const { error } = await supabase.from("videos_diarios").delete().eq("id", video.id);
+      if (error) throw new Error("Solo quien subió el video puede borrarlo");
+      await supabase.storage.from("media").remove([video.file_path]);
+    },
+    onSuccess: () => {
+      toast.success("Video borrado");
+      qc.invalidateQueries({ queryKey: ["videos"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const term = busqueda.trim().toLowerCase();
+  const visibles = (videos ?? []).filter(
+    (v) =>
+      !term ||
+      v.titulo.toLowerCase().includes(term) ||
+      (v.descripcion ?? "").toLowerCase().includes(term),
+  );
+
   return (
     <div className="space-y-6">
       <header>
@@ -191,6 +217,17 @@ function VideosPage() {
               maxLength={100}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="descripcion">Descripción (opcional)</Label>
+            <Textarea
+              id="descripcion"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Cuéntale qué pasó en ese momento…"
+              maxLength={500}
+              rows={2}
+            />
+          </div>
           <input
             ref={fileInputRef}
             type="file"
@@ -217,6 +254,18 @@ function VideosPage() {
         </CardContent>
       </Card>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          className="w-full sm:w-72"
+          value={busqueda}
+          placeholder="Buscar en los videos…"
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        <span className="text-xs text-muted-foreground">
+          {visibles.length} {visibles.length === 1 ? "video" : "videos"}
+        </span>
+      </div>
+
       {/* Lista de videos */}
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -224,14 +273,16 @@ function VideosPage() {
             <Card key={i} className="h-64 animate-pulse" />
           ))}
         </div>
-      ) : videos && videos.length > 0 ? (
+      ) : visibles.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {videos.map((video: VideoRow) => (
+          {visibles.map((video: VideoRow) => (
             <VideoCard
               key={video.id}
               video={video}
               profiles={profiles ?? []}
               nameOf={nameOf}
+              canDelete={video.user_id === user?.id}
+              onDelete={() => borrarVideo.mutate(video)}
               onComentar={(contenido) =>
                 agregarComentario.mutate({ videoId: video.id, contenido })
               }
@@ -251,15 +302,18 @@ function VideosPage() {
   );
 }
 
-function VideoCard({ 
-  video, 
-  profiles, 
-  nameOf, 
-  onComentar 
-}: { 
-  video: VideoRow; 
-  profiles: Profile[]; 
+function VideoCard({
+  video,
+  nameOf,
+  canDelete,
+  onDelete,
+  onComentar,
+}: {
+  video: VideoRow;
+  profiles: Profile[];
   nameOf: (id: string) => string;
+  canDelete: boolean;
+  onDelete: () => void;
   onComentar: (contenido: string) => void;
 }) {
   const [comentario, setComentario] = useState("");
@@ -308,8 +362,12 @@ function VideoCard({
           <div className="min-w-0 flex-1">
             <h3 className="font-display text-lg font-semibold">{video.titulo}</h3>
             <p className="text-xs text-muted-foreground">
-              Por {nameOf(video.user_id)} • {formatSize(video.file_size)}
+              Por {nameOf(video.user_id)} • {formatSize(video.file_size)} •{" "}
+              {new Date(video.created_at).toLocaleDateString("es", { day: "numeric", month: "long" })}
             </p>
+            {video.descripcion && (
+              <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{video.descripcion}</p>
+            )}
           </div>
           <Badge variant="secondary">
             <Clock className="mr-1 size-3" />
@@ -338,6 +396,17 @@ function VideoCard({
             <MessageCircle className="size-4" />
             {comentarios?.length ?? 0}
           </Button>
+          {canDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              aria-label="Borrar video"
+              onClick={onDelete}
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          )}
         </div>
 
         {showComentarios && (
