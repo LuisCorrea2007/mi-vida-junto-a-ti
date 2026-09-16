@@ -1,7 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Images, Star, Trash2, Upload, X, Download, MessageCircle, Heart } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Heart,
+  Images,
+  MessageCircle,
+  Pause,
+  Play,
+  Search,
+  Share2,
+  Star,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
