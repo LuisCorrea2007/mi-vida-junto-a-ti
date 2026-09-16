@@ -181,6 +181,26 @@ function Panel() {
         </div>
       </section>
 
+      <section className="surface p-5">
+        <p className="text-xs uppercase tracking-[0.2em] text-primary">Accesos rápidos</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {[
+            { label: "Escribir una nota", to: "/notas" as const },
+            { label: "Subir una foto", to: "/galeria" as const },
+            { label: "Crear una cita", to: "/calendario" as const },
+            { label: "Grabar un video", to: "/videos" as const },
+            { label: "Dedicarle algo", to: "/dedicatorias" as const },
+            { label: "Check-in del día", to: "/conexion" as const },
+            { label: "Guardar un deseo", to: "/deseos" as const },
+            { label: "Cápsula del tiempo", to: "/capsulas" as const },
+          ].map((a) => (
+            <Button key={a.label} asChild variant="outline" size="sm" className="rounded-full">
+              <Link to={a.to}>{a.label}</Link>
+            </Button>
+          ))}
+        </div>
+      </section>
+
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {[
           { label: "Notas", value: stats?.notas, icon: NotebookPen, to: "/notas" as const },
