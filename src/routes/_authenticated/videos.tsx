@@ -30,6 +30,7 @@ type VideoRow = {
   id: string;
   user_id: string;
   titulo: string;
+  descripcion: string | null;
   file_path: string;
   file_size: number;
   created_at: string;
