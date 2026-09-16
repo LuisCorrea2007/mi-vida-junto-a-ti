@@ -167,6 +167,27 @@ function VideosPage() {
 
   const nameOf = (uid: string) => profiles?.find((p: Profile) => p.id === uid)?.name ?? "Alguien";
 
+  const borrarVideo = useMutation({
+    mutationFn: async (video: VideoRow) => {
+      const { error } = await supabase.from("videos_diarios").delete().eq("id", video.id);
+      if (error) throw new Error("Solo quien subió el video puede borrarlo");
+      await supabase.storage.from("media").remove([video.file_path]);
+    },
+    onSuccess: () => {
+      toast.success("Video borrado");
+      qc.invalidateQueries({ queryKey: ["videos"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const term = busqueda.trim().toLowerCase();
+  const visibles = (videos ?? []).filter(
+    (v) =>
+      !term ||
+      v.titulo.toLowerCase().includes(term) ||
+      (v.descripcion ?? "").toLowerCase().includes(term),
+  );
+
   return (
     <div className="space-y-6">
       <header>
