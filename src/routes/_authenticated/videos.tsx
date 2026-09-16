@@ -112,6 +112,7 @@ function VideosPage() {
     onSuccess: () => {
       toast.success("¡Video subido!");
       setTitulo("");
+      setDescripcion("");
       qc.invalidateQueries({ queryKey: ["videos"] });
     },
     onError: (e: Error) => toast.error(e.message),
