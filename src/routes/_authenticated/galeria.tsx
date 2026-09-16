@@ -704,6 +704,9 @@ function GalleryPage() {
           photos={visible}
           index={lightbox}
           userId={user.id}
+          albums={albums ?? []}
+          onSaveCaption={(t) => void saveCaption(visible[lightbox]!, t)}
+          onMoveAlbum={(a) => void moveToAlbum(visible[lightbox]!, a)}
           onClose={() => setLightbox(null)}
           onMove={(d) => setLightbox((i) => ((i ?? 0) + d + visible.length) % visible.length)}
           onFavorite={() => toggleFavorite(visible[lightbox]!)}
