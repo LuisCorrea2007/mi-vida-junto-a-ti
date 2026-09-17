@@ -165,13 +165,23 @@ function WishesPage() {
   });
 
   const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";
-  const visible = (wishes ?? [])
-    .filter((w) => w.is_completed === showDone)
-    .sort(
-      (a, b) =>
-        (votes?.filter((v) => v.wish_id === b.id).length ?? 0) -
-        (votes?.filter((v) => v.wish_id === a.id).length ?? 0),
+  const list = wishes ?? [];
+  const visible = list
+    .filter((w) => {
+      const q = search.trim().toLowerCase();
+      const matchQ =
+        !q || w.title.toLowerCase().includes(q) || (w.description ?? "").toLowerCase().includes(q);
+      const matchC = filter === "todas" || w.category === filter;
+      return w.is_completed === showDone && matchQ && matchC;
+    })
+    .sort((a, b) =>
+      order === "votos"
+        ? (votes?.filter((v) => v.wish_id === b.id).length ?? 0) -
+          (votes?.filter((v) => v.wish_id === a.id).length ?? 0)
+        : 0,
     );
+  const totalBudget = visible.reduce((sum, w) => sum + (w.budget ?? 0), 0);
+  const doneCount = list.filter((w) => w.is_completed).length;
 
   return (
     <div className="space-y-6">
