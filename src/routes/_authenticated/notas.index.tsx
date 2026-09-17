@@ -51,6 +51,8 @@ function NotesPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [archived, setArchived] = useState(false);
+  const [onlyFav, setOnlyFav] = useState(false);
+  const [order, setOrder] = useState<"recientes" | "antiguas">("recientes");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", content: "", category: "amor", scheduled: "" });
 
