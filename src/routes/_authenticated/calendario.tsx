@@ -406,15 +406,35 @@ END:VCALENDAR`;
       </section>
 
       <section className="space-y-3">
-        <h2 className="font-display text-xl font-semibold">
-          {selected
-            ? new Date(`${selected}T00:00:00`).toLocaleDateString("es", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-              })
-            : "Próximos planes"}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-xl font-semibold">
+            {selected
+              ? new Date(`${selected}T00:00:00`).toLocaleDateString("es", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })
+              : "Próximos planes"}
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {listed.length} {listed.length === 1 ? "plan" : "planes"}
+            </span>
+            <Select value={filter} onValueChange={setFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas</SelectItem>
+                {EVENT_CATEGORIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         {isLoading ? (
           <Skeleton className="h-24 rounded-2xl" />
         ) : listed.length === 0 ? (
