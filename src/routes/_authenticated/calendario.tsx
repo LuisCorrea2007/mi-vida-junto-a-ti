@@ -67,6 +67,7 @@ function CalendarPage() {
   const today = new Date();
   const [cursor, setCursor] = useState({ y: today.getFullYear(), m: today.getMonth() });
   const [selected, setSelected] = useState<string | null>(null);
+  const [filter, setFilter] = useState("todas");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     title: "",
