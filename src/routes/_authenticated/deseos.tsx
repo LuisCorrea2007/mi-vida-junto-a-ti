@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, MessageCircle, Plus, Stars, ThumbsUp, Trash2 } from "lucide-react";
+import { Check, MessageCircle, Plus, Search, Stars, ThumbsUp, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -50,6 +50,9 @@ function WishesPage() {
   useRealtime("wishes", "wish_votes", "wish_comments");
   const [open, setOpen] = useState(false);
   const [showDone, setShowDone] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("todas");
+  const [order, setOrder] = useState<"votos" | "recientes">("votos");
   const [commentFor, setCommentFor] = useState<string | null>(null);
   const [comment, setComment] = useState("");
   const [form, setForm] = useState({
@@ -162,13 +165,23 @@ function WishesPage() {
   });
 
   const nameOf = (uid: string) => profiles?.find((p) => p.id === uid)?.name ?? "Alguien";
-  const visible = (wishes ?? [])
-    .filter((w) => w.is_completed === showDone)
-    .sort(
-      (a, b) =>
-        (votes?.filter((v) => v.wish_id === b.id).length ?? 0) -
-        (votes?.filter((v) => v.wish_id === a.id).length ?? 0),
+  const list = wishes ?? [];
+  const visible = list
+    .filter((w) => {
+      const q = search.trim().toLowerCase();
+      const matchQ =
+        !q || w.title.toLowerCase().includes(q) || (w.description ?? "").toLowerCase().includes(q);
+      const matchC = filter === "todas" || w.category === filter;
+      return w.is_completed === showDone && matchQ && matchC;
+    })
+    .sort((a, b) =>
+      order === "votos"
+        ? (votes?.filter((v) => v.wish_id === b.id).length ?? 0) -
+          (votes?.filter((v) => v.wish_id === a.id).length ?? 0)
+        : 0,
     );
+  const totalBudget = visible.reduce((sum, w) => sum + (w.budget ?? 0), 0);
+  const doneCount = list.filter((w) => w.is_completed).length;
 
   return (
     <div className="space-y-6">
@@ -264,6 +277,46 @@ function WishesPage() {
           </Dialog>
         </div>
       </header>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-0 basis-full sm:min-w-52 sm:basis-auto sm:flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar un deseo"
+            className="pl-9"
+          />
+        </div>
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            {WISH_CATEGORIES.map((c) => (
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "votos" | "recientes")}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="votos">Más votados</SelectItem>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        {visible.length} {visible.length === 1 ? "deseo" : "deseos"}
+        {totalBudget > 0 ? ` · presupuesto aproximado ${totalBudget}` : ""} · {doneCount} cumplidos
+      </p>
+
 
       {isLoading ? (
         <div className="space-y-3">

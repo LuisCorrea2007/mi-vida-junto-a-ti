@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, Plus, Search, Star } from "lucide-react";
+import { Archive, Heart, Plus, Search, Star } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -51,6 +51,8 @@ function NotesPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("todas");
   const [archived, setArchived] = useState(false);
+  const [onlyFav, setOnlyFav] = useState(false);
+  const [order, setOrder] = useState<"recientes" | "antiguas">("recientes");
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", content: "", category: "amor", scheduled: "" });
 
@@ -103,12 +105,40 @@ function NotesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const visible = (notes ?? []).filter((n) => {
-    const q = search.trim().toLowerCase();
-    const matchQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
-    const matchC = category === "todas" || n.category === category;
-    return matchQ && matchC;
+  const toggleFav = useMutation({
+    mutationFn: async ({ id, fav }: { id: string; fav: boolean }) => {
+      const { error } = await supabase.from("notes").update({ is_favorite: fav }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notes"] }),
+    onError: () => toast.error("Solo quien la escribió puede cambiarla"),
   });
+
+  const toggleArchive = useMutation({
+    mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
+      const { error } = await supabase.from("notes").update({ is_archived: value }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      toast.success(v.value ? "Nota archivada" : "Nota restaurada");
+      qc.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: () => toast.error("Solo quien la escribió puede archivarla"),
+  });
+
+  const visible = (notes ?? [])
+    .filter((n) => {
+      const q = search.trim().toLowerCase();
+      const matchQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
+      const matchC = category === "todas" || n.category === category;
+      const matchF = !onlyFav || n.is_favorite;
+      return matchQ && matchC && matchF;
+    })
+    .sort((a, b) =>
+      order === "recientes"
+        ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        : new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
 
   return (
     <div className="space-y-6">
@@ -213,6 +243,22 @@ function NotesPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "recientes" | "antiguas")}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+            <SelectItem value="antiguas">Más antiguas</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button
+          variant={onlyFav ? "default" : "outline"}
+          className="rounded-full"
+          onClick={() => setOnlyFav((v) => !v)}
+        >
+          <Star className="mr-1 size-4" /> Favoritas
+        </Button>
         <Button
           variant={archived ? "default" : "outline"}
           className="rounded-full"
@@ -221,6 +267,12 @@ function NotesPage() {
           {archived ? "Viendo archivadas" : "Archivadas"}
         </Button>
       </div>
+
+      <p className="text-xs text-muted-foreground">
+        {visible.length} {visible.length === 1 ? "nota" : "notas"}
+        {archived ? " archivadas" : ""}
+      </p>
+
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -248,7 +300,7 @@ function NotesPage() {
                 {n.is_favorite && <Star className="size-4 shrink-0 fill-primary text-primary" />}
               </div>
               <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{n.content}</p>
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="secondary">{labelFor(NOTE_CATEGORIES, n.category)}</Badge>
                 <span>
                   {profiles?.find((p) => p.id === n.user_id)?.name ?? "Alguien"} ·{" "}
@@ -258,6 +310,40 @@ function NotesPage() {
                   })}
                 </span>
               </div>
+              {n.user_id === user?.id && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFav.mutate({ id: n.id, fav: !n.is_favorite });
+                    }}
+                  >
+                    <Star
+                      className={
+                        n.is_favorite ? "mr-1 size-4 fill-primary text-primary" : "mr-1 size-4"
+                      }
+                    />
+                    {n.is_favorite ? "Quitar" : "Favorita"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleArchive.mutate({ id: n.id, value: !archived });
+                    }}
+                  >
+                    <Archive className="mr-1 size-4" />
+                    {archived ? "Restaurar" : "Archivar"}
+                  </Button>
+                </div>
+              )}
             </Link>
           ))}
         </div>
