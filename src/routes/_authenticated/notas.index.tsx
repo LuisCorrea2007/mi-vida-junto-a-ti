@@ -243,6 +243,22 @@ function NotesPage() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "recientes" | "antiguas")}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+            <SelectItem value="antiguas">Más antiguas</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button
+          variant={onlyFav ? "default" : "outline"}
+          className="rounded-full"
+          onClick={() => setOnlyFav((v) => !v)}
+        >
+          <Star className="mr-1 size-4" /> Favoritas
+        </Button>
         <Button
           variant={archived ? "default" : "outline"}
           className="rounded-full"
@@ -251,6 +267,12 @@ function NotesPage() {
           {archived ? "Viendo archivadas" : "Archivadas"}
         </Button>
       </div>
+
+      <p className="text-xs text-muted-foreground">
+        {visible.length} {visible.length === 1 ? "nota" : "notas"}
+        {archived ? " archivadas" : ""}
+      </p>
+
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2">
