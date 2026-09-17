@@ -54,6 +54,18 @@ function CapsulasPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [openAt, setOpenAt] = useState("");
+  const [search, setSearch] = useState("");
+
+  /** Atajos de fecha: suma meses a hoy y llena el campo. */
+  const inMonths = (months: number) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + months);
+    d.setHours(9, 0, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    setOpenAt(
+      `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    );
+  };
 
   const { data: capsules = [] } = useQuery({
     queryKey: ["time_capsules"],
