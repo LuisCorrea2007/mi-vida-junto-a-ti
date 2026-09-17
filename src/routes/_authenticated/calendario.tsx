@@ -351,7 +351,18 @@ END:VCALENDAR`;
           >
             Anterior
           </Button>
-          <p className="font-display text-lg font-semibold capitalize">{monthLabel}</p>
+          <div className="flex flex-col items-center">
+            <p className="font-display text-lg font-semibold capitalize">{monthLabel}</p>
+            <button
+              className="text-xs text-primary hover:underline"
+              onClick={() => {
+                setCursor({ y: today.getFullYear(), m: today.getMonth() });
+                setSelected(null);
+              }}
+            >
+              Ir a hoy
+            </button>
+          </div>
           <Button
             variant="ghost"
             size="sm"
