@@ -245,7 +245,9 @@ END:VCALENDAR`;
   });
   const todayStr = today.toISOString().slice(0, 10);
   const dayEvents = (d: string) => (events ?? []).filter((e) => e.date === d);
-  const listed = selected ? dayEvents(selected) : (events ?? []).filter((e) => e.date >= todayStr);
+  const listed = (
+    selected ? dayEvents(selected) : (events ?? []).filter((e) => e.date >= todayStr)
+  ).filter((e) => filter === "todas" || e.category === filter);
 
   return (
     <div className="space-y-6">
