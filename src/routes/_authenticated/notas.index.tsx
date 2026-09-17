@@ -300,7 +300,7 @@ function NotesPage() {
                 {n.is_favorite && <Star className="size-4 shrink-0 fill-primary text-primary" />}
               </div>
               <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{n.content}</p>
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <Badge variant="secondary">{labelFor(NOTE_CATEGORIES, n.category)}</Badge>
                 <span>
                   {profiles?.find((p) => p.id === n.user_id)?.name ?? "Alguien"} ·{" "}
@@ -310,6 +310,40 @@ function NotesPage() {
                   })}
                 </span>
               </div>
+              {n.user_id === user?.id && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleFav.mutate({ id: n.id, fav: !n.is_favorite });
+                    }}
+                  >
+                    <Star
+                      className={
+                        n.is_favorite ? "mr-1 size-4 fill-primary text-primary" : "mr-1 size-4"
+                      }
+                    />
+                    {n.is_favorite ? "Quitar" : "Favorita"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleArchive.mutate({ id: n.id, value: !archived });
+                    }}
+                  >
+                    <Archive className="mr-1 size-4" />
+                    {archived ? "Restaurar" : "Archivar"}
+                  </Button>
+                </div>
+              )}
             </Link>
           ))}
         </div>
