@@ -50,6 +50,9 @@ function WishesPage() {
   useRealtime("wishes", "wish_votes", "wish_comments");
   const [open, setOpen] = useState(false);
   const [showDone, setShowDone] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("todas");
+  const [order, setOrder] = useState<"votos" | "recientes">("votos");
   const [commentFor, setCommentFor] = useState<string | null>(null);
   const [comment, setComment] = useState("");
   const [form, setForm] = useState({
