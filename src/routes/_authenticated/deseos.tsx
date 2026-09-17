@@ -278,6 +278,46 @@ function WishesPage() {
         </div>
       </header>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative min-w-0 basis-full sm:min-w-52 sm:basis-auto sm:flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar un deseo"
+            className="pl-9"
+          />
+        </div>
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            {WISH_CATEGORIES.map((c) => (
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={order} onValueChange={(v) => setOrder(v as "votos" | "recientes")}>
+          <SelectTrigger className="w-full sm:w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="votos">Más votados</SelectItem>
+            <SelectItem value="recientes">Más recientes</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        {visible.length} {visible.length === 1 ? "deseo" : "deseos"}
+        {totalBudget > 0 ? ` · presupuesto aproximado ${totalBudget}` : ""} · {doneCount} cumplidos
+      </p>
+
+
       {isLoading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
