@@ -105,12 +105,40 @@ function NotesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const visible = (notes ?? []).filter((n) => {
-    const q = search.trim().toLowerCase();
-    const matchQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
-    const matchC = category === "todas" || n.category === category;
-    return matchQ && matchC;
+  const toggleFav = useMutation({
+    mutationFn: async ({ id, fav }: { id: string; fav: boolean }) => {
+      const { error } = await supabase.from("notes").update({ is_favorite: fav }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notes"] }),
+    onError: () => toast.error("Solo quien la escribió puede cambiarla"),
   });
+
+  const toggleArchive = useMutation({
+    mutationFn: async ({ id, value }: { id: string; value: boolean }) => {
+      const { error } = await supabase.from("notes").update({ is_archived: value }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      toast.success(v.value ? "Nota archivada" : "Nota restaurada");
+      qc.invalidateQueries({ queryKey: ["notes"] });
+    },
+    onError: () => toast.error("Solo quien la escribió puede archivarla"),
+  });
+
+  const visible = (notes ?? [])
+    .filter((n) => {
+      const q = search.trim().toLowerCase();
+      const matchQ = !q || n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q);
+      const matchC = category === "todas" || n.category === category;
+      const matchF = !onlyFav || n.is_favorite;
+      return matchQ && matchC && matchF;
+    })
+    .sort((a, b) =>
+      order === "recientes"
+        ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        : new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+    );
 
   return (
     <div className="space-y-6">
