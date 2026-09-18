@@ -169,9 +169,43 @@ function DiaryPage() {
         <p className="mt-3 font-display text-xl">{pickOfTheDay(DAILY_QUESTIONS, 3)}</p>
       </section>
 
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar momento…"
+          className="max-w-xs rounded-full"
+        />
+        <div className="flex flex-wrap gap-2">
+          {["todos", ...years].map((y) => (
+            <button
+              key={y}
+              onClick={() => setYearFilter(y)}
+              className={
+                yearFilter === y
+                  ? "rounded-full border border-primary bg-primary/15 px-4 py-1.5 text-xs font-medium text-primary"
+                  : "rounded-full border border-border px-4 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+              }
+            >
+              {y === "todos" ? "Todos" : y}
+            </button>
+          ))}
+        </div>
+        <Button
+          variant="outline"
+          className="rounded-full"
+          onClick={() => setOrder(order === "recientes" ? "antiguos" : "recientes")}
+        >
+          {order === "recientes" ? "Más recientes" : "Desde el inicio"}
+        </Button>
+        <p className="text-xs text-muted-foreground">
+          {visible.length} {visible.length === 1 ? "momento" : "momentos"}
+        </p>
+      </div>
+
       {isLoading ? (
         <Skeleton className="h-40 rounded-2xl" />
-      ) : !milestones?.length ? (
+      ) : !visible.length ? (
         <div className="surface flex flex-col items-center gap-3 p-14 text-center">
           <Heart className="size-8 text-primary" />
           <p className="font-display text-xl">Su historia empieza aquí</p>
@@ -181,7 +215,7 @@ function DiaryPage() {
         </div>
       ) : (
         <ol className="relative space-y-6 border-l border-border pl-6">
-          {milestones.map((m) => (
+          {visible.map((m) => (
             <li key={m.id} id={m.id} className="animate-fade-up relative scroll-mt-24 target:ring-2 target:ring-primary">
               <span className="absolute -left-[31px] top-2 size-3 rounded-full bg-primary ring-4 ring-background" />
               <div className="surface p-5">
