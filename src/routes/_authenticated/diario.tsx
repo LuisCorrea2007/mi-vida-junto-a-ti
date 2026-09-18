@@ -38,6 +38,9 @@ function DiaryPage() {
   const qc = useQueryClient();
   useRealtime("milestones");
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [yearFilter, setYearFilter] = useState("todos");
+  const [order, setOrder] = useState<"recientes" | "antiguos">("recientes");
   const [form, setForm] = useState({
     title: "",
     description: "",
