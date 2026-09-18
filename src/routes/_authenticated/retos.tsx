@@ -164,6 +164,17 @@ function RetosPage() {
     return count;
   })();
 
+  const doneToday = (id: string) =>
+    completions.some((x) => x.challenge_id === id && x.user_id === user?.id && x.day === today());
+  const q = search.trim().toLowerCase();
+  const visible = challenges.filter((c) => {
+    if (q && !`${c.title} ${c.description ?? ""}`.toLowerCase().includes(q)) return false;
+    if (filter === "pendientes") return !doneToday(c.id);
+    if (filter === "hechos") return doneToday(c.id);
+    if (filter === "mios") return c.user_id === user?.id;
+    return true;
+  });
+
   return (
     <div className="space-y-8">
       {hearts}
