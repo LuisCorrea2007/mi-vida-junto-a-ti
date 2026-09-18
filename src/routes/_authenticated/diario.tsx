@@ -89,6 +89,25 @@ function DiaryPage() {
     onError: () => toast.error("Solo quien lo añadió puede eliminarlo"),
   });
 
+  const years = useMemo(
+    () => Array.from(new Set((milestones ?? []).map((m) => m.date.slice(0, 4)))).sort().reverse(),
+    [milestones],
+  );
+
+  const visible = useMemo(() => {
+    let list = [...(milestones ?? [])];
+    if (yearFilter !== "todos") list = list.filter((m) => m.date.startsWith(yearFilter));
+    const q = query.trim().toLowerCase();
+    if (q) {
+      list = list.filter((m) =>
+        `${m.title} ${m.description ?? ""}`.toLowerCase().includes(q),
+      );
+    }
+    list.sort((a, b) => (order === "recientes" ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date)));
+    return list;
+  }, [milestones, yearFilter, query, order]);
+
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
