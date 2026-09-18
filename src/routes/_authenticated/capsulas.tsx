@@ -234,6 +234,22 @@ function CapsulasPage() {
         </Dialog>
       </section>
 
+      <section className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar entre nuestras cápsulas..."
+          />
+        </div>
+        <p className="text-xs text-muted-foreground sm:text-right">
+          {capsules.length} {capsules.length === 1 ? "cápsula" : "cápsulas"} · {sealed.length} selladas ·{" "}
+          {pendientes} por abrir
+        </p>
+      </section>
+
       <section className="space-y-4">
         <h2 className="font-display text-xl font-semibold">Listas para abrir</h2>
         {ready.length ? (
