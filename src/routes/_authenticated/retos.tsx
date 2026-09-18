@@ -46,6 +46,8 @@ function RetosPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"todos" | "pendientes" | "hechos" | "mios">("todos");
 
   const { data: challenges = [] } = useQuery({
     queryKey: ["challenges"],
