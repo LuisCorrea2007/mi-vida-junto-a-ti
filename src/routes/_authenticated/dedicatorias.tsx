@@ -138,11 +138,17 @@ function DedicationsPage() {
   });
 
   const filtered = useMemo(() => {
-    const list = items ?? [];
-    if (filter === "todas") return list;
-    if (filter === "favoritas") return list.filter((d) => d.is_favorite);
-    return list.filter((d) => d.kind === filter);
-  }, [items, filter]);
+    let list = items ?? [];
+    if (filter === "favoritas") list = list.filter((d) => d.is_favorite);
+    else if (filter !== "todas") list = list.filter((d) => d.kind === filter);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      list = list.filter((d) =>
+        [d.title, d.content ?? "", d.url ?? ""].join(" ").toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [items, filter, query]);
 
   return (
     <div className="space-y-6">
