@@ -94,6 +94,7 @@ function DedicationsPage() {
   useRealtime("dedications", "dedication_comments", "dedication_reactions");
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<"todas" | Kind | "favoritas">("todas");
+  const [query, setQuery] = useState("");
 
   const { data: items, isLoading } = useQuery({
     queryKey: ["dedications"],
