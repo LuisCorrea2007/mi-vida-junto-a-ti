@@ -143,8 +143,16 @@ function CapsulasPage() {
     id === user?.id ? "Tú" : (profiles?.find((p) => p.id === id)?.name ?? "Tu pareja");
 
   const now = Date.now();
-  const sealed = capsules.filter((c) => new Date(c.open_at).getTime() > now);
-  const ready = capsules.filter((c) => new Date(c.open_at).getTime() <= now);
+  const q = search.trim().toLowerCase();
+  const visible = q
+    ? capsules.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) || (c.content ?? "").toLowerCase().includes(q),
+      )
+    : capsules;
+  const sealed = visible.filter((c) => new Date(c.open_at).getTime() > now);
+  const ready = visible.filter((c) => new Date(c.open_at).getTime() <= now);
+  const pendientes = ready.filter((c) => !c.opened_at).length;
 
   return (
     <div className="space-y-8">
