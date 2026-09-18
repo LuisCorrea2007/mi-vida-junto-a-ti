@@ -213,6 +213,14 @@ function CancionesPage() {
   const nameOf = (id: string) =>
     id === user?.id ? "Tú" : (profiles?.find((p) => p.id === id)?.name ?? "Tu pareja");
 
+  const q = search.trim().toLowerCase();
+  const visibleSongs = songs.filter((s) => {
+    if (onlyFav && !s.is_favorite) return false;
+    if (!q) return true;
+    return `${s.title} ${s.artist ?? ""} ${s.note ?? ""}`.toLowerCase().includes(q);
+  });
+  const favCount = songs.filter((s) => s.is_favorite).length;
+
   return (
     <div className="space-y-8">
       {hearts}
