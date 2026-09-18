@@ -58,6 +58,8 @@ function CancionesPage() {
   const [note, setNote] = useState("");
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
+  const [search, setSearch] = useState("");
+  const [onlyFav, setOnlyFav] = useState(false);
 
   const { data: songs = [] } = useQuery({
     queryKey: ["songs"],
