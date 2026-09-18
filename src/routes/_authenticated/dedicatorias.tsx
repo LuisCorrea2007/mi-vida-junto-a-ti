@@ -94,6 +94,7 @@ function DedicationsPage() {
   useRealtime("dedications", "dedication_comments", "dedication_reactions");
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<"todas" | Kind | "favoritas">("todas");
+  const [query, setQuery] = useState("");
 
   const { data: items, isLoading } = useQuery({
     queryKey: ["dedications"],
@@ -138,11 +139,17 @@ function DedicationsPage() {
   });
 
   const filtered = useMemo(() => {
-    const list = items ?? [];
-    if (filter === "todas") return list;
-    if (filter === "favoritas") return list.filter((d) => d.is_favorite);
-    return list.filter((d) => d.kind === filter);
-  }, [items, filter]);
+    let list = items ?? [];
+    if (filter === "favoritas") list = list.filter((d) => d.is_favorite);
+    else if (filter !== "todas") list = list.filter((d) => d.kind === filter);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      list = list.filter((d) =>
+        [d.title, d.content ?? "", d.url ?? ""].join(" ").toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [items, filter, query]);
 
   return (
     <div className="space-y-6">
@@ -195,6 +202,21 @@ function DedicationsPage() {
           </button>
         ))}
       </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar dedicatoria…"
+          className="max-w-xs rounded-full"
+        />
+        <p className="text-xs text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? "dedicatoria" : "dedicatorias"}
+          {" · "}
+          {(items ?? []).filter((d) => d.is_favorite).length} favoritas
+        </p>
+      </div>
+
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
