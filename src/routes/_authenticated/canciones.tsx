@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, Music, Plus, Quote as QuoteIcon, Star, Trash2 } from "lucide-react";
+import { ExternalLink, Music, Plus, Quote as QuoteIcon, Search, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,6 +58,8 @@ function CancionesPage() {
   const [note, setNote] = useState("");
   const [quote, setQuote] = useState("");
   const [author, setAuthor] = useState("");
+  const [search, setSearch] = useState("");
+  const [onlyFav, setOnlyFav] = useState(false);
 
   const { data: songs = [] } = useQuery({
     queryKey: ["songs"],
@@ -211,6 +213,14 @@ function CancionesPage() {
   const nameOf = (id: string) =>
     id === user?.id ? "Tú" : (profiles?.find((p) => p.id === id)?.name ?? "Tu pareja");
 
+  const q = search.trim().toLowerCase();
+  const visibleSongs = songs.filter((s) => {
+    if (onlyFav && !s.is_favorite) return false;
+    if (!q) return true;
+    return `${s.title} ${s.artist ?? ""} ${s.note ?? ""}`.toLowerCase().includes(q);
+  });
+  const favCount = songs.filter((s) => s.is_favorite).length;
+
   return (
     <div className="space-y-8">
       {hearts}
@@ -267,9 +277,31 @@ function CancionesPage() {
 
       <section className="space-y-4">
         <h2 className="font-display text-xl font-semibold">Nuestra playlist</h2>
-        {songs.length ? (
+        <div className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por canción, artista o motivo..."
+            />
+          </div>
+          <Button
+            size="sm"
+            variant={onlyFav ? "default" : "outline"}
+            className="rounded-full"
+            onClick={() => setOnlyFav((v) => !v)}
+          >
+            <Star className="mr-1 size-4" /> Destacadas
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            {songs.length} {songs.length === 1 ? "canción" : "canciones"} · {favCount} destacadas
+          </p>
+        </div>
+        {visibleSongs.length ? (
           <ul className="grid gap-4 sm:grid-cols-2">
-            {songs.map((s) => (
+            {visibleSongs.map((s) => (
               <li key={s.id} id={s.id} className="surface scroll-mt-24 p-5 target:ring-2 target:ring-primary">
                 <div className="flex items-start gap-3">
                   <Music className="mt-1 size-4 shrink-0 text-primary" />

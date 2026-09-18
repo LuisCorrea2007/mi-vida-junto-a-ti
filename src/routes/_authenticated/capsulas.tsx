@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Lock, LockOpen, MailOpen, Plus, Trash2 } from "lucide-react";
+import { Lock, LockOpen, MailOpen, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -143,8 +143,16 @@ function CapsulasPage() {
     id === user?.id ? "Tú" : (profiles?.find((p) => p.id === id)?.name ?? "Tu pareja");
 
   const now = Date.now();
-  const sealed = capsules.filter((c) => new Date(c.open_at).getTime() > now);
-  const ready = capsules.filter((c) => new Date(c.open_at).getTime() <= now);
+  const q = search.trim().toLowerCase();
+  const visible = q
+    ? capsules.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) || (c.content ?? "").toLowerCase().includes(q),
+      )
+    : capsules;
+  const sealed = visible.filter((c) => new Date(c.open_at).getTime() > now);
+  const ready = visible.filter((c) => new Date(c.open_at).getTime() <= now);
+  const pendientes = ready.filter((c) => !c.opened_at).length;
 
   return (
     <div className="space-y-8">
@@ -194,6 +202,25 @@ function CapsulasPage() {
                   value={openAt}
                   onChange={(e) => setOpenAt(e.target.value)}
                 />
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {[
+                    { label: "En 1 mes", months: 1 },
+                    { label: "En 6 meses", months: 6 },
+                    { label: "En 1 año", months: 12 },
+                    { label: "En 5 años", months: 60 },
+                  ].map((s) => (
+                    <Button
+                      key={s.months}
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => inMonths(s.months)}
+                    >
+                      {s.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
               <Button
                 className="w-full rounded-full"
@@ -205,6 +232,22 @@ function CapsulasPage() {
             </div>
           </DialogContent>
         </Dialog>
+      </section>
+
+      <section className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar entre nuestras cápsulas..."
+          />
+        </div>
+        <p className="text-xs text-muted-foreground sm:text-right">
+          {capsules.length} {capsules.length === 1 ? "cápsula" : "cápsulas"} · {sealed.length} selladas ·{" "}
+          {pendientes} por abrir
+        </p>
       </section>
 
       <section className="space-y-4">

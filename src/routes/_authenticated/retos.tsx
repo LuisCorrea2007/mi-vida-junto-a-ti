@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Flame, Plus, Sparkles, Trash2, Trophy } from "lucide-react";
+import { Check, Flame, Plus, Search, Sparkles, Trash2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -46,6 +46,8 @@ function RetosPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"todos" | "pendientes" | "hechos" | "mios">("todos");
 
   const { data: challenges = [] } = useQuery({
     queryKey: ["challenges"],
@@ -162,6 +164,17 @@ function RetosPage() {
     return count;
   })();
 
+  const doneToday = (id: string) =>
+    completions.some((x) => x.challenge_id === id && x.user_id === user?.id && x.day === today());
+  const q = search.trim().toLowerCase();
+  const visible = challenges.filter((c) => {
+    if (q && !`${c.title} ${c.description ?? ""}`.toLowerCase().includes(q)) return false;
+    if (filter === "pendientes") return !doneToday(c.id);
+    if (filter === "hechos") return doneToday(c.id);
+    if (filter === "mios") return c.user_id === user?.id;
+    return true;
+  });
+
   return (
     <div className="space-y-8">
       {hearts}
@@ -231,9 +244,41 @@ function RetosPage() {
 
       <section className="space-y-4">
         <h2 className="font-display text-xl font-semibold">Nuestros retos</h2>
-        {challenges.length ? (
+        <div className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar un reto..."
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { key: "todos", label: "Todos" },
+                { key: "pendientes", label: "Pendientes hoy" },
+                { key: "hechos", label: "Cumplidos hoy" },
+                { key: "mios", label: "Míos" },
+              ] as const
+            ).map((f) => (
+              <Button
+                key={f.key}
+                size="sm"
+                variant={filter === f.key ? "default" : "outline"}
+                className="rounded-full"
+                onClick={() => setFilter(f.key)}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">{visible.length} de {challenges.length}</p>
+        </div>
+        {visible.length ? (
           <ul className="grid gap-4 sm:grid-cols-2">
-            {challenges.map((c) => {
+            {visible.map((c) => {
               const mineToday = completions.some(
                 (x) => x.challenge_id === c.id && x.user_id === user?.id && x.day === today(),
               );
