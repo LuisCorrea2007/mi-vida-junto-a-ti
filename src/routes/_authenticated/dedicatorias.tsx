@@ -203,6 +203,21 @@ function DedicationsPage() {
         ))}
       </div>
 
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar dedicatoria…"
+          className="max-w-xs rounded-full"
+        />
+        <p className="text-xs text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? "dedicatoria" : "dedicatorias"}
+          {" · "}
+          {(items ?? []).filter((d) => d.is_favorite).length} favoritas
+        </p>
+      </div>
+
+
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
