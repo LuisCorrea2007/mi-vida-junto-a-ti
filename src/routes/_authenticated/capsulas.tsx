@@ -202,6 +202,25 @@ function CapsulasPage() {
                   value={openAt}
                   onChange={(e) => setOpenAt(e.target.value)}
                 />
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {[
+                    { label: "En 1 mes", months: 1 },
+                    { label: "En 6 meses", months: 6 },
+                    { label: "En 1 año", months: 12 },
+                    { label: "En 5 años", months: 60 },
+                  ].map((s) => (
+                    <Button
+                      key={s.months}
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => inMonths(s.months)}
+                    >
+                      {s.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
               <Button
                 className="w-full rounded-full"
