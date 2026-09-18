@@ -244,9 +244,41 @@ function RetosPage() {
 
       <section className="space-y-4">
         <h2 className="font-display text-xl font-semibold">Nuestros retos</h2>
-        {challenges.length ? (
+        <div className="surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar un reto..."
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { key: "todos", label: "Todos" },
+                { key: "pendientes", label: "Pendientes hoy" },
+                { key: "hechos", label: "Cumplidos hoy" },
+                { key: "mios", label: "Míos" },
+              ] as const
+            ).map((f) => (
+              <Button
+                key={f.key}
+                size="sm"
+                variant={filter === f.key ? "default" : "outline"}
+                className="rounded-full"
+                onClick={() => setFilter(f.key)}
+              >
+                {f.label}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">{visible.length} de {challenges.length}</p>
+        </div>
+        {visible.length ? (
           <ul className="grid gap-4 sm:grid-cols-2">
-            {challenges.map((c) => {
+            {visible.map((c) => {
               const mineToday = completions.some(
                 (x) => x.challenge_id === c.id && x.user_id === user?.id && x.day === today(),
               );
