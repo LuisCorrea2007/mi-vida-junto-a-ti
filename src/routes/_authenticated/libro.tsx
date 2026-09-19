@@ -83,11 +83,30 @@ function BookPage() {
           .gte("created_at", range.from)
           .lte("created_at", range.to),
       ]);
+      const [dedications, songs] = await Promise.all([
+        supabase
+          .from("dedications")
+          .select("id, title, content, kind, created_at")
+          .gte("created_at", range.from)
+          .lte("created_at", range.to)
+          .order("is_favorite", { ascending: false })
+          .order("created_at")
+          .limit(6),
+        supabase
+          .from("songs")
+          .select("id, title, artist, note")
+          .gte("created_at", range.from)
+          .lte("created_at", range.to)
+          .order("is_favorite", { ascending: false })
+          .limit(8),
+      ]);
       return {
         photos: (photos.data ?? []) as Photo[],
         milestones: (milestones.data ?? []) as Milestone[],
         events: (events.data ?? []) as EventRow[],
         notes: (notes.data ?? []) as NoteRow[],
+        dedications: (dedications.data ?? []) as DedicationRow[],
+        songs: (songs.data ?? []) as SongRow[],
         videoCount: videos.count ?? 0,
       };
     },
