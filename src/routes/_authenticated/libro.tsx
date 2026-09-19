@@ -25,6 +25,8 @@ type Photo = { id: string; file_path: string; caption: string | null; created_at
 type Milestone = { id: string; title: string; description: string | null; date: string };
 type EventRow = { id: string; title: string; date: string; category: string; location: string | null };
 type NoteRow = { id: string; title: string; content: string; category: string; created_at: string };
+type DedicationRow = { id: string; title: string; content: string | null; kind: string; created_at: string };
+type SongRow = { id: string; title: string; artist: string | null; note: string | null };
 
 function BookPhoto({ path, caption }: { path: string; caption: string | null }) {
   const { data: url } = useSignedUrl(path);
