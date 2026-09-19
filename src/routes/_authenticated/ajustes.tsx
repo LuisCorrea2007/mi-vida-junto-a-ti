@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BellRing, Check, Copy, HeartHandshake, Loader2, Smartphone, Upload } from "lucide-react";
+import { BellRing, CalendarHeart, Check, Copy, HeartHandshake, Loader2, LogOut, Smartphone, Upload } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -206,6 +207,7 @@ function SettingsPage() {
           <p className="text-xs text-muted-foreground">
             Con esta fecha calculamos el contador de días juntos.
           </p>
+          {form.anniversary && <AnniversaryStats iso={form.anniversary} />}
         </div>
         <div className="space-y-2">
           <Label htmlFor="pl">Ciudad</Label>
@@ -299,7 +301,58 @@ function SettingsPage() {
           Sus fotos son privadas: solo ustedes dos pueden verlas.
         </p>
       </section>
+
+      <SignOutSection email={user?.email ?? ""} />
     </div>
+  );
+}
+
+function AnniversaryStats({ iso }: { iso: string }) {
+  const start = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(start.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.max(0, Math.round((today.getTime() - start.getTime()) / 86_400_000));
+  const next = new Date(today.getFullYear(), start.getMonth(), start.getDate());
+  if (next < today) next.setFullYear(next.getFullYear() + 1);
+  const until = Math.round((next.getTime() - today.getTime()) / 86_400_000);
+  const years = Math.floor(days / 365.25);
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-primary/25 bg-primary/10 px-4 py-3">
+      <CalendarHeart className="size-5 text-primary" />
+      <p className="text-sm">
+        <span className="font-semibold">{days.toLocaleString("es")} días juntos</span>
+        {years > 0 && <span className="text-muted-foreground"> ({years} {years === 1 ? "año" : "años"})</span>}
+      </p>
+      <p className="text-xs text-muted-foreground">
+        {until === 0 ? "¡Hoy es su aniversario! 🎉" : `Próximo aniversario en ${until} ${until === 1 ? "día" : "días"}`}
+      </p>
+    </div>
+  );
+}
+
+function SignOutSection({ email }: { email: string }) {
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  return (
+    <section className="surface flex flex-col items-start justify-between gap-3 p-6 sm:flex-row sm:items-center">
+      <div>
+        <h2 className="font-display text-xl font-semibold">Tu cuenta</h2>
+        <p className="text-sm text-muted-foreground">{email}</p>
+      </div>
+      <Button
+        variant="outline"
+        className="rounded-full"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          await supabase.auth.signOut();
+          navigate({ to: "/auth" });
+        }}
+      >
+        <LogOut className="mr-1 size-4" /> {busy ? "Saliendo…" : "Cerrar sesión"}
+      </Button>
+    </section>
   );
 }
 

@@ -617,6 +617,19 @@ function EphemeralChat({ userId }: { userId: string }) {
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
 
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("chat_messages")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["chat"] }),
+    onError: () => toast.error("No pudimos borrar el mensaje"),
+  });
+
   const send = useMutation({
     mutationFn: async (raw: string) => {
       const content = raw.trim().slice(0, 500);
@@ -713,6 +726,15 @@ function EphemeralChat({ userId }: { userId: string }) {
                     <p className={cn("mt-1 text-[10px]", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
                       {new Date(m.created_at).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}
                       <span className="hidden group-hover:inline"> · se borra en {remaining(m.expires_at)}</span>
+                      {mine && (
+                        <button
+                          onClick={() => remove.mutate(m.id)}
+                          className="ml-1 hidden underline opacity-70 hover:opacity-100 group-hover:inline"
+                          aria-label="Borrar mensaje"
+                        >
+                          · borrar
+                        </button>
+                      )}
                     </p>
                   </div>
                 </div>
