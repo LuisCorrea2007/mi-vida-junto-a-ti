@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BellRing, Check, Copy, HeartHandshake, Loader2, Smartphone, Upload } from "lucide-react";
+import { BellRing, CalendarHeart, Check, Copy, HeartHandshake, Loader2, LogOut, Smartphone, Upload } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
