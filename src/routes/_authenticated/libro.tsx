@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, CalendarHeart, Heart, Images, NotebookPen, Printer, Video } from "lucide-react";
+import { BookOpen, CalendarHeart, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfiles, anniversaryOf } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
