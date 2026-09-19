@@ -281,6 +281,49 @@ function BookPage() {
             </section>
           )}
 
+          {/* Dedicatorias */}
+          {data.dedications.length > 0 && (
+            <section className="break-inside-avoid">
+              <h3 className="mb-3 flex items-center gap-2 font-display text-2xl font-semibold">
+                <Gift className="size-5 text-primary" /> Dedicatorias del año
+              </h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {data.dedications.map((d) => (
+                  <div key={d.id} className="rounded-xl border border-border/60 p-4">
+                    <p className="font-display font-semibold">{d.title}</p>
+                    {d.content && (
+                      <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">{d.content}</p>
+                    )}
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      {new Date(d.created_at).toLocaleDateString("es", { day: "numeric", month: "long" })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Canciones */}
+          {data.songs.length > 0 && (
+            <section className="break-inside-avoid">
+              <h3 className="mb-3 flex items-center gap-2 font-display text-2xl font-semibold">
+                <Music className="size-5 text-primary" /> La banda sonora
+              </h3>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {data.songs.map((s) => (
+                  <li key={s.id} className="rounded-xl border border-border/60 p-4">
+                    <p className="font-medium">{s.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {s.artist ?? "Artista desconocido"}
+                      {s.note ? ` · ${s.note}` : ""}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+
           <p className="pt-4 text-center text-xs text-muted-foreground">
             Hecho con amor en Nuestro Espacio · {year}
           </p>
