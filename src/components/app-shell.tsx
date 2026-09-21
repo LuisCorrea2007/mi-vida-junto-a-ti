@@ -22,6 +22,7 @@ import {
   Settings,
   Sparkles,
   Stars,
+  Ticket,
   Video,
   X,
 } from "lucide-react";
@@ -63,6 +64,7 @@ const NAV = [
   { to: "/capsulas", label: "Cápsulas", icon: Hourglass },
   { to: "/retos", label: "Retos", icon: Flame },
   { to: "/canciones", label: "Canciones", icon: Music },
+  { to: "/cupones", label: "Cupones", icon: Ticket },
   { to: "/libro", label: "Libro", icon: BookOpen },
 ] as const;
 
