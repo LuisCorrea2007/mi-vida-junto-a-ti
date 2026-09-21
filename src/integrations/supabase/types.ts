@@ -385,6 +385,77 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_redemptions: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          id: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          emoji: string
+          expires_at: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          uses_total: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          expires_at?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          uses_total?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          expires_at?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          uses_total?: number
+        }
+        Relationships: []
+      }
       dedication_comments: {
         Row: {
           content: string
