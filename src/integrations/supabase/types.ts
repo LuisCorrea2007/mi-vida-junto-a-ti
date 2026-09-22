@@ -287,6 +287,48 @@ export type Database = {
         }
         Relationships: []
       }
+      couple_goals: {
+        Row: {
+          created_at: string
+          currency: string
+          deadline: string | null
+          description: string | null
+          emoji: string
+          id: string
+          is_completed: boolean
+          target_amount: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          emoji?: string
+          id?: string
+          is_completed?: boolean
+          target_amount?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          emoji?: string
+          id?: string
+          is_completed?: boolean
+          target_amount?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       couple_members: {
         Row: {
           couple_id: string
@@ -355,6 +397,51 @@ export type Database = {
           planned_date?: string | null
           status?: string
           time_available?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      couple_tasks: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          done_at: string | null
+          done_by: string | null
+          due_date: string | null
+          id: string
+          is_done: boolean
+          repeat_rule: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          due_date?: string | null
+          id?: string
+          is_done?: boolean
+          repeat_rule?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          done_at?: string | null
+          done_by?: string | null
+          due_date?: string | null
+          id?: string
+          is_done?: boolean
+          repeat_rule?: string | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -809,6 +896,41 @@ export type Database = {
             columns: ["fun_item_id"]
             isOneToOne: false
             referencedRelation: "fun_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goal_contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          goal_id: string
+          id: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          goal_id: string
+          id?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          goal_id?: string
+          id?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "couple_goals"
             referencedColumns: ["id"]
           },
         ]
