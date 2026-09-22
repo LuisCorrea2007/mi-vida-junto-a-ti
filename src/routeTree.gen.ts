@@ -27,8 +27,10 @@ import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDiversionRouteImport } from './routes/_authenticated/diversion'
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
 import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
+import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
+import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedConsejeroIndexRouteImport } from './routes/_authenticated/consejero.index'
@@ -126,6 +128,11 @@ const AuthenticatedLibroRoute = AuthenticatedLibroRouteImport.update({
   path: '/libro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
@@ -134,6 +141,11 @@ const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
 const AuthenticatedRetosRoute = AuthenticatedRetosRouteImport.update({
   id: '/retos',
   path: '/retos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
+  id: '/tareas',
+  path: '/tareas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
@@ -187,8 +199,10 @@ export interface FileRoutesByFullPath {
   '/diversion': typeof AuthenticatedDiversionRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
+  '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -214,8 +228,10 @@ export interface FileRoutesByTo {
   '/diversion': typeof AuthenticatedDiversionRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
+  '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -243,8 +259,10 @@ export interface FileRoutesById {
   '/_authenticated/diversion': typeof AuthenticatedDiversionRoute
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
   '/_authenticated/libro': typeof AuthenticatedLibroRoute
+  '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
+  '/_authenticated/tareas': typeof AuthenticatedTareasRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -272,8 +290,10 @@ export interface FileRouteTypes {
     | '/diversion'
     | '/galeria'
     | '/libro'
+    | '/metas'
     | '/panel'
     | '/retos'
+    | '/tareas'
     | '/videos'
     | '/api/chat'
     | '/consejero/$id'
@@ -299,8 +319,10 @@ export interface FileRouteTypes {
     | '/diversion'
     | '/galeria'
     | '/libro'
+    | '/metas'
     | '/panel'
     | '/retos'
+    | '/tareas'
     | '/videos'
     | '/api/chat'
     | '/consejero/$id'
@@ -327,8 +349,10 @@ export interface FileRouteTypes {
     | '/_authenticated/diversion'
     | '/_authenticated/galeria'
     | '/_authenticated/libro'
+    | '/_authenticated/metas'
     | '/_authenticated/panel'
     | '/_authenticated/retos'
+    | '/_authenticated/tareas'
     | '/_authenticated/videos'
     | '/api/chat'
     | '/_authenticated/consejero/$id'
@@ -474,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/metas': {
+      id: '/_authenticated/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof AuthenticatedMetasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/panel': {
       id: '/_authenticated/panel'
       path: '/panel'
@@ -486,6 +517,13 @@ declare module '@tanstack/react-router' {
       path: '/retos'
       fullPath: '/retos'
       preLoaderRoute: typeof AuthenticatedRetosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tareas': {
+      id: '/_authenticated/tareas'
+      path: '/tareas'
+      fullPath: '/tareas'
+      preLoaderRoute: typeof AuthenticatedTareasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/videos': {
@@ -547,8 +585,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiversionRoute: typeof AuthenticatedDiversionRoute
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
   AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
+  AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
+  AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedConsejeroIdRoute: typeof AuthenticatedConsejeroIdRoute
   AuthenticatedNotasIdRoute: typeof AuthenticatedNotasIdRoute
@@ -570,8 +610,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiversionRoute: AuthenticatedDiversionRoute,
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
   AuthenticatedLibroRoute: AuthenticatedLibroRoute,
+  AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
+  AuthenticatedTareasRoute: AuthenticatedTareasRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedConsejeroIdRoute: AuthenticatedConsejeroIdRoute,
   AuthenticatedNotasIdRoute: AuthenticatedNotasIdRoute,
