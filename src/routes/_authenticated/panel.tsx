@@ -194,6 +194,8 @@ function Panel() {
             { label: "Guardar un deseo", to: "/deseos" as const },
             { label: "Cápsula del tiempo", to: "/capsulas" as const },
             { label: "Regalar un cupón", to: "/cupones" as const },
+            { label: "Nueva meta juntos", to: "/metas" as const },
+            { label: "Añadir un pendiente", to: "/tareas" as const },
           ].map((a) => (
             <Button key={a.label} asChild variant="outline" size="sm" className="rounded-full">
               <Link to={a.to}>{a.label}</Link>

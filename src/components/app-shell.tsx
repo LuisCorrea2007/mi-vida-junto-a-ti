@@ -14,8 +14,10 @@ import {
   Images,
   Laugh,
   LayoutGrid,
+  ListChecks,
   LogOut,
   MapPin,
+  PiggyBank,
   MessageCircleHeart,
   Music,
   NotebookPen,
@@ -65,6 +67,8 @@ const NAV = [
   { to: "/retos", label: "Retos", icon: Flame },
   { to: "/canciones", label: "Canciones", icon: Music },
   { to: "/cupones", label: "Cupones", icon: Ticket },
+  { to: "/metas", label: "Metas", icon: PiggyBank },
+  { to: "/tareas", label: "Lista", icon: ListChecks },
   { to: "/libro", label: "Libro", icon: BookOpen },
 ] as const;
 
