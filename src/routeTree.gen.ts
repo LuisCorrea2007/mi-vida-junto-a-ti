@@ -30,6 +30,7 @@ import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
+import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -143,6 +144,11 @@ const AuthenticatedRetosRoute = AuthenticatedRetosRouteImport.update({
   path: '/retos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRuletaRoute = AuthenticatedRuletaRouteImport.update({
+  id: '/ruleta',
+  path: '/ruleta',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
   id: '/tareas',
   path: '/tareas',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/ruleta': typeof AuthenticatedRuletaRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/ruleta': typeof AuthenticatedRuletaRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
+  '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/panel'
     | '/retos'
+    | '/ruleta'
     | '/tareas'
     | '/videos'
     | '/api/chat'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/panel'
     | '/retos'
+    | '/ruleta'
     | '/tareas'
     | '/videos'
     | '/api/chat'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/_authenticated/metas'
     | '/_authenticated/panel'
     | '/_authenticated/retos'
+    | '/_authenticated/ruleta'
     | '/_authenticated/tareas'
     | '/_authenticated/videos'
     | '/api/chat'
@@ -519,6 +531,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRetosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ruleta': {
+      id: '/_authenticated/ruleta'
+      path: '/ruleta'
+      fullPath: '/ruleta'
+      preLoaderRoute: typeof AuthenticatedRuletaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tareas': {
       id: '/_authenticated/tareas'
       path: '/tareas'
@@ -588,6 +607,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
+  AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedConsejeroIdRoute: typeof AuthenticatedConsejeroIdRoute
@@ -613,6 +633,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
+  AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedConsejeroIdRoute: AuthenticatedConsejeroIdRoute,

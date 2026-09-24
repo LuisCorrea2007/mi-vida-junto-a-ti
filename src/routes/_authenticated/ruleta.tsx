@@ -62,7 +62,7 @@ const LISTS: Record<string, { label: string; items: string[] }> = {
   },
 };
 
-const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+const pick = <T,>(a: T[]): T => a[Math.floor(Math.random() * a.length)] as T;
 
 function RuletaPage() {
   const [cat, setCat] = useState("cita");
@@ -75,7 +75,7 @@ function RuletaPage() {
     setSpinning(true);
     let n = 0;
     const t = window.setInterval(() => {
-      setResult(pick(LISTS[cat].items));
+      setResult(pick((LISTS[cat]?.items ?? [""])));
       if (++n > 12) {
         window.clearInterval(t);
         setSpinning(false);
