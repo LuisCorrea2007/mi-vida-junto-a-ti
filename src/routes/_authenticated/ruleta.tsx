@@ -63,19 +63,19 @@ function RuletaPage() {
     const content = text.trim();
     if (!content || !user) return;
     const { error } = await supabase.from("roulette_items").insert({ content, category: cat, user_id: user.id });
-    if (error) return toast.error("No se pudo agregar");
+    if (error) { toast.error("No se pudo agregar"); return; }
     setText("");
     qc.invalidateQueries({ queryKey: ["roulette_items"] });
   }
 
   async function remove(id: string) {
     const { error } = await supabase.from("roulette_items").delete().eq("id", id);
-    if (error) return toast.error("No se pudo eliminar");
+    if (error) { toast.error("No se pudo eliminar"); return; }
     qc.invalidateQueries({ queryKey: ["roulette_items"] });
   }
 
   function spin() {
-    if (items.length === 0) return toast("Primero agreguen opciones");
+    if (items.length === 0) { toast("Primero agreguen opciones"); return; }
     setSpinning(true);
     let n = 0;
     const t = window.setInterval(() => {
