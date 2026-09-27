@@ -72,6 +72,7 @@ const NAV = [
   { to: "/tareas", label: "Lista", icon: ListChecks },
   { to: "/libro", label: "Libro", icon: BookOpen },
   { to: "/ruleta", label: "Ruleta", icon: Dices },
+  { to: "/estadisticas", label: "Números", icon: BarChart3 },
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
