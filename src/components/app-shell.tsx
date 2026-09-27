@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  BarChart3,
   Bell,
   Dices,
   BellRing,
@@ -72,6 +73,7 @@ const NAV = [
   { to: "/tareas", label: "Lista", icon: ListChecks },
   { to: "/libro", label: "Libro", icon: BookOpen },
   { to: "/ruleta", label: "Ruleta", icon: Dices },
+  { to: "/estadisticas", label: "Números", icon: BarChart3 },
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */

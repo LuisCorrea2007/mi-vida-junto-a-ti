@@ -25,6 +25,7 @@ import { Route as AuthenticatedDedicatoriasRouteImport } from './routes/_authent
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
 import { Route as AuthenticatedDiversionRouteImport } from './routes/_authenticated/diversion'
+import { Route as AuthenticatedEstadisticasRouteImport } from './routes/_authenticated/estadisticas'
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
 import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
@@ -119,6 +120,12 @@ const AuthenticatedDiversionRoute = AuthenticatedDiversionRouteImport.update({
   path: '/diversion',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEstadisticasRoute =
+  AuthenticatedEstadisticasRouteImport.update({
+    id: '/estadisticas',
+    path: '/estadisticas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGaleriaRoute = AuthenticatedGaleriaRouteImport.update({
   id: '/galeria',
   path: '/galeria',
@@ -203,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
+  '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/metas': typeof AuthenticatedMetasRoute
@@ -233,6 +241,7 @@ export interface FileRoutesByTo {
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
   '/diversion': typeof AuthenticatedDiversionRoute
+  '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/metas': typeof AuthenticatedMetasRoute
@@ -265,6 +274,7 @@ export interface FileRoutesById {
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
   '/_authenticated/diversion': typeof AuthenticatedDiversionRoute
+  '/_authenticated/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
   '/_authenticated/libro': typeof AuthenticatedLibroRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/deseos'
     | '/diario'
     | '/diversion'
+    | '/estadisticas'
     | '/galeria'
     | '/libro'
     | '/metas'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/deseos'
     | '/diario'
     | '/diversion'
+    | '/estadisticas'
     | '/galeria'
     | '/libro'
     | '/metas'
@@ -358,6 +370,7 @@ export interface FileRouteTypes {
     | '/_authenticated/deseos'
     | '/_authenticated/diario'
     | '/_authenticated/diversion'
+    | '/_authenticated/estadisticas'
     | '/_authenticated/galeria'
     | '/_authenticated/libro'
     | '/_authenticated/metas'
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiversionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/estadisticas': {
+      id: '/_authenticated/estadisticas'
+      path: '/estadisticas'
+      fullPath: '/estadisticas'
+      preLoaderRoute: typeof AuthenticatedEstadisticasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/galeria': {
       id: '/_authenticated/galeria'
       path: '/galeria'
@@ -602,6 +622,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
   AuthenticatedDiversionRoute: typeof AuthenticatedDiversionRoute
+  AuthenticatedEstadisticasRoute: typeof AuthenticatedEstadisticasRoute
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
   AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
@@ -628,6 +649,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,
   AuthenticatedDiversionRoute: AuthenticatedDiversionRoute,
+  AuthenticatedEstadisticasRoute: AuthenticatedEstadisticasRoute,
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
   AuthenticatedLibroRoute: AuthenticatedLibroRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
