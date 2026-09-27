@@ -73,16 +73,14 @@ function RuletaPage() {
   const { data: profiles = [] } = useQuery({
     queryKey: ["profiles", "ruleta"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("user_id, display_name");
+      const { data, error } = await supabase.from("profiles").select("id, name");
       if (error) throw error;
       return data ?? [];
     },
   });
 
-  const nameOf = (uid: string | undefined) =>
-    profiles.find((p) => p.user_id === uid)?.display_name?.trim() || null;
-  const myName = nameOf(user?.id);
-  const partnerName = profiles.find((p) => p.user_id !== user?.id)?.display_name?.trim() || null;
+  const myName = profiles.find((p) => p.id === user?.id)?.name?.trim() || null;
+  const partnerName = profiles.find((p) => p.id !== user?.id)?.name?.trim() || null;
 
   const isAll = cat === "todas";
   const items = isAll ? all : all.filter((i) => i.category === cat);
