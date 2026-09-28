@@ -35,7 +35,7 @@ const KINDS = [
   { value: "plan", label: "Plan", emoji: "🎟️" },
   { value: "otro", label: "Otro", emoji: "📍" },
 ];
-const kindOf = (v: string) => KINDS.find((k) => k.value === v) ?? KINDS[5];
+const kindOf = (v: string) => KINDS.find((k) => k.value === v) ?? KINDS[5]!;
 
 type Place = {
   id: string;
@@ -128,8 +128,8 @@ function LugaresPage() {
   const pending = places.filter((p) => !p.visited);
 
   function randomPick() {
-    if (!pending.length) return toast("Aún no hay lugares pendientes");
     const p = pending[Math.floor(Math.random() * pending.length)];
+    if (!p) { toast("Aún no hay lugares pendientes"); return; }
     toast.success(`¡Vamos a ${p.name}! ${kindOf(p.kind).emoji}`);
   }
 
