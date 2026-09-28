@@ -73,6 +73,7 @@ const NAV = [
   { to: "/tareas", label: "Lista", icon: ListChecks },
   { to: "/libro", label: "Libro", icon: BookOpen },
   { to: "/ruleta", label: "Ruleta", icon: Dices },
+  { to: "/lugares", label: "Lugares", icon: MapPin },
   { to: "/estadisticas", label: "Números", icon: BarChart3 },
 ] as const;
 

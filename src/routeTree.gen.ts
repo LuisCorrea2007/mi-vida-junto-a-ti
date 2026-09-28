@@ -28,6 +28,7 @@ import { Route as AuthenticatedDiversionRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEstadisticasRouteImport } from './routes/_authenticated/estadisticas'
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
 import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
+import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticated/lugares'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
@@ -136,6 +137,11 @@ const AuthenticatedLibroRoute = AuthenticatedLibroRouteImport.update({
   path: '/libro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLugaresRoute = AuthenticatedLugaresRouteImport.update({
+  id: '/lugares',
+  path: '/lugares',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
   id: '/metas',
   path: '/metas',
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
+  '/lugares': typeof AuthenticatedLugaresRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
+  '/lugares': typeof AuthenticatedLugaresRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/retos': typeof AuthenticatedRetosRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/_authenticated/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
   '/_authenticated/libro': typeof AuthenticatedLibroRoute
+  '/_authenticated/lugares': typeof AuthenticatedLugaresRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/estadisticas'
     | '/galeria'
     | '/libro'
+    | '/lugares'
     | '/metas'
     | '/panel'
     | '/retos'
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/estadisticas'
     | '/galeria'
     | '/libro'
+    | '/lugares'
     | '/metas'
     | '/panel'
     | '/retos'
@@ -373,6 +384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estadisticas'
     | '/_authenticated/galeria'
     | '/_authenticated/libro'
+    | '/_authenticated/lugares'
     | '/_authenticated/metas'
     | '/_authenticated/panel'
     | '/_authenticated/retos'
@@ -530,6 +542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibroRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lugares': {
+      id: '/_authenticated/lugares'
+      path: '/lugares'
+      fullPath: '/lugares'
+      preLoaderRoute: typeof AuthenticatedLugaresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/metas': {
       id: '/_authenticated/metas'
       path: '/metas'
@@ -625,6 +644,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEstadisticasRoute: typeof AuthenticatedEstadisticasRoute
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
   AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
+  AuthenticatedLugaresRoute: typeof AuthenticatedLugaresRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
@@ -652,6 +672,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEstadisticasRoute: AuthenticatedEstadisticasRoute,
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
   AuthenticatedLibroRoute: AuthenticatedLibroRoute,
+  AuthenticatedLugaresRoute: AuthenticatedLugaresRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
