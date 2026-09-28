@@ -1324,6 +1324,48 @@ export type Database = {
           },
         ]
       }
+      places: {
+        Row: {
+          city: string | null
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          note: string | null
+          rating: number | null
+          updated_at: string
+          user_id: string
+          visited: boolean
+          visited_on: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          name: string
+          note?: string | null
+          rating?: number | null
+          updated_at?: string
+          user_id: string
+          visited?: boolean
+          visited_on?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          note?: string | null
+          rating?: number | null
+          updated_at?: string
+          user_id?: string
+          visited?: boolean
+          visited_on?: string | null
+        }
+        Relationships: []
+      }
       plan_votes: {
         Row: {
           created_at: string

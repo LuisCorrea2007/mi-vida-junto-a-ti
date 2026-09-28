@@ -29,6 +29,13 @@
       "when": 1790485724281,
       "tag": "0003_roulette_items_allow_update",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790563059923,
+      "tag": "0004_create_places",
+      "breakpoints": true
     }
   ]
 }
