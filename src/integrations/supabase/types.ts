@@ -218,6 +218,30 @@ export type Database = {
         }
         Relationships: []
       }
+      compliments: {
+        Row: {
+          created_at: string
+          id: string
+          read_at: string | null
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       couple_agreements: {
         Row: {
           completed_at: string | null

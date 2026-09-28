@@ -75,6 +75,7 @@ const NAV = [
   { to: "/ruleta", label: "Ruleta", icon: Dices },
   { to: "/lugares", label: "Lugares", icon: MapPin },
   { to: "/estadisticas", label: "Números", icon: BarChart3 },
+  { to: "/cumplidos", label: "Cumplidos", icon: Quote },
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
