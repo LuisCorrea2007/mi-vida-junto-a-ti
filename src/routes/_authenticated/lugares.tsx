@@ -104,12 +104,12 @@ function LugaresPage() {
 
   async function update(id: string, patch: Partial<Place>) {
     const { error } = await supabase.from("places").update(patch).eq("id", id);
-    if (error) return toast.error("Solo quien lo agregó puede cambiarlo");
+    if (error) { toast.error("Solo quien lo agregó puede cambiarlo"); return; }
     qc.invalidateQueries({ queryKey: ["places"] });
   }
   async function remove(id: string) {
     const { error } = await supabase.from("places").delete().eq("id", id);
-    if (error) return toast.error("No se pudo borrar");
+    if (error) { toast.error("No se pudo borrar"); return; }
     qc.invalidateQueries({ queryKey: ["places"] });
   }
 
