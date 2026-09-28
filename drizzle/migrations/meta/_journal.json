@@ -36,6 +36,13 @@
       "when": 1790563059923,
       "tag": "0004_create_places",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790563078728,
+      "tag": "0005_places_update_own",
+      "breakpoints": true
     }
   ]
 }
