@@ -20,6 +20,7 @@ import {
   LogOut,
   MapPin,
   PiggyBank,
+  Quote,
   MessageCircleHeart,
   Music,
   NotebookPen,
