@@ -30,6 +30,7 @@ import { Route as AuthenticatedEstadisticasRouteImport } from './routes/_authent
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
 import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
 import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticated/lugares'
+import { Route as AuthenticatedMensajesRouteImport } from './routes/_authenticated/mensajes'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
@@ -149,6 +150,11 @@ const AuthenticatedLugaresRoute = AuthenticatedLugaresRouteImport.update({
   path: '/lugares',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMensajesRoute = AuthenticatedMensajesRouteImport.update({
+  id: '/mensajes',
+  path: '/mensajes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
   id: '/metas',
   path: '/metas',
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/lugares': typeof AuthenticatedLugaresRoute
+  '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/promesas': typeof AuthenticatedPromesasRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/galeria': typeof AuthenticatedGaleriaRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/lugares': typeof AuthenticatedLugaresRoute
+  '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/promesas': typeof AuthenticatedPromesasRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
   '/_authenticated/libro': typeof AuthenticatedLibroRoute
   '/_authenticated/lugares': typeof AuthenticatedLugaresRoute
+  '/_authenticated/mensajes': typeof AuthenticatedMensajesRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/libro'
     | '/lugares'
+    | '/mensajes'
     | '/metas'
     | '/panel'
     | '/promesas'
@@ -373,6 +383,7 @@ export interface FileRouteTypes {
     | '/galeria'
     | '/libro'
     | '/lugares'
+    | '/mensajes'
     | '/metas'
     | '/panel'
     | '/promesas'
@@ -408,6 +419,7 @@ export interface FileRouteTypes {
     | '/_authenticated/galeria'
     | '/_authenticated/libro'
     | '/_authenticated/lugares'
+    | '/_authenticated/mensajes'
     | '/_authenticated/metas'
     | '/_authenticated/panel'
     | '/_authenticated/promesas'
@@ -580,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLugaresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mensajes': {
+      id: '/_authenticated/mensajes'
+      path: '/mensajes'
+      fullPath: '/mensajes'
+      preLoaderRoute: typeof AuthenticatedMensajesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/metas': {
       id: '/_authenticated/metas'
       path: '/metas'
@@ -684,6 +703,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
   AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
   AuthenticatedLugaresRoute: typeof AuthenticatedLugaresRoute
+  AuthenticatedMensajesRoute: typeof AuthenticatedMensajesRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
@@ -714,6 +734,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
   AuthenticatedLibroRoute: AuthenticatedLibroRoute,
   AuthenticatedLugaresRoute: AuthenticatedLugaresRoute,
+  AuthenticatedMensajesRoute: AuthenticatedMensajesRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
