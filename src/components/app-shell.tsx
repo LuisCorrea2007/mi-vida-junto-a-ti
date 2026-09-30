@@ -57,6 +57,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/panel", label: "Panel", icon: Sparkles },
   { to: "/consejero", label: "Consejero", icon: MessageCircleHeart },
+  { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart },
   { to: "/notas", label: "Notas", icon: NotebookPen },
   { to: "/galeria", label: "Galería", icon: Images },
   { to: "/conexion", label: "Conexión", icon: Handshake },
