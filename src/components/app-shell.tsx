@@ -10,6 +10,7 @@ import {
   CalendarHeart,
   Flame,
   Gift,
+  HandHeart,
   Handshake,
   Hourglass,
   Heart,
