@@ -10,6 +10,7 @@ import {
   CalendarHeart,
   Flame,
   Gift,
+  HandHeart,
   Handshake,
   Hourglass,
   Heart,
@@ -77,6 +78,7 @@ const NAV = [
   { to: "/lugares", label: "Lugares", icon: MapPin },
   { to: "/estadisticas", label: "Números", icon: BarChart3 },
   { to: "/cumplidos", label: "Cumplidos", icon: Quote },
+  { to: "/promesas", label: "Promesas", icon: HandHeart },
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */

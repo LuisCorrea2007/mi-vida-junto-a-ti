@@ -32,6 +32,7 @@ import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticated/lugares'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
 import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
@@ -158,6 +159,11 @@ const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   path: '/panel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPromesasRoute = AuthenticatedPromesasRouteImport.update({
+  id: '/promesas',
+  path: '/promesas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRetosRoute = AuthenticatedRetosRouteImport.update({
   id: '/retos',
   path: '/retos',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/lugares': typeof AuthenticatedLugaresRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/promesas': typeof AuthenticatedPromesasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/tareas': typeof AuthenticatedTareasRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/lugares': typeof AuthenticatedLugaresRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/promesas': typeof AuthenticatedPromesasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/tareas': typeof AuthenticatedTareasRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/lugares': typeof AuthenticatedLugaresRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
   '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/metas'
     | '/panel'
+    | '/promesas'
     | '/retos'
     | '/ruleta'
     | '/tareas'
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/metas'
     | '/panel'
+    | '/promesas'
     | '/retos'
     | '/ruleta'
     | '/tareas'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lugares'
     | '/_authenticated/metas'
     | '/_authenticated/panel'
+    | '/_authenticated/promesas'
     | '/_authenticated/retos'
     | '/_authenticated/ruleta'
     | '/_authenticated/tareas'
@@ -582,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/promesas': {
+      id: '/_authenticated/promesas'
+      path: '/promesas'
+      fullPath: '/promesas'
+      preLoaderRoute: typeof AuthenticatedPromesasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/retos': {
       id: '/_authenticated/retos'
       path: '/retos'
@@ -667,6 +686,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLugaresRoute: typeof AuthenticatedLugaresRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
   AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
@@ -696,6 +716,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLugaresRoute: AuthenticatedLugaresRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
   AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
