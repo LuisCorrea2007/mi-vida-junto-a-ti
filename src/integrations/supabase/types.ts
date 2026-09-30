@@ -1470,6 +1470,42 @@ export type Database = {
         }
         Relationships: []
       }
+      promises: {
+        Row: {
+          created_at: string
+          detail: string | null
+          due_date: string | null
+          emoji: string
+          id: string
+          kept_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          due_date?: string | null
+          emoji?: string
+          id?: string
+          kept_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          due_date?: string | null
+          emoji?: string
+          id?: string
+          kept_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       push_tokens: {
         Row: {
           created_at: string
