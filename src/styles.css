@@ -285,3 +285,4 @@
 .sealed {
   background-image: radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 70%);
 }
+
