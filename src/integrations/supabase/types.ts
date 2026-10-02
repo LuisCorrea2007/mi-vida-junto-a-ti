@@ -1775,6 +1775,39 @@ export type Database = {
         }
         Relationships: []
       }
+      surprises: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message: string
+          opened_at: string | null
+          title: string
+          unlock_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message: string
+          opened_at?: string | null
+          title: string
+          unlock_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message?: string
+          opened_at?: string | null
+          title?: string
+          unlock_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       time_capsules: {
         Row: {
           content: string | null
