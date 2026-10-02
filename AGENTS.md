@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Decisions
+- Build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by in-place upgrades, which broke publishing.
