@@ -36,6 +36,7 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
 import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
+import { Route as AuthenticatedSorpresasRouteImport } from './routes/_authenticated/sorpresas'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -180,6 +181,11 @@ const AuthenticatedRuletaRoute = AuthenticatedRuletaRouteImport.update({
   path: '/ruleta',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSorpresasRoute = AuthenticatedSorpresasRouteImport.update({
+  id: '/sorpresas',
+  path: '/sorpresas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
   id: '/tareas',
   path: '/tareas',
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/promesas': typeof AuthenticatedPromesasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
+  '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/promesas': typeof AuthenticatedPromesasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
+  '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
   '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
+  '/_authenticated/sorpresas': typeof AuthenticatedSorpresasRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
@@ -354,6 +363,7 @@ export interface FileRouteTypes {
     | '/promesas'
     | '/retos'
     | '/ruleta'
+    | '/sorpresas'
     | '/tareas'
     | '/videos'
     | '/api/chat'
@@ -389,6 +399,7 @@ export interface FileRouteTypes {
     | '/promesas'
     | '/retos'
     | '/ruleta'
+    | '/sorpresas'
     | '/tareas'
     | '/videos'
     | '/api/chat'
@@ -425,6 +436,7 @@ export interface FileRouteTypes {
     | '/_authenticated/promesas'
     | '/_authenticated/retos'
     | '/_authenticated/ruleta'
+    | '/_authenticated/sorpresas'
     | '/_authenticated/tareas'
     | '/_authenticated/videos'
     | '/api/chat'
@@ -634,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRuletaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sorpresas': {
+      id: '/_authenticated/sorpresas'
+      path: '/sorpresas'
+      fullPath: '/sorpresas'
+      preLoaderRoute: typeof AuthenticatedSorpresasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tareas': {
       id: '/_authenticated/tareas'
       path: '/tareas'
@@ -709,6 +728,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
   AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
+  AuthenticatedSorpresasRoute: typeof AuthenticatedSorpresasRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedConsejeroIdRoute: typeof AuthenticatedConsejeroIdRoute
@@ -740,6 +760,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
   AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
+  AuthenticatedSorpresasRoute: AuthenticatedSorpresasRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedConsejeroIdRoute: AuthenticatedConsejeroIdRoute,
