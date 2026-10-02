@@ -52,7 +52,7 @@ function SorpresasPage() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [emoji, setEmoji] = useState(EMOJIS[0]);
+  const [emoji, setEmoji] = useState<string>("🎁");
   const [unlockDate, setUnlockDate] = useState("");
   const [tab, setTab] = useState<"paraMi" | "enviadas">("paraMi");
   const [q, setQ] = useState("");
