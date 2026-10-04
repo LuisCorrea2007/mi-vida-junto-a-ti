@@ -11,21 +11,23 @@ import { useRealtime } from "@/hooks/use-realtime";
 import { notifyPartner } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NavalBoard } from "@/components/naval-game";
 
 export const Route = createFileRoute("/_authenticated/juegos")({
   head: () => ({
     meta: [
       { title: "Juegos en pareja — Nuestro Espacio" },
-      { name: "description", content: "Tres en raya y Conecta 4 por turnos para jugar en pareja." },
+      { name: "description", content: "Tres en raya, Conecta 4 y Batalla naval por turnos para jugar en pareja." },
     ],
   }),
   component: JuegosPage,
 });
 
-type Kind = "ttt" | "c4";
+type Kind = "ttt" | "c4" | "naval";
 const GAMES: Record<Kind, { name: string; emoji: string; cols: number; rows: number; need: number; desc: string }> = {
   ttt: { name: "Tres en raya", emoji: "❌", cols: 3, rows: 3, need: 3, desc: "El clásico: tres en línea gana." },
   c4: { name: "Conecta 4", emoji: "🔴", cols: 7, rows: 6, need: 4, desc: "Deja caer fichas y junta cuatro." },
+  naval: { name: "Batalla naval", emoji: "🚢", cols: 10, rows: 10, need: 0, desc: "Esconde tus barcos y hunde los suyos." },
 };
 
 type Game = {
@@ -79,7 +81,7 @@ function JuegosPage() {
     const g = GAMES[kind];
     const { data, error } = await supabase
       .from("couple_games")
-      .insert({ user_id: user.id, opponent_id: partnerId, kind, board: Array(g.cols * g.rows).fill(null), turn: partnerId })
+      .insert({ user_id: user.id, opponent_id: partnerId, kind, board: kind === "naval" ? {} : Array(g.cols * g.rows).fill(null), turn: partnerId })
       .select("id")
       .single();
     if (error) { toast.error("No se pudo crear la partida"); return; }
@@ -145,7 +147,7 @@ function JuegosPage() {
         ))}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         {(Object.keys(GAMES) as Kind[]).map((k) => (
           <button key={k} onClick={() => start(k)} className="rounded-2xl border bg-card/60 p-5 text-left transition hover:border-primary/60 hover:bg-accent/40">
             <p className="text-3xl">{GAMES[k].emoji}</p>
@@ -156,7 +158,8 @@ function JuegosPage() {
         ))}
       </div>
 
-      {open && <Board game={open} userId={user?.id} nameOf={nameOf} onPlay={(i) => void play(open, i)} />}
+      {open && open.kind === "naval" && <NavalBoard game={open} userId={user?.id} nameOf={nameOf} />}
+      {open && open.kind !== "naval" && <Board game={open} userId={user?.id} nameOf={nameOf} onPlay={(i) => void play(open, i)} />}
 
       <section className="space-y-2">
         <h2 className="font-display text-lg font-semibold">Partidas</h2>

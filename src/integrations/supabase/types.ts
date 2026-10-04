@@ -1087,6 +1087,38 @@ export type Database = {
         }
         Relationships: []
       }
+      naval_fleets: {
+        Row: {
+          cells: number[]
+          created_at: string
+          game_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          cells: number[]
+          created_at?: string
+          game_id: string
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          cells?: number[]
+          created_at?: string
+          game_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "naval_fleets_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "couple_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       note_attachments: {
         Row: {
           attachment_type: string
@@ -2066,6 +2098,11 @@ export type Database = {
     }
     Functions: {
       my_couple_id: { Args: never; Returns: string }
+      naval_fire: { Args: { _cell: number; _game: string }; Returns: boolean }
+      naval_place: {
+        Args: { _cells: number[]; _game: string }
+        Returns: undefined
+      }
       same_space: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
