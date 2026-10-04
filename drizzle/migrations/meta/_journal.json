@@ -71,6 +71,13 @@
       "when": 1791146248847,
       "tag": "0009_create_couple_games",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791147514409,
+      "tag": "0010_create_naval_fleets",
+      "breakpoints": true
     }
   ]
 }
