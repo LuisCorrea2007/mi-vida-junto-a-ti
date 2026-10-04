@@ -45,7 +45,7 @@ function findWinner(board: (string | null)[], cols: number, rows: number, need: 
     for (let c = 0; c < cols; c++) {
       const v = at(r, c);
       if (!v) continue;
-      for (const [dr, dc] of [[0, 1], [1, 0], [1, 1], [1, -1]]) {
+      for (const [dr, dc] of [[0, 1], [1, 0], [1, 1], [1, -1]] as const) {
         let k = 1;
         while (k < need && at(r + dr * k, c + dc * k) === v) k++;
         if (k === need) return v;
@@ -75,14 +75,14 @@ function JuegosPage() {
   });
 
   async function start(kind: Kind) {
-    if (!user || !partnerId) return toast.error("Primero une a tu pareja en Ajustes");
+    if (!user || !partnerId) { toast.error("Primero une a tu pareja en Ajustes"); return; }
     const g = GAMES[kind];
     const { data, error } = await supabase
       .from("couple_games")
       .insert({ user_id: user.id, opponent_id: partnerId, kind, board: Array(g.cols * g.rows).fill(null), turn: partnerId })
       .select("id")
       .single();
-    if (error) return toast.error("No se pudo crear la partida");
+    if (error) { toast.error("No se pudo crear la partida"); return; }
     setOpenId(data.id);
     qc.invalidateQueries({ queryKey: ["couple_games"] });
     notifyPartner({ toUserId: partnerId, type: "juego", title: `¡Te reto a ${g.name}!`, message: "Te toca empezar 🎲", link: "/juegos" }).catch(() => {});
@@ -103,7 +103,7 @@ function JuegosPage() {
     const winner = findWinner(board, g.cols, g.rows, g.need);
     const other = user.id === game.user_id ? game.opponent_id : game.user_id;
     const { error } = await supabase.from("couple_games").update({ board, winner, turn: other }).eq("id", game.id);
-    if (error) return toast.error("No se pudo guardar la jugada");
+    if (error) { toast.error("No se pudo guardar la jugada"); return; }
     qc.invalidateQueries({ queryKey: ["couple_games"] });
     if (winner === user.id) toast.success("¡Ganaste! 🏆");
     notifyPartner({
@@ -156,7 +156,7 @@ function JuegosPage() {
         ))}
       </div>
 
-      {open && <Board game={open} userId={user?.id} nameOf={nameOf} onPlay={(i) => play(open, i)} />}
+      {open && <Board game={open} userId={user?.id} nameOf={nameOf} onPlay={(i) => void play(open, i)} />}
 
       <section className="space-y-2">
         <h2 className="font-display text-lg font-semibold">Partidas</h2>
@@ -187,7 +187,7 @@ function JuegosPage() {
   );
 }
 
-function Board({ game, userId, nameOf, onPlay }: { game: Game; userId?: string; nameOf: (id: string) => string; onPlay: (i: number) => void }) {
+function Board({ game, userId, nameOf, onPlay }: { game: Game; userId: string | undefined; nameOf: (id: string) => string; onPlay: (i: number) => void }) {
   const g = GAMES[game.kind as Kind];
   const mine = game.turn === userId && !game.winner;
   const mark = (v: string | null) => {
