@@ -311,6 +311,42 @@ export type Database = {
         }
         Relationships: []
       }
+      couple_games: {
+        Row: {
+          board: Json
+          created_at: string
+          id: string
+          kind: string
+          opponent_id: string
+          turn: string
+          updated_at: string
+          user_id: string
+          winner: string | null
+        }
+        Insert: {
+          board: Json
+          created_at?: string
+          id?: string
+          kind: string
+          opponent_id: string
+          turn: string
+          updated_at?: string
+          user_id?: string
+          winner?: string | null
+        }
+        Update: {
+          board?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          opponent_id?: string
+          turn?: string
+          updated_at?: string
+          user_id?: string
+          winner?: string | null
+        }
+        Relationships: []
+      }
       couple_goals: {
         Row: {
           created_at: string
