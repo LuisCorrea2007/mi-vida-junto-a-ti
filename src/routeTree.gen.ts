@@ -28,6 +28,7 @@ import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDiversionRouteImport } from './routes/_authenticated/diversion'
 import { Route as AuthenticatedEstadisticasRouteImport } from './routes/_authenticated/estadisticas'
 import { Route as AuthenticatedGaleriaRouteImport } from './routes/_authenticated/galeria'
+import { Route as AuthenticatedJuegosRouteImport } from './routes/_authenticated/juegos'
 import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/libro'
 import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticated/lugares'
 import { Route as AuthenticatedMensajesRouteImport } from './routes/_authenticated/mensajes'
@@ -141,6 +142,11 @@ const AuthenticatedGaleriaRoute = AuthenticatedGaleriaRouteImport.update({
   path: '/galeria',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJuegosRoute = AuthenticatedJuegosRouteImport.update({
+  id: '/juegos',
+  path: '/juegos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLibroRoute = AuthenticatedLibroRouteImport.update({
   id: '/libro',
   path: '/libro',
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/diversion': typeof AuthenticatedDiversionRoute
   '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
+  '/juegos': typeof AuthenticatedJuegosRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/lugares': typeof AuthenticatedLugaresRoute
   '/mensajes': typeof AuthenticatedMensajesRoute
@@ -279,6 +286,7 @@ export interface FileRoutesByTo {
   '/diversion': typeof AuthenticatedDiversionRoute
   '/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/galeria': typeof AuthenticatedGaleriaRoute
+  '/juegos': typeof AuthenticatedJuegosRoute
   '/libro': typeof AuthenticatedLibroRoute
   '/lugares': typeof AuthenticatedLugaresRoute
   '/mensajes': typeof AuthenticatedMensajesRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/diversion': typeof AuthenticatedDiversionRoute
   '/_authenticated/estadisticas': typeof AuthenticatedEstadisticasRoute
   '/_authenticated/galeria': typeof AuthenticatedGaleriaRoute
+  '/_authenticated/juegos': typeof AuthenticatedJuegosRoute
   '/_authenticated/libro': typeof AuthenticatedLibroRoute
   '/_authenticated/lugares': typeof AuthenticatedLugaresRoute
   '/_authenticated/mensajes': typeof AuthenticatedMensajesRoute
@@ -355,6 +364,7 @@ export interface FileRouteTypes {
     | '/diversion'
     | '/estadisticas'
     | '/galeria'
+    | '/juegos'
     | '/libro'
     | '/lugares'
     | '/mensajes'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/diversion'
     | '/estadisticas'
     | '/galeria'
+    | '/juegos'
     | '/libro'
     | '/lugares'
     | '/mensajes'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/_authenticated/diversion'
     | '/_authenticated/estadisticas'
     | '/_authenticated/galeria'
+    | '/_authenticated/juegos'
     | '/_authenticated/libro'
     | '/_authenticated/lugares'
     | '/_authenticated/mensajes'
@@ -590,6 +602,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGaleriaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/juegos': {
+      id: '/_authenticated/juegos'
+      path: '/juegos'
+      fullPath: '/juegos'
+      preLoaderRoute: typeof AuthenticatedJuegosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/libro': {
       id: '/_authenticated/libro'
       path: '/libro'
@@ -720,6 +739,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiversionRoute: typeof AuthenticatedDiversionRoute
   AuthenticatedEstadisticasRoute: typeof AuthenticatedEstadisticasRoute
   AuthenticatedGaleriaRoute: typeof AuthenticatedGaleriaRoute
+  AuthenticatedJuegosRoute: typeof AuthenticatedJuegosRoute
   AuthenticatedLibroRoute: typeof AuthenticatedLibroRoute
   AuthenticatedLugaresRoute: typeof AuthenticatedLugaresRoute
   AuthenticatedMensajesRoute: typeof AuthenticatedMensajesRoute
@@ -752,6 +772,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiversionRoute: AuthenticatedDiversionRoute,
   AuthenticatedEstadisticasRoute: AuthenticatedEstadisticasRoute,
   AuthenticatedGaleriaRoute: AuthenticatedGaleriaRoute,
+  AuthenticatedJuegosRoute: AuthenticatedJuegosRoute,
   AuthenticatedLibroRoute: AuthenticatedLibroRoute,
   AuthenticatedLugaresRoute: AuthenticatedLugaresRoute,
   AuthenticatedMensajesRoute: AuthenticatedMensajesRoute,
