@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 
 ## Decisions
-- Build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by in-place upgrades, which broke publishing.
+- Dev and build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by sandbox reinstalls, which broke the preview and publishing.

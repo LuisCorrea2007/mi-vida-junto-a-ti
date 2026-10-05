@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "node scripts/repair-deps.mjs && vite dev",
     "build": "node scripts/repair-deps.mjs && vite build",
     "build:dev": "node scripts/repair-deps.mjs && vite build --mode development",
     "preview": "vite preview",
