@@ -22,14 +22,14 @@ export type NavalGame = {
 
 type Shots = Record<string, boolean>;
 
-function shipCells(start: number, size: number, vertical: boolean): number[] | null {
+export function shipCells(start: number, size: number, vertical: boolean): number[] | null {
   const r = Math.floor(start / N);
   const c = start % N;
   if (vertical ? r + size > N : c + size > N) return null;
   return Array.from({ length: size }, (_, k) => (vertical ? start + k * N : start + k));
 }
 
-function randomFleet(): number[][] {
+export function randomFleet(): number[][] {
   for (;;) {
     const taken = new Set<number>();
     const fleet: number[][] = [];
