@@ -12,6 +12,7 @@ import { notifyPartner } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NavalBoard } from "@/components/naval-game";
+import { BotArcade } from "@/components/bot-arcade";
 
 export const Route = createFileRoute("/_authenticated/juegos")({
   head: () => ({
@@ -162,7 +163,7 @@ function JuegosPage() {
       {open && open.kind !== "naval" && <Board game={open} userId={user?.id} nameOf={nameOf} onPlay={(i) => void play(open, i)} />}
 
       <section className="space-y-2">
-        <h2 className="font-display text-lg font-semibold">Partidas</h2>
+        <h2 className="font-display text-lg font-semibold">Partidas con tu pareja</h2>
         {games.length === 0 && <p className="text-sm text-muted-foreground">Aún no hay partidas. ¡Reta a tu pareja!</p>}
         {games.map((g) => {
           const info = GAMES[g.kind as Kind];
@@ -186,6 +187,7 @@ function JuegosPage() {
           );
         })}
       </section>
+      <BotArcade />
     </div>
   );
 }
