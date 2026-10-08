@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { MessageCircleHeart, Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -606,7 +606,7 @@ function EphemeralChat({ userId }: { userId: string }) {
       <div className="flex max-h-[55vh] min-h-72 flex-col gap-1.5 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <div className="my-auto text-center">
-            <p className="text-3xl"></p>
+            <MessageCircleHeart className="mx-auto size-9 text-primary" />
             <p className="mt-2 text-sm text-muted-foreground">
               Nada por ahora. Cuéntale qué haces en este momento.
             </p>
