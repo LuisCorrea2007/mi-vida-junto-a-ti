@@ -97,7 +97,7 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
       const a = shot.angle * Math.PI/180;
       const speed = sport === "basket" ? 6 + shot.power*0.04 : sport === "curling" ? 3 + shot.power*0.095 : sport === "golf" ? 4+shot.power*0.22 : 4 + shot.power*0.12;
       rb.setLinvel({x:Math.sin(a)*speed,y:sport === "basket" ? 4.5+shot.power*0.036 : 0,z:-Math.cos(a)*speed},true);
-      rb.setAngvel({x:-speed/radius,y:0,z:0},true);
+      rb.setAngvel({x:sport==="curling" ? 0 : -speed/radius,y:0,z:0},true);
     }
     elapsed.current += dt;
     const p = rb.translation(); const v = rb.linvel();
@@ -108,10 +108,11 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
     if (hole || settled.current > 0.65 || elapsed.current > (sport === "curling" ? 12 : 8) || p.y < -3) {
       done.current = true;
       const points = sport === "basket" ? (basket.current ? 3 : 0) : sport === "curling" ? curlingScore(p.x,p.z) : sport === "bowling" ? pins.current.filter(pin => { if (!pin) return false; const q=pin.rotation(); return Math.abs(q.x)+Math.abs(q.z)>0.4 || pin.translation().y<0; }).length : 0;
+      console.info("arcade-shot",sport,p.x,p.y,p.z,points,hole);
       onFinish({points,hole,x:Math.max(-3.1,Math.min(3.1,p.x)),z:Math.max(-7,Math.min(6.5,p.z))});
     }
   });
-  return <RigidBody ref={body} colliders={false} position={[shot.start[0],sport==="basket" ? 1 : radius+0.02,shot.start[1]]} mass={sport==="bowling" ? 3 : 1} friction={sport==="curling" ? 0.02 : 0.5} restitution={sport==="basket" ? 0.65 : 0.35} linearDamping={sport==="curling" ? 0.38 : sport==="golf" ? 0.55 : 0.12} angularDamping={0.2} ccd>
+  return <RigidBody ref={body} colliders={false} position={[shot.start[0],sport==="basket" ? 1 : radius+0.02,shot.start[1]]} mass={sport==="bowling" ? 3 : 1} friction={sport==="curling" ? 0.02 : 0.5} restitution={sport==="basket" ? 0.65 : 0.35} linearDamping={sport==="basket" ? 0 : sport==="curling" ? 0.38 : sport==="golf" ? 0.55 : 0.12} angularDamping={0.2} ccd>
     <BallCollider args={[radius]} />
     <mesh castShadow>{sport==="curling" ? <cylinderGeometry args={[radius,radius,0.16,24]} /> : <sphereGeometry args={[radius,24,16]} />}<meshStandardMaterial color={sport==="basket" ? colors.coral : shot.player===0 ? colors.white : colors.yellow} roughness={0.3} metalness={sport==="curling" ? 0.35 : 0.05} /></mesh>
     {sport==="curling" && <mesh position-y={0.17}><torusGeometry args={[0.12,0.04,8,16]} /><meshStandardMaterial color={shot.player===0 ? colors.coral : colors.mint} /></mesh>}
