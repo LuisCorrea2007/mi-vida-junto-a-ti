@@ -8,7 +8,7 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
-  Clapperboard,
+  Mail,
   Flame,
   Gift,
   HandHeart,
@@ -67,7 +67,7 @@ const NAV = [
   { to: "/galeria", label: "Galería", icon: Images },
   { to: "/conexion", label: "Conexión", icon: Handshake },
   { to: "/videos", label: "Videos", icon: Video },
-  { to: "/cine", label: "Cine", icon: Clapperboard },
+  { to: "/cartas", label: "Cartas", icon: Mail },
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
   { to: "/cerca", label: "Ahora", icon: MapPin },
   { to: "/deseos", label: "Deseos", icon: Stars },
@@ -284,7 +284,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile(user?.id);
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
   const locationError = useLiveLocation(profile);
-  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "cinema_movies");
+  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters");
   const [sectionSearch, setSectionSearch] = useState("");
   const visibleNav = NAV.filter((item) => item.label.toLocaleLowerCase("es").includes(sectionSearch.trim().toLocaleLowerCase("es")));
   const [mounted, setMounted] = useState(false);
@@ -461,7 +461,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {mounted && user && <PushBanner userId={user.id} />}
       {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
-      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">{children}</main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
       <MobileNav pathname={pathname} />

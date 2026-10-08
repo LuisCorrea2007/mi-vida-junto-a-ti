@@ -18,6 +18,7 @@ import { Route as AuthenticatedAjustesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedCancionesRouteImport } from './routes/_authenticated/canciones'
 import { Route as AuthenticatedCapsulasRouteImport } from './routes/_authenticated/capsulas'
+import { Route as AuthenticatedCartasRouteImport } from './routes/_authenticated/cartas'
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
 import { Route as AuthenticatedCineRouteImport } from './routes/_authenticated/cine'
 import { Route as AuthenticatedConexionRouteImport } from './routes/_authenticated/conexion'
@@ -89,6 +90,11 @@ const AuthenticatedCancionesRoute = AuthenticatedCancionesRouteImport.update({
 const AuthenticatedCapsulasRoute = AuthenticatedCapsulasRouteImport.update({
   id: '/capsulas',
   path: '/capsulas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCartasRoute = AuthenticatedCartasRouteImport.update({
+  id: '/cartas',
+  path: '/cartas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCercaRoute = AuthenticatedCercaRouteImport.update({
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/canciones': typeof AuthenticatedCancionesRoute
   '/capsulas': typeof AuthenticatedCapsulasRoute
+  '/cartas': typeof AuthenticatedCartasRoute
   '/cerca': typeof AuthenticatedCercaRoute
   '/cine': typeof AuthenticatedCineRoute
   '/conexion': typeof AuthenticatedConexionRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/calendario': typeof AuthenticatedCalendarioRoute
   '/canciones': typeof AuthenticatedCancionesRoute
   '/capsulas': typeof AuthenticatedCapsulasRoute
+  '/cartas': typeof AuthenticatedCartasRoute
   '/cerca': typeof AuthenticatedCercaRoute
   '/cine': typeof AuthenticatedCineRoute
   '/conexion': typeof AuthenticatedConexionRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/canciones': typeof AuthenticatedCancionesRoute
   '/_authenticated/capsulas': typeof AuthenticatedCapsulasRoute
+  '/_authenticated/cartas': typeof AuthenticatedCartasRoute
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
   '/_authenticated/cine': typeof AuthenticatedCineRoute
   '/_authenticated/conexion': typeof AuthenticatedConexionRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/canciones'
     | '/capsulas'
+    | '/cartas'
     | '/cerca'
     | '/cine'
     | '/conexion'
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/canciones'
     | '/capsulas'
+    | '/cartas'
     | '/cerca'
     | '/cine'
     | '/conexion'
@@ -440,6 +451,7 @@ export interface FileRouteTypes {
     | '/_authenticated/calendario'
     | '/_authenticated/canciones'
     | '/_authenticated/capsulas'
+    | '/_authenticated/cartas'
     | '/_authenticated/cerca'
     | '/_authenticated/cine'
     | '/_authenticated/conexion'
@@ -542,6 +554,13 @@ declare module '@tanstack/react-router' {
       path: '/capsulas'
       fullPath: '/capsulas'
       preLoaderRoute: typeof AuthenticatedCapsulasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cartas': {
+      id: '/_authenticated/cartas'
+      path: '/cartas'
+      fullPath: '/cartas'
+      preLoaderRoute: typeof AuthenticatedCartasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cerca': {
@@ -748,6 +767,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
   AuthenticatedCancionesRoute: typeof AuthenticatedCancionesRoute
   AuthenticatedCapsulasRoute: typeof AuthenticatedCapsulasRoute
+  AuthenticatedCartasRoute: typeof AuthenticatedCartasRoute
   AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
   AuthenticatedCineRoute: typeof AuthenticatedCineRoute
   AuthenticatedConexionRoute: typeof AuthenticatedConexionRoute
@@ -782,6 +802,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedCancionesRoute: AuthenticatedCancionesRoute,
   AuthenticatedCapsulasRoute: AuthenticatedCapsulasRoute,
+  AuthenticatedCartasRoute: AuthenticatedCartasRoute,
   AuthenticatedCercaRoute: AuthenticatedCercaRoute,
   AuthenticatedCineRoute: AuthenticatedCineRoute,
   AuthenticatedConexionRoute: AuthenticatedConexionRoute,

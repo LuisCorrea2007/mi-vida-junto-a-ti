@@ -15,5 +15,4 @@
 - Shared location tracking lives in the authenticated shell and only follows a previously consented sharing session; navigation must not stop updates or extend consent.
 - Retired published sections keep a redirect without loading removed feature code, preserving old links.
 - Realtime refreshes are debounced and recover on reconnect or visibility changes to avoid stale couple data.
-- Cinema keeps user-owned movies and append-only user-owned playback commands separate so either partner can control playback without editing another person's records.
-- Free cinema sources require an explicit open-license declaration verified again before adding a playable stream; language selection uses available source versions, not automatic dubbing.
+- Love letters stay owner-editable; the recipient marks them opened only through a security-definer function.
