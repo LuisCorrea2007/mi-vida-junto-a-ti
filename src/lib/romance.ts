@@ -3,14 +3,14 @@
 export type Mood = { emoji: string; label: string };
 
 export const MOODS: Mood[] = [
-  { emoji: "😍", label: "Enamorado" },
-  { emoji: "😊", label: "Feliz" },
-  { emoji: "🥹", label: "Te extraño" },
-  { emoji: "😴", label: "Cansado" },
-  { emoji: "😋", label: "Con antojo" },
-  { emoji: "😤", label: "Estresado" },
-  { emoji: "🤒", label: "Malito" },
-  { emoji: "🤗", label: "Necesito un abrazo" },
+  { emoji: "", label: "Enamorado" },
+  { emoji: "", label: "Feliz" },
+  { emoji: "", label: "Te extraño" },
+  { emoji: "", label: "Cansado" },
+  { emoji: "", label: "Con antojo" },
+  { emoji: "", label: "Estresado" },
+  { emoji: "", label: "Malito" },
+  { emoji: "", label: "Necesito un abrazo" },
 ];
 
 export const CHALLENGE_IDEAS: { title: string; description: string }[] = [

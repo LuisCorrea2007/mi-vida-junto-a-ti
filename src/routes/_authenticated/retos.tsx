@@ -89,7 +89,7 @@ function RetosPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "reto",
-          title: "Nuevo reto para nosotros ✨",
+          title: "Nuevo reto para nosotros",
           message: input.title.trim(),
           link: "/retos",
         });
@@ -124,7 +124,7 @@ function RetosPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "reto",
-          title: "¡Cumplí un reto! 🏆",
+          title: "¡Cumplí un reto!",
           message: challenge.title,
           link: "/retos",
         });

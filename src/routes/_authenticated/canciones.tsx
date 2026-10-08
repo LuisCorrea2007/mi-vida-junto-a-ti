@@ -114,7 +114,7 @@ function CancionesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cancion",
-          title: "Te dediqué una canción 🎵",
+          title: "Te dediqué una canción",
           message: `${title.trim()}${artist.trim() ? ` — ${artist.trim()}` : ""}`,
           link: "/canciones",
         });

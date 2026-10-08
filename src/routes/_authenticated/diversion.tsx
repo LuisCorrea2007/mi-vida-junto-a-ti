@@ -67,11 +67,11 @@ const FUN_CATEGORIES = [
 ] as const;
 
 const REACTIONS = [
-  { type: "risa", emoji: "😂", label: "Me hizo reír" },
-  { type: "amor", emoji: "❤️", label: "Me encanta" },
-  { type: "sorpresa", emoji: "😮", label: "No me lo esperaba" },
-  { type: "aplauso", emoji: "👏", label: "Bien hecho" },
-  { type: "fuego", emoji: "🔥", label: "Buenísimo" },
+  { type: "risa", emoji: "", label: "Me hizo reír" },
+  { type: "amor", emoji: "", label: "Me encanta" },
+  { type: "sorpresa", emoji: "", label: "No me lo esperaba" },
+  { type: "aplauso", emoji: "", label: "Bien hecho" },
+  { type: "fuego", emoji: "", label: "Buenísimo" },
 ] as const;
 
 type FunCategory = typeof FUN_CATEGORIES[number]["value"];
@@ -192,7 +192,7 @@ function FunPage() {
         await notifyPartner({
           toUserId: partnerId,
           type: "diversion_nuevo",
-          title: `Nuevo ${label.toLowerCase()} para ti 😄`,
+          title: `Nuevo ${label.toLowerCase()} para ti`,
           message: form.content.trim().slice(0, 120),
           link: "/diversion",
         });
@@ -302,7 +302,7 @@ function FunPage() {
         await notifyPartner({
           toUserId: item.user_id,
           type: "diversion_comentario",
-          title: "Comentaron lo que escribiste 💬",
+          title: "Comentaron lo que escribiste",
           message: text.trim().slice(0, 120),
           link: "/diversion",
         });
@@ -343,7 +343,7 @@ function FunPage() {
     const pool = (items ?? []).filter((i) => i.user_id !== user?.id);
     const list = pool.length > 0 ? pool : (items ?? []);
     if (list.length === 0) {
-      toast.error("Agreguen algo primero 😄");
+      toast.error("Agreguen algo primero");
       return;
     }
     const pick = list[Math.floor(Math.random() * list.length)]!;
@@ -620,7 +620,7 @@ function FunCard({
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
     if (item.answer && option === item.answer) {
-      toast.success("¡Correcto! 🎉");
+      toast.success("¡Correcto!");
     } else if (item.answer) {
       toast.error(`Incorrecto. La respuesta era: ${item.answer}`);
     }

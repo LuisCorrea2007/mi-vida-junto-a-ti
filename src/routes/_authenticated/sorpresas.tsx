@@ -39,7 +39,7 @@ type Surprise = {
   created_at: string;
 };
 
-const EMOJIS = ["🎁", "💌", "🌹", "🎂", "✈️", "💍", "⭐", "🎉"];
+const EMOJIS = ["", "", "", "", "", "", "⭐", ""];
 const today = () => new Date().toISOString().slice(0, 10);
 
 function SorpresasPage() {
@@ -52,7 +52,7 @@ function SorpresasPage() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [emoji, setEmoji] = useState<string>("🎁");
+  const [emoji, setEmoji] = useState<string>("");
   const [unlockDate, setUnlockDate] = useState("");
   const [tab, setTab] = useState<"paraMi" | "enviadas">("paraMi");
   const [q, setQ] = useState("");
@@ -84,7 +84,7 @@ function SorpresasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "sorpresa",
-          title: "Tienes una sorpresa esperando 🎁",
+          title: "Tienes una sorpresa esperando",
           message: `Se desbloquea el ${unlockDate}`,
           link: "/sorpresas",
         });

@@ -44,11 +44,11 @@ type Task = {
 };
 
 const CATEGORIES = [
-  { value: "casa", label: "Casa", emoji: "🏠" },
-  { value: "compras", label: "Compras", emoji: "🛒" },
-  { value: "pareja", label: "Nosotros", emoji: "💗" },
-  { value: "papeles", label: "Trámites", emoji: "📄" },
-  { value: "salud", label: "Salud", emoji: "🩺" },
+  { value: "casa", label: "Casa", emoji: "" },
+  { value: "compras", label: "Compras", emoji: "" },
+  { value: "pareja", label: "Nosotros", emoji: "" },
+  { value: "papeles", label: "Trámites", emoji: "" },
+  { value: "salud", label: "Salud", emoji: "" },
 ] as const;
 
 function TareasPage() {
@@ -98,7 +98,7 @@ function TareasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "tarea",
-          title: "Nuevo pendiente en la lista ✅",
+          title: "Nuevo pendiente en la lista",
           message: title.trim(),
           link: "/tareas",
         });
@@ -128,7 +128,7 @@ function TareasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "tarea",
-          title: "Ya está hecho ✅",
+          title: "Ya está hecho",
           message: t.title,
           link: "/tareas",
         });

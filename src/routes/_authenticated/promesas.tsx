@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/promesas")({
   component: PromesasPage,
 });
 
-const EMOJIS = ["🤝", "💍", "🌹", "✈️", "🏠", "💪", "❤️", "🎁"];
+const EMOJIS = ["", "", "", "", "", "", "", ""];
 
 type Promise_ = {
   id: string;
@@ -48,7 +48,7 @@ function PromesasPage() {
 
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
-  const [emoji, setEmoji] = useState("🤝");
+  const [emoji, setEmoji] = useState("");
   const [due, setDue] = useState("");
   const [tab, setTab] = useState<"pendientes" | "cumplidas">("pendientes");
   const [q, setQ] = useState("");
@@ -77,7 +77,7 @@ function PromesasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "promesa",
-          title: "Te hicieron una promesa 🤝",
+          title: "Te hicieron una promesa",
           message: title.trim(),
           link: "/promesas",
         });

@@ -145,7 +145,7 @@ export function useAgreements() {
           await notifyPartner(user.id, {
             type: "conexion",
             link: "/conexion",
-            title: "¡Acuerdo cumplido! 🎉",
+            title: "¡Acuerdo cumplido!",
             message: data.title,
           });
         } catch {}
@@ -322,7 +322,7 @@ export function useGratitudes() {
           await notifyPartner(user.id, {
             type: "conexion",
             link: "/conexion",
-            title: "Tu pareja te agradeció algo 💗",
+            title: "Tu pareja te agradeció algo",
             message: data.content,
           });
         } catch {}

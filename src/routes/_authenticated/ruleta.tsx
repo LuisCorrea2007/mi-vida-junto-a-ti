@@ -154,8 +154,8 @@ function RuletaPage() {
   }
 
   const coinOptions = myName && partnerName
-    ? [`¡${myName} elige! 💖`, `¡${partnerName} elige! 😎`]
-    : ["¡Tú eliges! 💖", "¡Yo elijo! 😎"];
+    ? [`¡${myName} elige!`, `¡${partnerName} elige!`]
+    : ["¡Tú eliges!", "¡Yo elijo!"];
 
   return (
     <div className="space-y-6">
@@ -178,7 +178,7 @@ function RuletaPage() {
             </Button>
           </div>
           <div className={`flex min-h-28 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 p-6 text-center font-display text-xl transition-transform ${spinning ? "scale-[1.02] animate-pulse" : ""}`}>
-            {result ?? (items.length ? "Toca girar ✨" : isAll ? "Aún no hay opciones en ningún tema" : "Aún no hay opciones aquí")}
+            {result ?? (items.length ? "Toca girar" : isAll ? "Aún no hay opciones en ningún tema" : "Aún no hay opciones aquí")}
           </div>
           <div className="flex gap-2">
             <Button className="flex-1" onClick={spin} disabled={spinning}><Sparkles className="size-4" /> {spinning ? "Girando…" : "Girar"}</Button>
@@ -252,14 +252,14 @@ function RuletaPage() {
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Coins className="size-5 text-primary" /> ¿Quién elige?</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-center font-display text-2xl">{coin ?? "🪙"}</p>
+            <p className="text-center font-display text-2xl">{coin ?? ""}</p>
             <Button variant="outline" className="w-full" onClick={() => setCoin(pick(coinOptions))}>Lanzar moneda</Button>
           </CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Timer className="size-5 text-primary" /> Abrazo de 20 segundos</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-center font-display text-2xl">{secs !== null ? `${secs}s 🤗` : "Listos"}</p>
+            <p className="text-center font-display text-2xl">{secs !== null ? `${secs}s` : "Listos"}</p>
             <Button variant="outline" className="w-full" onClick={hug} disabled={secs !== null}>Empezar</Button>
           </CardContent>
         </Card>

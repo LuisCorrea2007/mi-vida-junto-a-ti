@@ -327,7 +327,7 @@ function AnniversaryStats({ iso }: { iso: string }) {
         {years > 0 && <span className="text-muted-foreground"> ({years} {years === 1 ? "año" : "años"})</span>}
       </p>
       <p className="text-xs text-muted-foreground">
-        {until === 0 ? "¡Hoy es su aniversario! 🎉" : `Próximo aniversario en ${until} ${until === 1 ? "día" : "días"}`}
+        {until === 0 ? "¡Hoy es su aniversario!" : `Próximo aniversario en ${until} ${until === 1 ? "día" : "días"}`}
       </p>
     </div>
   );

@@ -112,7 +112,7 @@ function CheckInSection() {
       { emotion, energy_level: energy, need: null, note: note.trim() || null, support_type: supportType },
       {
         onSuccess: () => {
-          toast.success("Check-in guardado 💕");
+          toast.success("Check-in guardado");
           setEmotion("");
           setNote("");
           setEnergy(5);
@@ -260,7 +260,7 @@ function GratitudeSection() {
     }
     createGratitude.mutate(content.trim(), {
       onSuccess: () => {
-        toast.success("Gracias enviadas 💗");
+        toast.success("Gracias enviadas");
         setContent("");
       },
       onError: () => toast.error("No se pudo guardar"),
@@ -362,7 +362,7 @@ function AgreementsSection() {
       },
       {
         onSuccess: () => {
-          toast.success("Acuerdo creado 🤝");
+          toast.success("Acuerdo creado");
           setTitle("");
           setDescription("");
           setReviewDate("");
@@ -396,7 +396,7 @@ function AgreementsSection() {
             <div>
               <CardTitle className="text-lg">Nuestros acuerdos</CardTitle>
               <CardDescription>
-                {cumplidos > 0 ? `${cumplidos} cumplidos juntos 🎉` : "Creen metas o compromisos juntos"}
+                {cumplidos > 0 ? `${cumplidos} cumplidos juntos` : "Creen metas o compromisos juntos"}
               </CardDescription>
             </div>
             <Button size="sm" className="rounded-full" onClick={() => setShowForm(!showForm)}>
@@ -520,7 +520,7 @@ function QuestionsSection() {
       { questionId, answer: currentAnswer.trim() },
       {
         onSuccess: () => {
-          toast.success("Respuesta guardada 💭");
+          toast.success("Respuesta guardada");
           setCurrentAnswer("");
           setActiveQuestionId(null);
         },
@@ -538,7 +538,7 @@ function QuestionsSection() {
       { question: nueva.trim(), category: nuevaCat },
       {
         onSuccess: () => {
-          toast.success("Pregunta creada ✨");
+          toast.success("Pregunta creada");
           setNueva("");
           setShowForm(false);
         },
@@ -551,7 +551,7 @@ function QuestionsSection() {
     const pendientes = (questions ?? []).filter((q) => !responses.some((r) => r.question_id === q.id));
     const q = pendientes[Math.floor(Math.random() * pendientes.length)];
     if (!q) {
-      toast.success("¡Ya respondieron todas! Crea una nueva ✨");
+      toast.success("¡Ya respondieron todas! Crea una nueva");
       return;
     }
     setSelectedCategory(null);
@@ -806,7 +806,7 @@ function PlansSection() {
       } as never,
       {
         onSuccess: () => {
-          toast.success("Plan creado 📅");
+          toast.success("Plan creado");
           setTitle("");
           setDescription("");
           setShowForm(false);

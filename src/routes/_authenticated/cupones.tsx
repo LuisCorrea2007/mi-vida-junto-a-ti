@@ -45,23 +45,23 @@ type Coupon = {
 type Redemption = { id: string; coupon_id: string; user_id: string; note: string | null; created_at: string };
 
 const CATEGORIES = [
-  { value: "detalle", label: "Detalle", emoji: "🎁" },
-  { value: "mimos", label: "Mimos", emoji: "🤍" },
-  { value: "comida", label: "Comida", emoji: "🍰" },
-  { value: "cita", label: "Cita", emoji: "🌙" },
-  { value: "capricho", label: "Capricho", emoji: "✨" },
-  { value: "perdon", label: "Perdón", emoji: "🕊️" },
+  { value: "detalle", label: "Detalle", emoji: "" },
+  { value: "mimos", label: "Mimos", emoji: "" },
+  { value: "comida", label: "Comida", emoji: "" },
+  { value: "cita", label: "Cita", emoji: "" },
+  { value: "capricho", label: "Capricho", emoji: "" },
+  { value: "perdon", label: "Perdón", emoji: "" },
 ] as const;
 
 const IDEAS = [
-  { emoji: "💆", title: "Masaje de 20 minutos", category: "mimos" },
-  { emoji: "🍳", title: "Desayuno en la cama", category: "comida" },
-  { emoji: "🎬", title: "Eliges la película sin quejas", category: "cita" },
-  { emoji: "🧹", title: "Me toca a mí toda la limpieza", category: "detalle" },
-  { emoji: "🌙", title: "Una noche solo de abrazos", category: "mimos" },
-  { emoji: "🍦", title: "Postre a la hora que quieras", category: "capricho" },
-  { emoji: "📵", title: "Tarde sin celulares", category: "cita" },
-  { emoji: "🚗", title: "Paseo sorpresa a donde diga yo", category: "cita" },
+  { emoji: "", title: "Masaje de 20 minutos", category: "mimos" },
+  { emoji: "", title: "Desayuno en la cama", category: "comida" },
+  { emoji: "", title: "Eliges la película sin quejas", category: "cita" },
+  { emoji: "", title: "Me toca a mí toda la limpieza", category: "detalle" },
+  { emoji: "", title: "Una noche solo de abrazos", category: "mimos" },
+  { emoji: "", title: "Postre a la hora que quieras", category: "capricho" },
+  { emoji: "", title: "Tarde sin celulares", category: "cita" },
+  { emoji: "", title: "Paseo sorpresa a donde diga yo", category: "cita" },
 ];
 
 function isExpired(c: Coupon) {
@@ -79,7 +79,7 @@ function CuponesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("🎁");
+  const [emoji, setEmoji] = useState("");
   const [category, setCategory] = useState<string>("detalle");
   const [uses, setUses] = useState("1");
   const [expires, setExpires] = useState("");
@@ -123,7 +123,7 @@ function CuponesPage() {
         user_id: user.id,
         title: title.trim(),
         description: description.trim() || null,
-        emoji: emoji || "🎁",
+        emoji: emoji || "",
         category,
         uses_total: total,
         expires_at: expires || null,
@@ -133,7 +133,7 @@ function CuponesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cupon",
-          title: "Tienes un cupón nuevo 🎟️",
+          title: "Tienes un cupón nuevo",
           message: `${emoji} ${title.trim()}`,
           link: "/cupones",
         });
@@ -163,7 +163,7 @@ function CuponesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cupon",
-          title: "Canjeó tu cupón 🎟️",
+          title: "Canjeó tu cupón",
           message: `${coupon.emoji} ${coupon.title}`,
           link: "/cupones",
         });
@@ -171,7 +171,7 @@ function CuponesPage() {
     },
     onSuccess: () => {
       burst(16);
-      toast.success("¡Cupón canjeado! Ahora toca cumplirlo 💗");
+      toast.success("¡Cupón canjeado! Ahora toca cumplirlo");
       qc.invalidateQueries({ queryKey: ["coupon_redemptions"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -440,7 +440,7 @@ function CuponesPage() {
               const c = coupons.find((x) => x.id === r.coupon_id);
               return (
                 <li key={r.id} className="flex items-center gap-3 py-3 text-sm">
-                  <span className="text-lg">{c?.emoji ?? "🎟️"}</span>
+                  <span className="text-lg">{c?.emoji ?? ""}</span>
                   <span className="min-w-0 flex-1 truncate">{c?.title ?? "Cupón"}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">
                     {nameOf(r.user_id)} ·{" "}

@@ -28,12 +28,12 @@ export const Route = createFileRoute("/_authenticated/lugares")({
 });
 
 const KINDS = [
-  { value: "restaurante", label: "Restaurante", emoji: "🍽️" },
-  { value: "cafe", label: "Café", emoji: "☕" },
-  { value: "viaje", label: "Viaje", emoji: "✈️" },
-  { value: "naturaleza", label: "Naturaleza", emoji: "🌿" },
-  { value: "plan", label: "Plan", emoji: "🎟️" },
-  { value: "otro", label: "Otro", emoji: "📍" },
+  { value: "restaurante", label: "Restaurante", emoji: "" },
+  { value: "cafe", label: "Café", emoji: "" },
+  { value: "viaje", label: "Viaje", emoji: "" },
+  { value: "naturaleza", label: "Naturaleza", emoji: "" },
+  { value: "plan", label: "Plan", emoji: "" },
+  { value: "otro", label: "Otro", emoji: "" },
 ];
 const kindOf = (v: string) => KINDS.find((k) => k.value === v) ?? KINDS[5]!;
 
@@ -88,7 +88,7 @@ function LugaresPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "lugar",
-          title: "Nuevo lugar para ir juntos 📍",
+          title: "Nuevo lugar para ir juntos",
           message: name.trim(),
           link: "/lugares",
         });

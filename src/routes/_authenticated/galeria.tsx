@@ -163,7 +163,7 @@ function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
         .from("photo_reactions")
         .insert({ photo_id: photo.id, user_id: userId, reaction_type: type });
       const other = profiles?.find((p) => p.id !== userId);
-      const emoji = REACTIONS.find((r) => r.type === type)?.emoji ?? "❤️";
+      const emoji = REACTIONS.find((r) => r.type === type)?.emoji ?? "";
       if (other && photo.user_id === other.id) {
         await notifyPartner({
           toUserId: other.id,
@@ -415,7 +415,7 @@ function Lightbox({
             size="sm"
             className="rounded-full"
             onClick={() => {
-              const text = photo.caption ?? "Mira este recuerdo nuestro 💗";
+              const text = photo.caption ?? "Mira este recuerdo nuestro";
               const url = `${window.location.origin}/galeria?foto=${photo.id}`;
               if (navigator.share) void navigator.share({ title: "Nuestro Espacio", text, url });
               else {

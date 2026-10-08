@@ -52,12 +52,12 @@ const SHARE_OPTIONS = [
 ] as const;
 
 const QUICK_STATUS = [
-  "Trabajando 💼",
-  "Comiendo 🍽️",
-  "En camino 🚗",
-  "Descansando 🛋️",
-  "Pensando en ti 💭",
-  "Ya casi duermo 😴",
+  "Trabajando",
+  "Comiendo",
+  "En camino",
+  "Descansando",
+  "Pensando en ti",
+  "Ya casi duermo",
 ];
 
 /** Distancia en km entre dos coordenadas. */
@@ -78,7 +78,7 @@ function distanceLabel(km: number) {
 }
 
 function distancePhrase(km: number) {
-  if (km < 0.3) return "Están juntitos 💞";
+  if (km < 0.3) return "Están juntitos";
   if (km < 5) return "A un salto de distancia";
   if (km < 50) return "En la misma ciudad, cerquita";
   if (km < 500) return "Lejos, pero no tanto";
@@ -444,14 +444,14 @@ function Heartbeat({ userId }: { userId: string }) {
       await notifyPartner({
         toUserId: other.id,
         type: "latido",
-        title: `${me?.name ?? "Tu pareja"} está pensando en ti 💗`,
+        title: `${me?.name ?? "Tu pareja"} está pensando en ti`,
         message: "Te mandó un latido desde Nuestro Espacio.",
         link: "/cerca",
       });
     },
     onSuccess: () => {
       setSentAt(Date.now());
-      toast.success("Latido enviado 💗");
+      toast.success("Latido enviado");
     },
     onError: (e: Error) => toast.error(e.message),
   });

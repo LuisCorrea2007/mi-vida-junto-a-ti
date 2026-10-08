@@ -45,12 +45,12 @@ type Goal = {
 type Contribution = { id: string; goal_id: string; user_id: string; amount: number; note: string | null; created_at: string };
 
 const IDEAS = [
-  { emoji: "✈️", title: "Nuestro primer viaje juntos" },
-  { emoji: "🏡", title: "Nuestra casa" },
-  { emoji: "💍", title: "El anillo" },
-  { emoji: "🐶", title: "Adoptar una mascota" },
-  { emoji: "🎸", title: "Un concierto de los dos" },
-  { emoji: "📷", title: "Una sesión de fotos" },
+  { emoji: "", title: "Nuestro primer viaje juntos" },
+  { emoji: "", title: "Nuestra casa" },
+  { emoji: "", title: "El anillo" },
+  { emoji: "", title: "Adoptar una mascota" },
+  { emoji: "", title: "Un concierto de los dos" },
+  { emoji: "", title: "Una sesión de fotos" },
 ];
 
 function MetasPage() {
@@ -64,7 +64,7 @@ function MetasPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("🎯");
+  const [emoji, setEmoji] = useState("");
   const [target, setTarget] = useState("");
   const [deadline, setDeadline] = useState("");
   const [search, setSearch] = useState("");
@@ -108,7 +108,7 @@ function MetasPage() {
         user_id: user.id,
         title: title.trim(),
         description: description.trim() || null,
-        emoji: emoji || "🎯",
+        emoji: emoji || "",
         target_amount: target ? Number(target) : null,
         deadline: deadline || null,
       });
@@ -117,7 +117,7 @@ function MetasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "meta",
-          title: "Nueva meta juntos 🎯",
+          title: "Nueva meta juntos",
           message: `${emoji} ${title.trim()}`,
           link: "/metas",
         });
@@ -149,7 +149,7 @@ function MetasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "meta",
-          title: "Avanzamos en una meta 💰",
+          title: "Avanzamos en una meta",
           message: `${goal.emoji} ${goal.title}`,
           link: "/metas",
         });

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/mensajes")({
   component: MensajesPage,
 });
 
-const EMOJIS = ["❤️", "😂", "😍", "🥺", "👍", "🔥"];
+const EMOJIS = ["", "", "", "", "", ""];
 
 type Msg = { id: string; user_id: string; content: string; reply_to: string | null; read_at: string | null; created_at: string };
 type Reaction = { id: string; message_id: string; user_id: string; emoji: string };
@@ -89,7 +89,7 @@ function MensajesPage() {
       const { error } = await supabase.from("private_messages").insert({ user_id: user.id, content, reply_to: replyTo?.id ?? null });
       if (error) throw error;
       if (couple?.partnerId) {
-        await notifyPartner({ toUserId: couple.partnerId, type: "mensaje", title: "Nuevo mensaje 💬", message: content.slice(0, 80), link: "/mensajes" });
+        await notifyPartner({ toUserId: couple.partnerId, type: "mensaje", title: "Nuevo mensaje", message: content.slice(0, 80), link: "/mensajes" });
       }
     },
     onSuccess: () => {

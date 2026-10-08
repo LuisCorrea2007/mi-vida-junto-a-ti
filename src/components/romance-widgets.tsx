@@ -85,14 +85,14 @@ export function MoodBar() {
       await notifyPartner({
         toUserId: couple.partnerId,
         type: "pensando",
-        title: "Está pensando en ti 💭",
+        title: "Está pensando en ti",
         message: "Un abrazo desde donde estoy.",
         link: "/cerca",
       });
     },
     onSuccess: () => {
       burst(16);
-      toast.success("Se lo enviamos 💗");
+      toast.success("Se lo enviamos");
     },
     onError: (e: Error) => toast.error(e.message),
   });
