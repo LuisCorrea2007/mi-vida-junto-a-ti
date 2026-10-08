@@ -7,4 +7,4 @@
 - [x] Investigar e integrar catálogo de licencias abiertas declaradas; disponibilidad limitada en español, sin prometer doblaje o estrenos.
 - [x] Mejorar la experiencia compartida mediante navegación y actualizaciones transversales; no equivale a añadir funciones específicas nuevas en cada sección.
 - [x] Retirar Cine y añadir Cartas de amor con sobres cerrados, avisos y transiciones de página.
-- [ ] Cambiar emojis por íconos SVG y reescribir textos con tono amoroso en todas las secciones.
+- [x] Íconos SVG en lugar de emojis, nueva tipografía, Dados del amor y menú renovado.

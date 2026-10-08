@@ -516,7 +516,7 @@ function MobileNav({ pathname }: { pathname: string }) {
                 Más
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] p-3">
+            <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] border-border/80 bg-background/95 p-3 shadow-lift backdrop-blur-2xl">
               <div className="grid max-h-[60vh] grid-cols-3 gap-1 overflow-y-auto">
                 {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].map((item) => (
                   <Link
