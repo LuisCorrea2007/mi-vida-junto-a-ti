@@ -53,7 +53,7 @@ function SorpresasPage() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [emoji, setEmoji] = useState<string>("");
+  const [emoji, setEmoji] = useState<string>("gift");
   const [unlockDate, setUnlockDate] = useState("");
   const [tab, setTab] = useState<"paraMi" | "enviadas">("paraMi");
   const [q, setQ] = useState("");
@@ -155,7 +155,7 @@ function SorpresasPage() {
 
       {readyCount > 0 && (
         <p className="rounded-2xl border border-primary/40 bg-primary/10 px-4 py-3 text-sm">
-          🎉 Tienes {readyCount} {readyCount === 1 ? "sorpresa lista" : "sorpresas listas"} para abrir.
+          Tienes {readyCount} {readyCount === 1 ? "sorpresa lista" : "sorpresas listas"} para abrir.
         </p>
       )}
 
@@ -261,7 +261,7 @@ function SorpresasPage() {
                   </p>
                 )}
                 {isMine && s.opened_at && (
-                  <p className="text-xs text-primary">✓ Tu pareja ya la abrió</p>
+                  <p className="text-xs text-primary">Tu pareja ya la abrió</p>
                 )}
               </li>
             );

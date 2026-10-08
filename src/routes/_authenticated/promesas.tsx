@@ -49,7 +49,7 @@ function PromesasPage() {
 
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
-  const [emoji, setEmoji] = useState("");
+  const [emoji, setEmoji] = useState("promise");
   const [due, setDue] = useState("");
   const [tab, setTab] = useState<"pendientes" | "cumplidas">("pendientes");
   const [q, setQ] = useState("");

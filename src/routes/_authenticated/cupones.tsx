@@ -80,7 +80,7 @@ function CuponesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("");
+  const [emoji, setEmoji] = useState("gift");
   const [category, setCategory] = useState<string>("detalle");
   const [uses, setUses] = useState("1");
   const [expires, setExpires] = useState("");
@@ -124,7 +124,7 @@ function CuponesPage() {
         user_id: user.id,
         title: title.trim(),
         description: description.trim() || null,
-        emoji: emoji || "",
+        emoji: emoji || "heart",
         category,
         uses_total: total,
         expires_at: expires || null,

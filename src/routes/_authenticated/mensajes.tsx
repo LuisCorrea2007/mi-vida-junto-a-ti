@@ -134,7 +134,7 @@ function MensajesPage() {
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto rounded-2xl border border-border bg-card/40 p-4">
-        {msgs.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">Aún no hay mensajes. ¡Escribe el primero! 💌</p>}
+        {msgs.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">Aún no hay mensajes. ¡Escribe el primero!</p>}
         {q && shown.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">No hay mensajes con “{q}”.</p>}
         {shown.map((m) => {
           const mine = m.user_id === user?.id;

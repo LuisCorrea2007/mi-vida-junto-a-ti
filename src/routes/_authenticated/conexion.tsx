@@ -53,7 +53,7 @@ export const Route = createFileRoute("/_authenticated/conexion")({
   component: ConexionPage,
 });
 
-const EMOTIONS = ["😊 Feliz", "😌 Tranquilo", "😔 Triste", "😤 Estresado", "😴 Cansado", "💪 Energético"];
+const EMOTIONS = ["Feliz", "Tranquilo", "Triste", "Estresado", "Cansado", "Energético"];
 const SUPPORT_TYPES = [
   { value: "escuchar", label: "Escuchar" },
   { value: "espacio", label: "Dar espacio" },
@@ -63,11 +63,11 @@ const SUPPORT_TYPES = [
 ] as const;
 
 const QUESTION_CATEGORIES = {
-  futuro: "🔮 Futuro",
-  cariño: "💕 Cariño",
-  confianza: "🤝 Confianza",
-  recuerdos: "📸 Recuerdos",
-  diversion: "🎉 Diversión",
+  futuro: "Futuro",
+  cariño: "Cariño",
+  confianza: "Confianza",
+  recuerdos: "Recuerdos",
+  diversion: "Diversión",
 } as const;
 
 type Category = keyof typeof QUESTION_CATEGORIES;
@@ -146,7 +146,7 @@ function CheckInSection() {
               <CardTitle className="text-lg">¿Cómo estás hoy?</CardTitle>
               <CardDescription>Comparte tu estado emocional con tu pareja</CardDescription>
             </div>
-            {racha > 0 && <Badge variant="secondary">🔥 {racha} día(s) seguidos</Badge>}
+            {racha > 0 && <Badge variant="secondary">{racha} día(s) seguidos</Badge>}
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -650,7 +650,7 @@ function QuestionsSection() {
           <ScrollArea className="h-96 pr-3">
             {lista.length === 0 && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                No hay preguntas aquí. Crea una nueva ✨
+                No hay preguntas aquí. Crea una nueva
               </p>
             )}
             {lista.map((q) => {
@@ -737,7 +737,7 @@ function QuestionsSection() {
                         <span className="italic">“{theirResponse.answer}”</span>
                       ) : (
                         <span className="text-muted-foreground">
-                          Tu amor ya respondió. Responde tú para verla 💗
+                          Tu amor ya respondió. Responde tú para verla
                         </span>
                       )}
                     </div>
@@ -922,18 +922,18 @@ function PlansSection() {
                     </div>
 
                     {match && (
-                      <p className="mt-2 text-sm text-primary">¡Los dos dijeron sí! 💞 Agéndenlo.</p>
+                      <p className="mt-2 text-sm text-primary">¡Los dos dijeron sí! Agéndenlo.</p>
                     )}
 
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button size="sm" variant="outline" className="rounded-full" onClick={() => votePlan.mutate({ planId: p.id, voteType: "yes" })}>
-                        👍 Sí {yes > 0 && `(${yes})`}
+                        Sí {yes > 0 && `(${yes})`}
                       </Button>
                       <Button size="sm" variant="outline" className="rounded-full" onClick={() => votePlan.mutate({ planId: p.id, voteType: "maybe" })}>
-                        🤔 Quizás
+                        Quizás
                       </Button>
                       <Button size="sm" variant="outline" className="rounded-full" onClick={() => votePlan.mutate({ planId: p.id, voteType: "no" })}>
-                        👎 No
+                        No
                       </Button>
                       {p.status !== "planificado" && p.status !== "completado" && (
                         <Button size="sm" className="rounded-full" onClick={() => updatePlan.mutate({ id: p.id, updates: { status: "planificado" } })}>

@@ -65,7 +65,7 @@ function MetasPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("");
+  const [emoji, setEmoji] = useState("star");
   const [target, setTarget] = useState("");
   const [deadline, setDeadline] = useState("");
   const [search, setSearch] = useState("");
@@ -109,7 +109,7 @@ function MetasPage() {
         user_id: user.id,
         title: title.trim(),
         description: description.trim() || null,
-        emoji: emoji || "",
+        emoji: emoji || "heart",
         target_amount: target ? Number(target) : null,
         deadline: deadline || null,
       });

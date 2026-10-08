@@ -514,7 +514,7 @@ function FunPage() {
         <div className="surface flex flex-col items-center gap-3 p-14 text-center">
           <Laugh className="size-8 text-primary" />
           <p className="font-display text-xl">¡Agreguen algo divertido!</p>
-          <p className="text-sm text-muted-foreground">Empiecen con un chiste malo 😄</p>
+          <p className="text-sm text-muted-foreground">Empiecen con un chiste malo</p>
         </div>
       ) : (
         <div className="grid items-start gap-4 sm:grid-cols-2">
@@ -684,7 +684,7 @@ function FunCard({
                   selectedOption === item.answer ? "text-primary" : "text-destructive",
                 )}
               >
-                {selectedOption === item.answer ? "✅ ¡Correcto!" : `❌ La respuesta era: ${item.answer}`}
+                {selectedOption === item.answer ? "¡Correcto!" : `La respuesta era: ${item.answer}`}
               </p>
             )}
           </div>
@@ -734,7 +734,7 @@ function FunCard({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <Stars value={myScore} onPick={onRate} />
           <p className="text-xs text-muted-foreground">
-            {rating ? `${rating.avg.toFixed(1)} ★ · ${rating.votes} ${rating.votes === 1 ? "voto" : "votos"}` : "Sin puntuar"}
+            {rating ? `${rating.avg.toFixed(1)} · ${rating.votes} ${rating.votes === 1 ? "voto" : "votos"}` : "Sin puntuar"}
           </p>
         </div>
 

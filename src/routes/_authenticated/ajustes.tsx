@@ -436,7 +436,7 @@ function InstallSection() {
     <section className="surface space-y-3 p-6">
       <h2 className="font-display text-xl font-semibold">Instalar la app</h2>
       {installed ? (
-        <p className="text-sm text-muted-foreground">Ya tienes Nuestro Espacio en tu pantalla de inicio. 💗</p>
+        <p className="text-sm text-muted-foreground">Ya tienes Nuestro Espacio en tu pantalla de inicio.</p>
       ) : prompt ? (
         <Button
           className="rounded-full"

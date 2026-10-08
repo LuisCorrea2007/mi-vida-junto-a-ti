@@ -109,7 +109,7 @@ export function MoodBar() {
           disabled={thinking.isPending}
           onClick={() => thinking.mutate()}
         >
-          <Send className="mr-2 size-4" /> Pensando en ti 💭
+          <Send className="mr-2 size-4" /> Pensando en ti
         </Button>
       </div>
 

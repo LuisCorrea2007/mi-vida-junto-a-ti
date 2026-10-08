@@ -310,7 +310,7 @@ function RetosPage() {
                     </Button>
                     {partnerToday && (
                       <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary">
-                        Ella también lo hizo hoy 💗
+                        Ella también lo hizo hoy
                       </span>
                     )}
                     {c.user_id === user?.id && (

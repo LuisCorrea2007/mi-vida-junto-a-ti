@@ -143,7 +143,7 @@ function LugaresPage() {
           </h1>
           <p className="text-sm text-muted-foreground">Donde queremos ir y donde ya fuimos felices.</p>
         </div>
-        <Button variant="outline" className="rounded-full" onClick={randomPick}>🎲 ¿A dónde vamos?</Button>
+        <Button variant="outline" className="rounded-full" onClick={randomPick}>¿A dónde vamos?</Button>
       </header>
 
       <div className="rounded-2xl border bg-card/60 p-4">
