@@ -62,6 +62,11 @@ function MensajesPage() {
   });
 
   const byId = useMemo(() => new Map(msgs.map((m) => [m.id, m])), [msgs]);
+  const [q, setQ] = useState("");
+  const shown = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    return s ? msgs.filter((m) => m.content.toLowerCase().includes(s)) : msgs;
+  }, [msgs, q]);
   const nameOf = (id: string) => (id === user?.id ? "Tú" : profiles.find((p) => p.id === id)?.name || "Tu pareja");
 
   useEffect(() => {
@@ -114,14 +119,23 @@ function MensajesPage() {
 
   return (
     <div className="mx-auto flex h-[calc(100dvh-8rem)] max-w-3xl flex-col gap-3">
-      <header>
-        <h1 className="font-display text-3xl font-semibold">Mensajes</h1>
-        <p className="text-sm text-muted-foreground">Solo para los dos. Toca un mensaje para responder o reaccionar.</p>
+      <header className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h1 className="font-display text-3xl font-semibold">Mensajes</h1>
+          <p className="text-sm text-muted-foreground">Solo para los dos. Toca un mensaje para responder o reaccionar.</p>
+        </div>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar mensajes…"
+          className="h-9 w-48 rounded-full border border-border bg-card/60 px-4 text-sm outline-none focus:border-primary"
+        />
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto rounded-2xl border border-border bg-card/40 p-4">
         {msgs.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">Aún no hay mensajes. ¡Escribe el primero! 💌</p>}
-        {msgs.map((m) => {
+        {q && shown.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">No hay mensajes con “{q}”.</p>}
+        {shown.map((m) => {
           const mine = m.user_id === user?.id;
           const parent = m.reply_to ? byId.get(m.reply_to) : null;
           const groups = EMOJIS.map((e) => ({ e, list: reactions.filter((r) => r.message_id === m.id && r.emoji === e) })).filter((g) => g.list.length);
