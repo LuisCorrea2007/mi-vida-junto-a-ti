@@ -471,7 +471,6 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function MobileNav({ pathname }: { pathname: string }) {
   const [moreOpen, setMoreOpen] = useState(false);
-  const [search, setSearch] = useState("");
   const primary = NAV.filter((n) => (MOBILE_PRIMARY as readonly string[]).includes(n.to));
   const secondary = NAV.filter((n) => !(MOBILE_PRIMARY as readonly string[]).includes(n.to));
   const moreActive = secondary.some((n) => isRouteActive(pathname, n.to)) || pathname === "/ajustes";
@@ -516,9 +515,8 @@ function MobileNav({ pathname }: { pathname: string }) {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] p-3">
-              <Input aria-label="Buscar sección" placeholder="Buscar sección…" value={search} onChange={(event) => setSearch(event.target.value)} className="mb-2 h-9" />
-              <div className="grid max-h-[55vh] grid-cols-3 gap-1 overflow-y-auto">
-                {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].filter((item) => item.label.toLocaleLowerCase("es").includes(search.trim().toLocaleLowerCase("es"))).map((item) => (
+              <div className="grid max-h-[60vh] grid-cols-3 gap-1 overflow-y-auto">
+                {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
