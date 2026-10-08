@@ -11,3 +11,6 @@
 
 ## Decisions
 - Dev and build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by sandbox reinstalls, which broke the preview and publishing.
+- Sports games use a client-only, dynamically loaded React Three Fiber scene with Rapier physics; this keeps WebGL and physics out of SSR and only loads them when playing.
+- Sports matches offer bot difficulty and same-device two-player turns; online asynchronous games remain separate to preserve existing couple matches.
+- Character assets are self-contained CC0 GLBs with embedded textures and cloned skeletons; this prevents shared model mutation and missing texture requests.

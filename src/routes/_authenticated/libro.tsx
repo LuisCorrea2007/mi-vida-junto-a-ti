@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/_authenticated/libro")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Libro de recuerdos — Nuestro Espacio" },
       { name: "description", content: "El resumen de su historia, listo para imprimir o guardar en PDF." },
       { property: "og:title", content: "Libro de recuerdos — Nuestro Espacio" },

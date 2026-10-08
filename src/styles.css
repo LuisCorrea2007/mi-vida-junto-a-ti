@@ -36,6 +36,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--gold);
   --color-gold-foreground: var(--gold-foreground);
+  --color-arcade-white: var(--arcade-white);
+  --color-arcade-ink: var(--arcade-ink);
+  --color-arcade-yellow: var(--arcade-yellow);
+  --color-arcade-sky: var(--arcade-sky);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -61,6 +65,15 @@
 }
 
 :root {
+  --arcade-sky: #bddfe5;
+  --arcade-mint: #42b7a3;
+  --arcade-coral: #ed7285;
+  --arcade-yellow: #f5ce64;
+  --arcade-ice: #cfeef1;
+  --arcade-white: #fafcf9;
+  --arcade-ink: #25323c;
+  --arcade-wood: #cfac76;
+  --arcade-grass: #72bd8e;
   --radius: 1rem;
   --background: oklch(0.145 0.018 350);
   --foreground: oklch(0.925 0.028 72);
@@ -287,3 +300,4 @@
 }
 
 /* build check */
+.arcade-cover-shade { background: linear-gradient(0deg, var(--arcade-ink), transparent 85%); }

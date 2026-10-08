@@ -21,6 +21,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 export const Route = createFileRoute("/_authenticated/retos")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Retos de pareja — Nuestro Espacio" },
       { name: "description", content: "Pequeñas misiones románticas para cumplir cada día juntos." },
       { property: "og:title", content: "Retos de pareja — Nuestro Espacio" },

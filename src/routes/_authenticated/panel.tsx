@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/panel")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Panel — Nuestro Espacio" },
       { name: "description", content: "Resumen del día: tiempo juntos, próximas citas y últimos recuerdos." },
       { property: "og:title", content: "Panel — Nuestro Espacio" },

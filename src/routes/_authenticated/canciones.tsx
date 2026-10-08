@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/canciones")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Nuestras canciones — Nuestro Espacio" },
       { name: "description", content: "La playlist de los dos y las frases que nos encantan." },
       { property: "og:title", content: "Nuestras canciones — Nuestro Espacio" },

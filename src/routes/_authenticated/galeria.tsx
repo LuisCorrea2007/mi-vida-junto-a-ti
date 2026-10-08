@@ -49,6 +49,8 @@ export const Route = createFileRoute("/_authenticated/galeria")({
     typeof search["foto"] === "string" ? { foto: search["foto"] } : {},
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Galería — Nuestro Espacio" },
       { name: "description", content: "Fotos y recuerdos de la pareja organizados en álbumes." },
       { property: "og:title", content: "Galería — Nuestro Espacio" },

@@ -34,6 +34,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/deseos")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Deseos — Nuestro Espacio" },
       { name: "description", content: "Lista compartida de lugares, planes y antojos pendientes." },
       { property: "og:title", content: "Deseos — Nuestro Espacio" },

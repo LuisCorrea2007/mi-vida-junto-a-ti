@@ -30,6 +30,8 @@ const CoupleMap = lazy(() => import("@/components/couple-map"));
 export const Route = createFileRoute("/_authenticated/cerca")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Ahora — Nuestro Espacio" },
       { name: "description", content: "Un mapa con los dos, la distancia que los separa y un chat que se borra cada 24 horas." },
       { property: "og:title", content: "Ahora — Nuestro Espacio" },

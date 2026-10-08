@@ -48,6 +48,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 export const Route = createFileRoute("/_authenticated/diversion")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Diversión — Nuestro Espacio" },
       { name: "description", content: "Chistes, adivinanzas, trivia y preguntas divertidas para la pareja." },
       { property: "og:title", content: "Diversión — Nuestro Espacio" },

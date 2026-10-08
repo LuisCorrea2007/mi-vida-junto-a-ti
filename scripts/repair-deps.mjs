@@ -5,7 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { execSync } from "node:child_process";
 
 const NM = resolve("node_modules");
-const SCOPES = ["@tanstack"];
+const SCOPES = ["@tanstack", "@lovable.dev"];
 const PLAIN = ["seroval", "seroval-plugins"];
 
 function packageDirs() {
