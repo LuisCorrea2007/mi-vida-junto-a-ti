@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarHeart, Gift, Lock, LockOpen, PartyPopper, Plus, Search, Trash2 } from "lucide-react";
@@ -39,7 +40,7 @@ type Surprise = {
   created_at: string;
 };
 
-const EMOJIS = ["", "", "", "", "", "", "⭐", ""];
+const EMOJIS = ["gift", "heart", "party", "flower", "moon", "ring", "star", "cake"];
 const today = () => new Date().toISOString().slice(0, 10);
 
 function SorpresasPage() {
@@ -171,7 +172,7 @@ function SorpresasPage() {
                 )}
                 aria-label={`Emoji ${e}`}
               >
-                {e}
+                <Glyph name={e} />
               </button>
             ))}
           </div>
@@ -219,7 +220,7 @@ function SorpresasPage() {
             return (
               <li key={s.id} className="surface space-y-3 p-5">
                 <div className="flex items-start gap-3">
-                  <span className="text-3xl">{s.emoji}</span>
+                  <span className="text-3xl"><Glyph name={s.emoji} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-lg font-semibold">{s.title}</p>
                     <p className="text-xs text-muted-foreground">
@@ -272,7 +273,7 @@ function SorpresasPage() {
         <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur" onClick={() => setOpened(null)}>
           <div className="surface max-w-md space-y-4 p-8 text-center" onClick={(e) => e.stopPropagation()}>
             <Gift className="mx-auto size-10 text-primary" />
-            <p className="text-4xl">{opened.emoji}</p>
+            <p className="text-4xl"><Glyph name={opened.emoji} /></p>
             <h2 className="font-display text-2xl font-semibold">{opened.title}</h2>
             <p className="whitespace-pre-wrap text-sm text-muted-foreground">{opened.message}</p>
             <Button className="rounded-full" onClick={() => setOpened(null)}>Cerrar</Button>

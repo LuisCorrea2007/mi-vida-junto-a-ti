@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ChatStatus, UIMessage } from "ai";
@@ -380,7 +381,7 @@ async function buildAdvisorSystem(userId: string) {
       ? `Ánimos recientes: ${moods
           .map(
             (mood) =>
-              `${nameOf(mood.user_id)} ${mood.emoji} ${mood.label}${mood.note ? ` (${mood.note})` : ""}`,
+              `${nameOf(mood.user_id)} $<Glyph name={mood.emoji} /> ${mood.label}${mood.note ? ` (${mood.note})` : ""}`,
           )
           .join("; ")}.`
       : "",

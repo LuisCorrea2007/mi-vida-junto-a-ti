@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -746,7 +747,7 @@ function DedicationDetail({
                   mine_r ? "border-primary bg-primary/15" : "border-border",
                 )}
               >
-                {r.emoji}
+                <Glyph name={r.emoji} />
                 {count > 0 && <span className="text-xs">{count}</span>}
               </button>
             );

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -67,11 +68,11 @@ const FUN_CATEGORIES = [
 ] as const;
 
 const REACTIONS = [
-  { type: "risa", emoji: "", label: "Me hizo reír" },
-  { type: "amor", emoji: "", label: "Me encanta" },
-  { type: "sorpresa", emoji: "", label: "No me lo esperaba" },
-  { type: "aplauso", emoji: "", label: "Bien hecho" },
-  { type: "fuego", emoji: "", label: "Buenísimo" },
+  { type: "risa", emoji: "laugh", label: "Me hizo reír" },
+  { type: "amor", emoji: "heart", label: "Me encanta" },
+  { type: "sorpresa", emoji: "wow", label: "No me lo esperaba" },
+  { type: "aplauso", emoji: "clap", label: "Bien hecho" },
+  { type: "fuego", emoji: "fire", label: "Buenísimo" },
 ] as const;
 
 type FunCategory = typeof FUN_CATEGORIES[number]["value"];
@@ -717,7 +718,7 @@ function FunCard({
                   mineR ? "border-primary bg-primary/15" : "border-border",
                 )}
               >
-                {r.emoji}
+                <Glyph name={r.emoji} />
                 {count > 0 && <span className="text-xs">{count}</span>}
               </button>
             );

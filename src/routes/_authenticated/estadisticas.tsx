@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -113,7 +114,7 @@ function EstadisticasPage() {
   const moodStats = useMemo(() => {
     const map = new Map<string, { emoji: string; label: string; n: number }>();
     for (const m of moods) {
-      const k = `${m.emoji} ${m.label}`;
+      const k = `$<Glyph name={m.emoji} /> ${m.label}`;
       const cur = map.get(k);
       if (cur) cur.n += 1;
       else map.set(k, { emoji: m.emoji, label: m.label, n: 1 });
@@ -168,9 +169,9 @@ function EstadisticasPage() {
         ) : (
           <div className="space-y-2">
             {moodStats.map((m) => (
-              <div key={`${m.emoji}${m.label}`} className="flex items-center gap-3">
+              <div key={`$<Glyph name={m.emoji} />${m.label}`} className="flex items-center gap-3">
                 <span className="w-32 truncate text-sm">
-                  {m.emoji} {m.label}
+                  <Glyph name={m.emoji} /> {m.label}
                 </span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                   <div

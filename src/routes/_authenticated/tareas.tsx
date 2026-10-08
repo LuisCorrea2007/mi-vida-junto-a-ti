@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Circle, ListChecks, Plus, Search, Trash2 } from "lucide-react";
@@ -44,11 +45,11 @@ type Task = {
 };
 
 const CATEGORIES = [
-  { value: "casa", label: "Casa", emoji: "" },
-  { value: "compras", label: "Compras", emoji: "" },
-  { value: "pareja", label: "Nosotros", emoji: "" },
-  { value: "papeles", label: "Trámites", emoji: "" },
-  { value: "salud", label: "Salud", emoji: "" },
+  { value: "casa", label: "Casa", emoji: "home" },
+  { value: "compras", label: "Compras", emoji: "shop" },
+  { value: "pareja", label: "Nosotros", emoji: "couple" },
+  { value: "papeles", label: "Trámites", emoji: "papers" },
+  { value: "salud", label: "Salud", emoji: "health" },
 ] as const;
 
 function TareasPage() {
@@ -221,7 +222,7 @@ function TareasPage() {
                         category === c.value && "border-primary bg-primary/15 text-primary",
                       )}
                     >
-                      {c.emoji} {c.label}
+                      <Glyph name={c.emoji} /> {c.label}
                     </button>
                   ))}
                 </div>
@@ -317,7 +318,7 @@ function TareasPage() {
                 </button>
                 <div className="min-w-0 flex-1">
                   <p className={cn("truncate text-sm font-medium", t.is_done && "text-muted-foreground line-through")}>
-                    {cat?.emoji} {t.title}
+                    <Glyph name={cat?.emoji} /> {t.title}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {nameOf(t.assigned_to)}

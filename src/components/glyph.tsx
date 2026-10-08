@@ -2,7 +2,7 @@ import {
   Award, Baby, Bike, BookHeart, Cake, Camera, Car, Coffee, Crown, Dog, Flame, Flower2, Gem, Gift, HandHeart, Handshake,
   Heart, HeartCrack, HeartHandshake, Home, IceCream, Laugh, type LucideIcon, Moon, Mountain, Music, PartyPopper, Pill,
   Plane, Salad, ShoppingBag, Smile, Sparkles, Star, Sun, ThumbsDown, ThumbsUp, Ticket, Utensils, Wind, Zap, FileText,
-  Frown, Coffee as Cup, Drama, Leaf, CircleHelp, Kiss,
+  Frown, Coffee as Cup, Drama, Leaf, CircleHelp, Smile as Kiss,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

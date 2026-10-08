@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -192,7 +193,7 @@ function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
                 mine ? "border-primary bg-primary/15" : "border-border"
               }`}
             >
-              {r.emoji} {count > 0 && count}
+              <Glyph name={r.emoji} /> {count > 0 && count}
             </button>
           );
         })}

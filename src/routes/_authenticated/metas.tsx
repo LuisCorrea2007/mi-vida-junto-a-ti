@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, PiggyBank, Plus, Search, Trash2 } from "lucide-react";
@@ -45,12 +46,12 @@ type Goal = {
 type Contribution = { id: string; goal_id: string; user_id: string; amount: number; note: string | null; created_at: string };
 
 const IDEAS = [
-  { emoji: "", title: "Nuestro primer viaje juntos" },
-  { emoji: "", title: "Nuestra casa" },
-  { emoji: "", title: "El anillo" },
-  { emoji: "", title: "Adoptar una mascota" },
-  { emoji: "", title: "Un concierto de los dos" },
-  { emoji: "", title: "Una sesión de fotos" },
+  { emoji: "plane", title: "Nuestro primer viaje juntos" },
+  { emoji: "home", title: "Nuestra casa" },
+  { emoji: "ring", title: "El anillo" },
+  { emoji: "dog", title: "Adoptar una mascota" },
+  { emoji: "music", title: "Un concierto de los dos" },
+  { emoji: "camera", title: "Una sesión de fotos" },
 ];
 
 function MetasPage() {
@@ -150,7 +151,7 @@ function MetasPage() {
           toUserId: couple.partnerId,
           type: "meta",
           title: "Avanzamos en una meta",
-          message: `${goal.emoji} ${goal.title}`,
+          message: `$<Glyph name={goal.emoji} /> ${goal.title}`,
           link: "/metas",
         });
       }
@@ -240,7 +241,7 @@ function MetasPage() {
                       }}
                       className="rounded-full border border-border px-3 py-1.5 text-xs transition-colors hover:bg-accent"
                     >
-                      {i.emoji} {i.title}
+                      <Glyph name={i.emoji} /> {i.title}
                     </button>
                   ))}
                 </div>
@@ -311,7 +312,7 @@ function MetasPage() {
             return (
               <li key={g.id} id={g.id} className={cn("surface p-5 scroll-mt-24", g.is_completed && "opacity-70")}>
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl">{g.emoji}</span>
+                  <span className="text-2xl"><Glyph name={g.emoji} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-lg font-semibold">{g.title}</p>
                     {g.description && <p className="mt-1 text-sm text-muted-foreground">{g.description}</p>}

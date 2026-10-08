@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ExternalLink, MapPinned, Plus, Search, Star, Trash2 } from "lucide-react";
@@ -28,12 +29,12 @@ export const Route = createFileRoute("/_authenticated/lugares")({
 });
 
 const KINDS = [
-  { value: "restaurante", label: "Restaurante", emoji: "" },
-  { value: "cafe", label: "Café", emoji: "" },
-  { value: "viaje", label: "Viaje", emoji: "" },
-  { value: "naturaleza", label: "Naturaleza", emoji: "" },
-  { value: "plan", label: "Plan", emoji: "" },
-  { value: "otro", label: "Otro", emoji: "" },
+  { value: "restaurante", label: "Restaurante", emoji: "food" },
+  { value: "cafe", label: "Café", emoji: "coffee" },
+  { value: "viaje", label: "Viaje", emoji: "plane" },
+  { value: "naturaleza", label: "Naturaleza", emoji: "nature" },
+  { value: "plan", label: "Plan", emoji: "ticket" },
+  { value: "otro", label: "Otro", emoji: "star" },
 ];
 const kindOf = (v: string) => KINDS.find((k) => k.value === v) ?? KINDS[5]!;
 
@@ -166,7 +167,7 @@ function LugaresPage() {
           {KINDS.map((k) => (
             <button type="button" key={k.value} onClick={() => setKind(k.value)}
               className={cn("rounded-full border px-3 py-1 text-xs", kind === k.value && "border-primary bg-primary/15 text-primary")}>
-              {k.emoji} {k.label}
+              <Glyph name={k.emoji} /> {k.label}
             </button>
           ))}
         </div>
@@ -203,7 +204,7 @@ function LugaresPage() {
               <li key={p.id} className="space-y-2 rounded-2xl border bg-card/60 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="font-semibold">{k.emoji} {p.name}</p>
+                    <p className="font-semibold"><Glyph name={k.emoji} /> {p.name}</p>
                     {p.city && <p className="text-xs text-muted-foreground">{p.city}</p>}
                   </div>
                   <span className="text-[11px] text-muted-foreground">{mine ? "Tuyo" : "De tu pareja"}</span>

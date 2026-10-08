@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, Plus, Search, Ticket, Trash2 } from "lucide-react";
@@ -45,23 +46,23 @@ type Coupon = {
 type Redemption = { id: string; coupon_id: string; user_id: string; note: string | null; created_at: string };
 
 const CATEGORIES = [
-  { value: "detalle", label: "Detalle", emoji: "" },
-  { value: "mimos", label: "Mimos", emoji: "" },
-  { value: "comida", label: "Comida", emoji: "" },
-  { value: "cita", label: "Cita", emoji: "" },
-  { value: "capricho", label: "Capricho", emoji: "" },
-  { value: "perdon", label: "Perdón", emoji: "" },
+  { value: "detalle", label: "Detalle", emoji: "gift" },
+  { value: "mimos", label: "Mimos", emoji: "hug" },
+  { value: "comida", label: "Comida", emoji: "food" },
+  { value: "cita", label: "Cita", emoji: "ticket" },
+  { value: "capricho", label: "Capricho", emoji: "icecream" },
+  { value: "perdon", label: "Perdón", emoji: "sorry" },
 ] as const;
 
 const IDEAS = [
-  { emoji: "", title: "Masaje de 20 minutos", category: "mimos" },
-  { emoji: "", title: "Desayuno en la cama", category: "comida" },
-  { emoji: "", title: "Eliges la película sin quejas", category: "cita" },
-  { emoji: "", title: "Me toca a mí toda la limpieza", category: "detalle" },
-  { emoji: "", title: "Una noche solo de abrazos", category: "mimos" },
-  { emoji: "", title: "Postre a la hora que quieras", category: "capricho" },
-  { emoji: "", title: "Tarde sin celulares", category: "cita" },
-  { emoji: "", title: "Paseo sorpresa a donde diga yo", category: "cita" },
+  { emoji: "hug", title: "Masaje de 20 minutos", category: "mimos" },
+  { emoji: "food", title: "Desayuno en la cama", category: "comida" },
+  { emoji: "ticket", title: "Eliges la película sin quejas", category: "cita" },
+  { emoji: "home", title: "Me toca a mí toda la limpieza", category: "detalle" },
+  { emoji: "hug", title: "Una noche solo de abrazos", category: "mimos" },
+  { emoji: "icecream", title: "Postre a la hora que quieras", category: "capricho" },
+  { emoji: "moon", title: "Tarde sin celulares", category: "cita" },
+  { emoji: "star", title: "Paseo sorpresa a donde diga yo", category: "cita" },
 ];
 
 function isExpired(c: Coupon) {
@@ -164,7 +165,7 @@ function CuponesPage() {
           toUserId: couple.partnerId,
           type: "cupon",
           title: "Canjeó tu cupón",
-          message: `${coupon.emoji} ${coupon.title}`,
+          message: `$<Glyph name={coupon.emoji} /> ${coupon.title}`,
           link: "/cupones",
         });
       }
@@ -243,7 +244,7 @@ function CuponesPage() {
                       }}
                       className="rounded-full border border-border px-3 py-1.5 text-xs transition-colors hover:bg-accent"
                     >
-                      {i.emoji} {i.title}
+                      <Glyph name={i.emoji} /> {i.title}
                     </button>
                   ))}
                 </div>
@@ -277,7 +278,7 @@ function CuponesPage() {
                         category === c.value && "border-primary bg-primary/15 text-primary",
                       )}
                     >
-                      {c.emoji} {c.label}
+                      <Glyph name={c.emoji} /> {c.label}
                     </button>
                   ))}
                 </div>
@@ -375,7 +376,7 @@ function CuponesPage() {
               >
                 <div className="absolute inset-y-0 left-0 w-1.5 bg-primary/70" />
                 <div className="flex items-start gap-3 pl-2">
-                  <span className="text-2xl">{c.emoji}</span>
+                  <span className="text-2xl"><Glyph name={c.emoji} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-lg font-semibold">{c.title}</p>
                     {c.description && (
