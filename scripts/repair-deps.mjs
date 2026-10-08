@@ -29,7 +29,19 @@ function jsFiles(dir, out = []) {
 
 const IMPORT_RE = /(?:from|import)\s*\(?\s*["'](\.{1,2}\/[^"']+\.m?js)["']/g;
 
+function entryFiles(pkgDir) {
+  const pkg = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8"));
+  const out = [pkg.main, pkg.module];
+  const walk = (v) => {
+    if (typeof v === "string") { if (!v.includes("*")) out.push(v); }
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+  };
+  walk(pkg.exports);
+  return out.filter((p) => typeof p === "string" && /\.(m?js|cjs)$/.test(p));
+}
+
 function isBroken(pkgDir) {
+  if (entryFiles(pkgDir).some((p) => !existsSync(join(pkgDir, p)))) return true;
   const dist = join(pkgDir, "dist");
   if (!existsSync(dist)) return false;
   for (const file of jsFiles(dist)) {
