@@ -1093,6 +1093,39 @@ export type Database = {
         }
         Relationships: []
       }
+      love_letters: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          mood: string
+          opened_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          mood?: string
+          opened_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          mood?: string
+          opened_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       milestones: {
         Row: {
           created_at: string
@@ -2177,6 +2210,7 @@ export type Database = {
         Args: { _cells: number[]; _game: string }
         Returns: undefined
       }
+      open_love_letter: { Args: { _id: string }; Returns: undefined }
       same_space: { Args: { _user: string }; Returns: boolean }
     }
     Enums: {
