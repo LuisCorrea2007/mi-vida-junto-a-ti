@@ -12,7 +12,7 @@ import { curlingScore, targetX, type Sport } from "@/lib/arcade-sports";
 
 export type Shot = { id: number; angle: number; power: number; player: number; start: [number, number] };
 export type ShotResult = { points: number; hole: boolean; x: number; z: number };
-type Props = { sport: Sport; round: number; shot: Shot | null; paused: boolean; avatar: number; onReady: () => void; onFinish: (result: ShotResult) => void };
+type Props = { sport: Sport; round: number; shot: Shot | null; paused: boolean; avatar: number; angle: number; position: [number, number]; onReady: () => void; onFinish: (result: ShotResult) => void };
 function Scenery({url,position,height}: {url:string;position:[number,number,number];height:number}) {
   const {scene}=useGLTF(url);
   const object=useMemo(()=>{const obj=scene.clone(true);const box=new THREE.Box3().setFromObject(obj);obj.scale.setScalar(height/Math.max(0.01,box.getSize(new THREE.Vector3()).y));const scaled=new THREE.Box3().setFromObject(obj);obj.position.y-=scaled.min.y;obj.traverse(o=>{if(o instanceof THREE.Mesh)o.castShadow=true;});return obj;},[scene,height]);
@@ -101,7 +101,7 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
     }
     elapsed.current += dt;
     const p = rb.translation(); const v = rb.linvel();
-    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0) { console.info("basket-cross",shot.power,p.x,p.z); if(Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true; }
+    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0 && Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true;
     lastY.current = p.y;
     const hole = sport === "golf" && Math.hypot(p.x-targetX(round),p.z+4)<0.38 && Math.hypot(v.x,v.z)<3.8;
     if (Math.hypot(v.x,v.y,v.z)<0.13) settled.current += dt; else settled.current = 0;
@@ -130,7 +130,13 @@ function World(props: Props & { colors: Palette }) {
     <Surface sport={props.sport} colors={props.colors} />
     <Course key={`${props.round}:${props.shot?.id??0}`} sport={props.sport} round={props.round} colors={props.colors} pins={pins} />
     {props.shot && <Ball key={props.shot.id} {...props} shot={props.shot} pins={pins} />}
-    {!props.shot && <mesh position={[0,0.3,5]} castShadow><sphereGeometry args={[0.2,24,16]} /><meshStandardMaterial color={props.colors.white} /></mesh>}
+    {!props.shot && <group position={[props.position[0],0.3,props.position[1]]}>
+      <mesh castShadow><sphereGeometry args={[0.2,24,16]} /><meshStandardMaterial color={props.colors.white} /></mesh>
+      <group rotation-y={-props.angle*Math.PI/180}>
+        <mesh position={[0,0,-0.8]} rotation-x={Math.PI/2}><cylinderGeometry args={[0.025,0.025,1,8]} /><meshStandardMaterial color={props.colors.yellow} /></mesh>
+        <mesh position={[0,0,-1.5]} rotation-x={-Math.PI/2}><coneGeometry args={[0.14,0.35,12]} /><meshStandardMaterial color={props.colors.yellow} /></mesh>
+      </group>
+    </group>}
     <Suspense fallback={null}>
       <Character url={props.avatar===0 ? boy.url : girl.url} position={[-4.2,0,3]} active={props.shot?.player===0} /><Character url={props.avatar===0 ? girl.url : boy.url} position={[4.2,0,0.5]} active={props.shot?.player===1} />
       {([-1,1] as const).map(side=><group key={side}><Scenery url={palm.url} position={[side*5.6,0,-5.5]} height={4} /><Scenery url={palm.url} position={[side*7,0,1]} height={3} /><Scenery url={rock.url} position={[side*5,-0.05,-7]} height={0.7} /><Scenery url={rock.url} position={[side*5.8,-0.05,5.3]} height={0.5} /></group>)}

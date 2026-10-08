@@ -1,7 +1,8 @@
 ## Roadmap
-- [ ] Ampliar Juegos con deportes 3D, personajes, física, bot y modos locales
-- [ ] Mejorar catálogo y corregir turnos de los juegos actuales
-- [ ] Comprobar partidas y escenarios 3D en escritorio y móvil
+- [x] Ampliar Juegos con cuatro deportes 3D, personajes, física, bot y modos locales
+- [x] Mejorar catálogo y corregir turnos de los juegos actuales
+- [x] Comprobar escenarios 3D, tiros puntuados y partidas de bolos/canastas en escritorio y móvil
+- [ ] Completar pruebas de todos los juegos y dificultades con partidas enteras
 - [x] Auditar rendimiento, diseño, ubicación y Consejero
 - [x] Definir rediseño y nuevas secciones sin romper funciones
 - [x] Implementar sección Conexión (Check-ins, Acuerdos, Preguntas, Planes)
