@@ -89,7 +89,7 @@ function RetosPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "reto",
-          title: "Nuevo reto para nosotros ✨",
+          title: "Nuevo reto para nosotros",
           message: input.title.trim(),
           link: "/retos",
         });
@@ -124,7 +124,7 @@ function RetosPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "reto",
-          title: "¡Cumplí un reto! 🏆",
+          title: "¡Cumplí un reto!",
           message: challenge.title,
           link: "/retos",
         });
@@ -310,7 +310,7 @@ function RetosPage() {
                     </Button>
                     {partnerToday && (
                       <span className="rounded-full bg-primary/15 px-3 py-1 text-xs text-primary">
-                        Ella también lo hizo hoy 💗
+                        Ella también lo hizo hoy
                       </span>
                     )}
                     {c.user_id === user?.id && (

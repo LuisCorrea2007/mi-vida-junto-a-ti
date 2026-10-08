@@ -24,6 +24,7 @@ import { Route as AuthenticatedCineRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedConexionRouteImport } from './routes/_authenticated/conexion'
 import { Route as AuthenticatedCumplidosRouteImport } from './routes/_authenticated/cumplidos'
 import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
+import { Route as AuthenticatedDadosRouteImport } from './routes/_authenticated/dados'
 import { Route as AuthenticatedDedicatoriasRouteImport } from './routes/_authenticated/dedicatorias'
 import { Route as AuthenticatedDeseosRouteImport } from './routes/_authenticated/deseos'
 import { Route as AuthenticatedDiarioRouteImport } from './routes/_authenticated/diario'
@@ -120,6 +121,11 @@ const AuthenticatedCumplidosRoute = AuthenticatedCumplidosRouteImport.update({
 const AuthenticatedCuponesRoute = AuthenticatedCuponesRouteImport.update({
   id: '/cupones',
   path: '/cupones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDadosRoute = AuthenticatedDadosRouteImport.update({
+  id: '/dados',
+  path: '/dados',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDedicatoriasRoute =
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/conexion': typeof AuthenticatedConexionRoute
   '/cumplidos': typeof AuthenticatedCumplidosRoute
   '/cupones': typeof AuthenticatedCuponesRoute
+  '/dados': typeof AuthenticatedDadosRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/conexion': typeof AuthenticatedConexionRoute
   '/cumplidos': typeof AuthenticatedCumplidosRoute
   '/cupones': typeof AuthenticatedCuponesRoute
+  '/dados': typeof AuthenticatedDadosRoute
   '/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/deseos': typeof AuthenticatedDeseosRoute
   '/diario': typeof AuthenticatedDiarioRoute
@@ -337,6 +345,7 @@ export interface FileRoutesById {
   '/_authenticated/conexion': typeof AuthenticatedConexionRoute
   '/_authenticated/cumplidos': typeof AuthenticatedCumplidosRoute
   '/_authenticated/cupones': typeof AuthenticatedCuponesRoute
+  '/_authenticated/dados': typeof AuthenticatedDadosRoute
   '/_authenticated/dedicatorias': typeof AuthenticatedDedicatoriasRoute
   '/_authenticated/deseos': typeof AuthenticatedDeseosRoute
   '/_authenticated/diario': typeof AuthenticatedDiarioRoute
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/conexion'
     | '/cumplidos'
     | '/cupones'
+    | '/dados'
     | '/dedicatorias'
     | '/deseos'
     | '/diario'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/conexion'
     | '/cumplidos'
     | '/cupones'
+    | '/dados'
     | '/dedicatorias'
     | '/deseos'
     | '/diario'
@@ -457,6 +468,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conexion'
     | '/_authenticated/cumplidos'
     | '/_authenticated/cupones'
+    | '/_authenticated/dados'
     | '/_authenticated/dedicatorias'
     | '/_authenticated/deseos'
     | '/_authenticated/diario'
@@ -596,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/cupones'
       fullPath: '/cupones'
       preLoaderRoute: typeof AuthenticatedCuponesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dados': {
+      id: '/_authenticated/dados'
+      path: '/dados'
+      fullPath: '/dados'
+      preLoaderRoute: typeof AuthenticatedDadosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dedicatorias': {
@@ -773,6 +792,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConexionRoute: typeof AuthenticatedConexionRoute
   AuthenticatedCumplidosRoute: typeof AuthenticatedCumplidosRoute
   AuthenticatedCuponesRoute: typeof AuthenticatedCuponesRoute
+  AuthenticatedDadosRoute: typeof AuthenticatedDadosRoute
   AuthenticatedDedicatoriasRoute: typeof AuthenticatedDedicatoriasRoute
   AuthenticatedDeseosRoute: typeof AuthenticatedDeseosRoute
   AuthenticatedDiarioRoute: typeof AuthenticatedDiarioRoute
@@ -808,6 +828,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConexionRoute: AuthenticatedConexionRoute,
   AuthenticatedCumplidosRoute: AuthenticatedCumplidosRoute,
   AuthenticatedCuponesRoute: AuthenticatedCuponesRoute,
+  AuthenticatedDadosRoute: AuthenticatedDadosRoute,
   AuthenticatedDedicatoriasRoute: AuthenticatedDedicatoriasRoute,
   AuthenticatedDeseosRoute: AuthenticatedDeseosRoute,
   AuthenticatedDiarioRoute: AuthenticatedDiarioRoute,

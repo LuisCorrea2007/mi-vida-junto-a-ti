@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, Plus, Search, Ticket, Trash2 } from "lucide-react";
@@ -45,23 +46,23 @@ type Coupon = {
 type Redemption = { id: string; coupon_id: string; user_id: string; note: string | null; created_at: string };
 
 const CATEGORIES = [
-  { value: "detalle", label: "Detalle", emoji: "🎁" },
-  { value: "mimos", label: "Mimos", emoji: "🤍" },
-  { value: "comida", label: "Comida", emoji: "🍰" },
-  { value: "cita", label: "Cita", emoji: "🌙" },
-  { value: "capricho", label: "Capricho", emoji: "✨" },
-  { value: "perdon", label: "Perdón", emoji: "🕊️" },
+  { value: "detalle", label: "Detalle", emoji: "gift" },
+  { value: "mimos", label: "Mimos", emoji: "hug" },
+  { value: "comida", label: "Comida", emoji: "food" },
+  { value: "cita", label: "Cita", emoji: "ticket" },
+  { value: "capricho", label: "Capricho", emoji: "icecream" },
+  { value: "perdon", label: "Perdón", emoji: "sorry" },
 ] as const;
 
 const IDEAS = [
-  { emoji: "💆", title: "Masaje de 20 minutos", category: "mimos" },
-  { emoji: "🍳", title: "Desayuno en la cama", category: "comida" },
-  { emoji: "🎬", title: "Eliges la película sin quejas", category: "cita" },
-  { emoji: "🧹", title: "Me toca a mí toda la limpieza", category: "detalle" },
-  { emoji: "🌙", title: "Una noche solo de abrazos", category: "mimos" },
-  { emoji: "🍦", title: "Postre a la hora que quieras", category: "capricho" },
-  { emoji: "📵", title: "Tarde sin celulares", category: "cita" },
-  { emoji: "🚗", title: "Paseo sorpresa a donde diga yo", category: "cita" },
+  { emoji: "hug", title: "Masaje de 20 minutos", category: "mimos" },
+  { emoji: "food", title: "Desayuno en la cama", category: "comida" },
+  { emoji: "ticket", title: "Eliges la película sin quejas", category: "cita" },
+  { emoji: "home", title: "Me toca a mí toda la limpieza", category: "detalle" },
+  { emoji: "hug", title: "Una noche solo de abrazos", category: "mimos" },
+  { emoji: "icecream", title: "Postre a la hora que quieras", category: "capricho" },
+  { emoji: "moon", title: "Tarde sin celulares", category: "cita" },
+  { emoji: "star", title: "Paseo sorpresa a donde diga yo", category: "cita" },
 ];
 
 function isExpired(c: Coupon) {
@@ -79,7 +80,7 @@ function CuponesPage() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [emoji, setEmoji] = useState("🎁");
+  const [emoji, setEmoji] = useState("gift");
   const [category, setCategory] = useState<string>("detalle");
   const [uses, setUses] = useState("1");
   const [expires, setExpires] = useState("");
@@ -123,7 +124,7 @@ function CuponesPage() {
         user_id: user.id,
         title: title.trim(),
         description: description.trim() || null,
-        emoji: emoji || "🎁",
+        emoji: emoji || "heart",
         category,
         uses_total: total,
         expires_at: expires || null,
@@ -133,7 +134,7 @@ function CuponesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cupon",
-          title: "Tienes un cupón nuevo 🎟️",
+          title: "Tienes un cupón nuevo",
           message: `${emoji} ${title.trim()}`,
           link: "/cupones",
         });
@@ -163,15 +164,15 @@ function CuponesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cupon",
-          title: "Canjeó tu cupón 🎟️",
-          message: `${coupon.emoji} ${coupon.title}`,
+          title: "Canjeó tu cupón",
+          message: coupon.title,
           link: "/cupones",
         });
       }
     },
     onSuccess: () => {
       burst(16);
-      toast.success("¡Cupón canjeado! Ahora toca cumplirlo 💗");
+      toast.success("¡Cupón canjeado! Ahora toca cumplirlo");
       qc.invalidateQueries({ queryKey: ["coupon_redemptions"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -243,7 +244,7 @@ function CuponesPage() {
                       }}
                       className="rounded-full border border-border px-3 py-1.5 text-xs transition-colors hover:bg-accent"
                     >
-                      {i.emoji} {i.title}
+                      <Glyph name={i.emoji} /> {i.title}
                     </button>
                   ))}
                 </div>
@@ -277,7 +278,7 @@ function CuponesPage() {
                         category === c.value && "border-primary bg-primary/15 text-primary",
                       )}
                     >
-                      {c.emoji} {c.label}
+                      <Glyph name={c.emoji} /> {c.label}
                     </button>
                   ))}
                 </div>
@@ -375,7 +376,7 @@ function CuponesPage() {
               >
                 <div className="absolute inset-y-0 left-0 w-1.5 bg-primary/70" />
                 <div className="flex items-start gap-3 pl-2">
-                  <span className="text-2xl">{c.emoji}</span>
+                  <span className="text-2xl"><Glyph name={c.emoji} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="font-display text-lg font-semibold">{c.title}</p>
                     {c.description && (
@@ -440,7 +441,7 @@ function CuponesPage() {
               const c = coupons.find((x) => x.id === r.coupon_id);
               return (
                 <li key={r.id} className="flex items-center gap-3 py-3 text-sm">
-                  <span className="text-lg">{c?.emoji ?? "🎟️"}</span>
+                  <span className="text-lg">{c?.emoji ?? ""}</span>
                   <span className="min-w-0 flex-1 truncate">{c?.title ?? "Cupón"}</span>
                   <span className="shrink-0 text-xs text-muted-foreground">
                     {nameOf(r.user_id)} ·{" "}

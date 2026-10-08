@@ -9,6 +9,7 @@ import {
   BookOpen,
   CalendarHeart,
   Mail,
+  Dice5,
   Flame,
   Gift,
   HandHeart,
@@ -68,6 +69,7 @@ const NAV = [
   { to: "/conexion", label: "Conexión", icon: Handshake },
   { to: "/videos", label: "Videos", icon: Video },
   { to: "/cartas", label: "Cartas", icon: Mail },
+  { to: "/dados", label: "Dados", icon: Dice5 },
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
   { to: "/cerca", label: "Ahora", icon: MapPin },
   { to: "/deseos", label: "Deseos", icon: Stars },
@@ -514,7 +516,7 @@ function MobileNav({ pathname }: { pathname: string }) {
                 Más
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] p-3">
+            <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] border-border/80 bg-background/95 p-3 shadow-lift backdrop-blur-2xl">
               <div className="grid max-h-[60vh] grid-cols-3 gap-1 overflow-y-auto">
                 {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].map((item) => (
                   <Link
@@ -522,11 +524,11 @@ function MobileNav({ pathname }: { pathname: string }) {
                     to={item.to}
                     onClick={() => setMoreOpen(false)}
                     className={cn(
-                      "flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                      isRouteActive(pathname, item.to) && "bg-accent text-primary",
+                      "group flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground active:scale-95",
+                      isRouteActive(pathname, item.to) && "bg-primary/15 text-primary",
                     )}
                   >
-                    <item.icon className="size-5" />
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-background/50 ring-1 ring-border transition-colors group-hover:ring-primary/40"><item.icon className="size-5" /></span>
                     {item.label}
                   </Link>
                 ))}

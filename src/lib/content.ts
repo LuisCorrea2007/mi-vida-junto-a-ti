@@ -28,11 +28,11 @@ export const WISH_CATEGORIES: Option[] = [
 ];
 
 export const REACTIONS: { type: string; emoji: string; label: string }[] = [
-  { type: "heart", emoji: "❤️", label: "Me encanta" },
-  { type: "kiss", emoji: "😘", label: "Beso" },
-  { type: "laugh", emoji: "😂", label: "Me divierte" },
-  { type: "wow", emoji: "😮", label: "Wow" },
-  { type: "cry", emoji: "🥹", label: "Me emociona" },
+  { type: "heart", emoji: "heart", label: "Me encanta" },
+  { type: "kiss", emoji: "kiss", label: "Beso" },
+  { type: "laugh", emoji: "laugh", label: "Me divierte" },
+  { type: "wow", emoji: "wow", label: "Wow" },
+  { type: "cry", emoji: "cry", label: "Me emociona" },
   { type: "star", emoji: "⭐", label: "Especial" },
 ];
 

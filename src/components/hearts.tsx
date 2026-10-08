@@ -1,3 +1,4 @@
+import { Heart as HeartIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 
 type Heart = { id: number; left: number; delay: number; scale: number };
@@ -40,7 +41,7 @@ function HeartsLayer({ items }: { items: Heart[] }) {
             transform: `scale(${h.scale})`,
           }}
         >
-          ❤️
+          <HeartIcon className="size-6 fill-primary text-primary" />
         </span>
       ))}
     </div>

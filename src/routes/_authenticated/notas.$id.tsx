@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -724,7 +725,7 @@ function NoteDetail() {
                   mine ? "border-primary bg-primary/10" : "border-border"
                 }`}
               >
-                {r.emoji} {count > 0 && count}
+                <Glyph name={r.emoji} /> {count > 0 && count}
               </button>
             );
           })}

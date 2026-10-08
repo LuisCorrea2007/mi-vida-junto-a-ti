@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -163,7 +164,7 @@ function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
         .from("photo_reactions")
         .insert({ photo_id: photo.id, user_id: userId, reaction_type: type });
       const other = profiles?.find((p) => p.id !== userId);
-      const emoji = REACTIONS.find((r) => r.type === type)?.emoji ?? "❤️";
+      const emoji = REACTIONS.find((r) => r.type === type)?.emoji ?? "";
       if (other && photo.user_id === other.id) {
         await notifyPartner({
           toUserId: other.id,
@@ -192,7 +193,7 @@ function PhotoPanel({ photo, userId }: { photo: Photo; userId: string }) {
                 mine ? "border-primary bg-primary/15" : "border-border"
               }`}
             >
-              {r.emoji} {count > 0 && count}
+              <Glyph name={r.emoji} /> {count > 0 && count}
             </button>
           );
         })}
@@ -415,7 +416,7 @@ function Lightbox({
             size="sm"
             className="rounded-full"
             onClick={() => {
-              const text = photo.caption ?? "Mira este recuerdo nuestro 💗";
+              const text = photo.caption ?? "Mira este recuerdo nuestro";
               const url = `${window.location.origin}/galeria?foto=${photo.id}`;
               if (navigator.share) void navigator.share({ title: "Nuestro Espacio", text, url });
               else {

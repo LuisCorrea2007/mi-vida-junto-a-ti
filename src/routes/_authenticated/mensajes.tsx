@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CornerUpLeft, Send, SmilePlus, Trash2, X } from "lucide-react";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/mensajes")({
   component: MensajesPage,
 });
 
-const EMOJIS = ["❤️", "😂", "😍", "🥺", "👍", "🔥"];
+const EMOJIS = ["heart", "laugh", "kiss", "wow", "cry", "fire"];
 
 type Msg = { id: string; user_id: string; content: string; reply_to: string | null; read_at: string | null; created_at: string };
 type Reaction = { id: string; message_id: string; user_id: string; emoji: string };
@@ -89,7 +90,7 @@ function MensajesPage() {
       const { error } = await supabase.from("private_messages").insert({ user_id: user.id, content, reply_to: replyTo?.id ?? null });
       if (error) throw error;
       if (couple?.partnerId) {
-        await notifyPartner({ toUserId: couple.partnerId, type: "mensaje", title: "Nuevo mensaje 💬", message: content.slice(0, 80), link: "/mensajes" });
+        await notifyPartner({ toUserId: couple.partnerId, type: "mensaje", title: "Nuevo mensaje", message: content.slice(0, 80), link: "/mensajes" });
       }
     },
     onSuccess: () => {
@@ -133,7 +134,7 @@ function MensajesPage() {
       </header>
 
       <div className="flex-1 space-y-3 overflow-y-auto rounded-2xl border border-border bg-card/40 p-4">
-        {msgs.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">Aún no hay mensajes. ¡Escribe el primero! 💌</p>}
+        {msgs.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">Aún no hay mensajes. ¡Escribe el primero!</p>}
         {q && shown.length === 0 && <p className="py-12 text-center text-sm text-muted-foreground">No hay mensajes con “{q}”.</p>}
         {shown.map((m) => {
           const mine = m.user_id === user?.id;
@@ -161,7 +162,7 @@ function MensajesPage() {
                       onClick={() => toggleReaction(m.id, g.e)}
                       className={cn("rounded-full border border-border bg-card px-2 text-xs", g.list.some((r) => r.user_id === user?.id) && "border-primary")}
                     >
-                      {g.e} {g.list.length > 1 ? g.list.length : ""}
+                      <Glyph name={g.e} /> {g.list.length > 1 ? g.list.length : ""}
                     </button>
                   ))}
                 </div>
@@ -183,7 +184,7 @@ function MensajesPage() {
                 <div className="flex gap-1 rounded-full border border-border bg-card px-2 py-1">
                   {EMOJIS.map((e) => (
                     <button key={e} className="text-lg transition hover:scale-125" onClick={() => toggleReaction(m.id, e)}>
-                      {e}
+                      <Glyph name={e} />
                     </button>
                   ))}
                 </div>

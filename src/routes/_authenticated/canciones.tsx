@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ExternalLink, Music, Plus, Quote as QuoteIcon, Search, Star, Trash2 } from "lucide-react";
@@ -114,7 +115,7 @@ function CancionesPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cancion",
-          title: "Te dediqué una canción 🎵",
+          title: "Te dediqué una canción",
           message: `${title.trim()}${artist.trim() ? ` — ${artist.trim()}` : ""}`,
           link: "/canciones",
         });
@@ -344,7 +345,7 @@ function CancionesPage() {
                           mine && "bg-primary/15",
                         )}
                       >
-                        {r.emoji}
+                        <Glyph name={r.emoji} />
                         {list.length > 0 && (
                           <span className="ml-1 text-xs text-muted-foreground">{list.length}</span>
                         )}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -67,11 +68,11 @@ const FUN_CATEGORIES = [
 ] as const;
 
 const REACTIONS = [
-  { type: "risa", emoji: "😂", label: "Me hizo reír" },
-  { type: "amor", emoji: "❤️", label: "Me encanta" },
-  { type: "sorpresa", emoji: "😮", label: "No me lo esperaba" },
-  { type: "aplauso", emoji: "👏", label: "Bien hecho" },
-  { type: "fuego", emoji: "🔥", label: "Buenísimo" },
+  { type: "risa", emoji: "laugh", label: "Me hizo reír" },
+  { type: "amor", emoji: "heart", label: "Me encanta" },
+  { type: "sorpresa", emoji: "wow", label: "No me lo esperaba" },
+  { type: "aplauso", emoji: "clap", label: "Bien hecho" },
+  { type: "fuego", emoji: "fire", label: "Buenísimo" },
 ] as const;
 
 type FunCategory = typeof FUN_CATEGORIES[number]["value"];
@@ -192,7 +193,7 @@ function FunPage() {
         await notifyPartner({
           toUserId: partnerId,
           type: "diversion_nuevo",
-          title: `Nuevo ${label.toLowerCase()} para ti 😄`,
+          title: `Nuevo ${label.toLowerCase()} para ti`,
           message: form.content.trim().slice(0, 120),
           link: "/diversion",
         });
@@ -302,7 +303,7 @@ function FunPage() {
         await notifyPartner({
           toUserId: item.user_id,
           type: "diversion_comentario",
-          title: "Comentaron lo que escribiste 💬",
+          title: "Comentaron lo que escribiste",
           message: text.trim().slice(0, 120),
           link: "/diversion",
         });
@@ -343,7 +344,7 @@ function FunPage() {
     const pool = (items ?? []).filter((i) => i.user_id !== user?.id);
     const list = pool.length > 0 ? pool : (items ?? []);
     if (list.length === 0) {
-      toast.error("Agreguen algo primero 😄");
+      toast.error("Agreguen algo primero");
       return;
     }
     const pick = list[Math.floor(Math.random() * list.length)]!;
@@ -513,7 +514,7 @@ function FunPage() {
         <div className="surface flex flex-col items-center gap-3 p-14 text-center">
           <Laugh className="size-8 text-primary" />
           <p className="font-display text-xl">¡Agreguen algo divertido!</p>
-          <p className="text-sm text-muted-foreground">Empiecen con un chiste malo 😄</p>
+          <p className="text-sm text-muted-foreground">Empiecen con un chiste malo</p>
         </div>
       ) : (
         <div className="grid items-start gap-4 sm:grid-cols-2">
@@ -620,7 +621,7 @@ function FunCard({
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
     if (item.answer && option === item.answer) {
-      toast.success("¡Correcto! 🎉");
+      toast.success("¡Correcto!");
     } else if (item.answer) {
       toast.error(`Incorrecto. La respuesta era: ${item.answer}`);
     }
@@ -683,7 +684,7 @@ function FunCard({
                   selectedOption === item.answer ? "text-primary" : "text-destructive",
                 )}
               >
-                {selectedOption === item.answer ? "✅ ¡Correcto!" : `❌ La respuesta era: ${item.answer}`}
+                {selectedOption === item.answer ? "¡Correcto!" : `La respuesta era: ${item.answer}`}
               </p>
             )}
           </div>
@@ -717,7 +718,7 @@ function FunCard({
                   mineR ? "border-primary bg-primary/15" : "border-border",
                 )}
               >
-                {r.emoji}
+                <Glyph name={r.emoji} />
                 {count > 0 && <span className="text-xs">{count}</span>}
               </button>
             );
@@ -733,7 +734,7 @@ function FunCard({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <Stars value={myScore} onPick={onRate} />
           <p className="text-xs text-muted-foreground">
-            {rating ? `${rating.avg.toFixed(1)} ★ · ${rating.votes} ${rating.votes === 1 ? "voto" : "votos"}` : "Sin puntuar"}
+            {rating ? `${rating.avg.toFixed(1)} · ${rating.votes} ${rating.votes === 1 ? "voto" : "votos"}` : "Sin puntuar"}
           </p>
         </div>
 

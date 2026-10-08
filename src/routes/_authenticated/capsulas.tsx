@@ -96,7 +96,7 @@ function CapsulasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "capsula",
-          title: "Te guardé una cápsula del tiempo 💌",
+          title: "Te guardé una cápsula del tiempo",
           message: `Se abre el ${new Date(openAt).toLocaleDateString("es", { day: "numeric", month: "long", year: "numeric" })}`,
           link: "/capsulas",
         });

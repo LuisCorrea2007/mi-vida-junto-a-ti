@@ -64,7 +64,7 @@ function CumplidosPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "cumplido",
-          title: "Te dejaron algo bonito en el frasco 💌",
+          title: "Te dejaron algo bonito en el frasco",
           message: text.trim().slice(0, 80),
           link: "/cumplidos",
         });

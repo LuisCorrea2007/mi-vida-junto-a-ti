@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarClock, Check, HandHeart, Plus, Search, Trash2, Undo2 } from "lucide-react";
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/promesas")({
   component: PromesasPage,
 });
 
-const EMOJIS = ["🤝", "💍", "🌹", "✈️", "🏠", "💪", "❤️", "🎁"];
+const EMOJIS = ["promise", "heart", "home", "plane", "ring", "flower", "star", "hug"];
 
 type Promise_ = {
   id: string;
@@ -48,7 +49,7 @@ function PromesasPage() {
 
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
-  const [emoji, setEmoji] = useState("🤝");
+  const [emoji, setEmoji] = useState("promise");
   const [due, setDue] = useState("");
   const [tab, setTab] = useState<"pendientes" | "cumplidas">("pendientes");
   const [q, setQ] = useState("");
@@ -77,7 +78,7 @@ function PromesasPage() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "promesa",
-          title: "Te hicieron una promesa 🤝",
+          title: "Te hicieron una promesa",
           message: title.trim(),
           link: "/promesas",
         });
@@ -144,7 +145,7 @@ function PromesasPage() {
           {EMOJIS.map((e) => (
             <button type="button" key={e} onClick={() => setEmoji(e)}
               className={cn("rounded-full border px-3 py-1 text-sm", emoji === e && "border-primary bg-primary/15")}>
-              {e}
+              <Glyph name={e} />
             </button>
           ))}
         </div>
@@ -175,7 +176,7 @@ function PromesasPage() {
             return (
               <li key={p.id} className="space-y-2 rounded-2xl border bg-card/60 p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="font-semibold">{p.emoji} {p.title}</p>
+                  <p className="font-semibold"><Glyph name={p.emoji} /> {p.title}</p>
                   <span className="text-[11px] text-muted-foreground">{mine ? "Tuya" : "De tu pareja"}</span>
                 </div>
                 {p.detail && <p className="text-sm text-muted-foreground">{p.detail}</p>}

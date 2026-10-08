@@ -11,6 +11,7 @@ import {
   Navigation as NavigationIcon,
   Send,
   Timer,
+  MessageCircleHeart,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,12 +53,12 @@ const SHARE_OPTIONS = [
 ] as const;
 
 const QUICK_STATUS = [
-  "Trabajando 💼",
-  "Comiendo 🍽️",
-  "En camino 🚗",
-  "Descansando 🛋️",
-  "Pensando en ti 💭",
-  "Ya casi duermo 😴",
+  "Trabajando",
+  "Comiendo",
+  "En camino",
+  "Descansando",
+  "Pensando en ti",
+  "Ya casi duermo",
 ];
 
 /** Distancia en km entre dos coordenadas. */
@@ -78,7 +79,7 @@ function distanceLabel(km: number) {
 }
 
 function distancePhrase(km: number) {
-  if (km < 0.3) return "Están juntitos 💞";
+  if (km < 0.3) return "Están juntitos";
   if (km < 5) return "A un salto de distancia";
   if (km < 50) return "En la misma ciudad, cerquita";
   if (km < 500) return "Lejos, pero no tanto";
@@ -444,14 +445,14 @@ function Heartbeat({ userId }: { userId: string }) {
       await notifyPartner({
         toUserId: other.id,
         type: "latido",
-        title: `${me?.name ?? "Tu pareja"} está pensando en ti 💗`,
+        title: `${me?.name ?? "Tu pareja"} está pensando en ti`,
         message: "Te mandó un latido desde Nuestro Espacio.",
         link: "/cerca",
       });
     },
     onSuccess: () => {
       setSentAt(Date.now());
-      toast.success("Latido enviado 💗");
+      toast.success("Latido enviado");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -606,7 +607,7 @@ function EphemeralChat({ userId }: { userId: string }) {
       <div className="flex max-h-[55vh] min-h-72 flex-col gap-1.5 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <div className="my-auto text-center">
-            <p className="text-3xl">💬</p>
+            <MessageCircleHeart className="mx-auto size-9 text-primary" />
             <p className="mt-2 text-sm text-muted-foreground">
               Nada por ahora. Cuéntale qué haces en este momento.
             </p>

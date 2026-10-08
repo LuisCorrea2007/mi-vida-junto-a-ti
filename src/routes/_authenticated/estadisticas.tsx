@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -170,7 +171,7 @@ function EstadisticasPage() {
             {moodStats.map((m) => (
               <div key={`${m.emoji}${m.label}`} className="flex items-center gap-3">
                 <span className="w-32 truncate text-sm">
-                  {m.emoji} {m.label}
+                  <Glyph name={m.emoji} /> {m.label}
                 </span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                   <div
