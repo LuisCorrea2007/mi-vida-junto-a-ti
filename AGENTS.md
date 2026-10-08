@@ -11,6 +11,9 @@
 
 ## Decisions
 - Dev and build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by sandbox reinstalls, which broke the preview and publishing.
-- Sports games use a client-only, dynamically loaded React Three Fiber scene with Rapier physics; this keeps WebGL and physics out of SSR and only loads them when playing.
-- Sports matches offer bot difficulty and same-device two-player turns; online asynchronous games remain separate to preserve existing couple matches.
-- Character assets are self-contained CC0 GLBs with embedded textures and cloned skeletons; this prevents shared model mutation and missing texture requests.
+
+- Shared location tracking lives in the authenticated shell and only follows a previously consented sharing session; navigation must not stop updates or extend consent.
+- Retired published sections keep a redirect without loading removed feature code, preserving old links.
+- Realtime refreshes are debounced and recover on reconnect or visibility changes to avoid stale couple data.
+- Cinema keeps user-owned movies and append-only user-owned playback commands separate so either partner can control playback without editing another person's records.
+- Free cinema sources require an explicit open-license declaration verified again before adding a playable stream; language selection uses available source versions, not automatic dubbing.
