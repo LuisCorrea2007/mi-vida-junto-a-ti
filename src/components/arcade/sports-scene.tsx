@@ -95,20 +95,19 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
     if (!launched.current) {
       launched.current = true;
       const a = shot.angle * Math.PI/180;
-      const speed = sport === "basket" ? 5 + shot.power*0.04 : sport === "curling" ? 3 + shot.power*0.095 : sport === "golf" ? 2+shot.power*0.14 : 4 + shot.power*0.12;
+      const speed = sport === "basket" ? 5.55 + shot.power*0.04 : sport === "curling" ? 3 + shot.power*0.095 : sport === "golf" ? 2+shot.power*0.14 : 4 + shot.power*0.12;
       rb.setLinvel({x:Math.sin(a)*speed,y:sport === "basket" ? 6+shot.power*0.036 : 0,z:-Math.cos(a)*speed},true);
       rb.setAngvel({x:sport==="curling" ? 0 : -speed/radius,y:0,z:0},true);
     }
     elapsed.current += dt;
     const p = rb.translation(); const v = rb.linvel();
-    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0) { console.info("basket-cross",p.x,p.z); if(Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true; }
+    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0 && Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true;
     lastY.current = p.y;
     const hole = sport === "golf" && Math.hypot(p.x-targetX(round),p.z+4)<0.38 && Math.hypot(v.x,v.z)<3.8;
     if (Math.hypot(v.x,v.y,v.z)<0.13) settled.current += dt; else settled.current = 0;
     if (hole || settled.current > 0.65 || elapsed.current > (sport === "curling" ? 12 : 8) || p.y < -3) {
       done.current = true;
       const points = sport === "basket" ? (basket.current ? 3 : 0) : sport === "curling" ? curlingScore(p.x,p.z) : sport === "bowling" ? pins.current.filter(pin => { if (!pin) return false; const q=pin.rotation(); return Math.abs(q.x)+Math.abs(q.z)>0.4 || pin.translation().y<0; }).length : 0;
-      console.info("arcade-shot",sport,p.x,p.y,p.z,points,hole);
       onFinish({points,hole,x:Math.max(-3.1,Math.min(3.1,p.x)),z:Math.max(-7,Math.min(6.5,p.z))});
     }
   });
