@@ -132,7 +132,10 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image: radial-gradient(circle at 82% 0%, oklch(0.35 0.09 355 / 18%), transparent 30rem);
+    background-image:
+      radial-gradient(circle at 85% -5%, oklch(0.42 0.12 8 / 22%), transparent 32rem),
+      radial-gradient(circle at 0% 100%, oklch(0.5 0.06 72 / 10%), transparent 28rem),
+      radial-gradient(circle at 40% 45%, oklch(0.3 0.07 350 / 12%), transparent 40rem);
     background-attachment: fixed;
   }
 
@@ -302,3 +305,22 @@
 
 /* build check */
 .arcade-cover-shade { background: linear-gradient(0deg, var(--arcade-ink), transparent 85%); }
+
+h1, h2, h3, .font-display { letter-spacing: -0.015em; font-optical-sizing: auto; }
+
+@keyframes shimmer-line { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@utility shine {
+  background-image: linear-gradient(110deg, transparent 30%, oklch(1 0 0 / 8%) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: shimmer-line 3.5s linear infinite;
+}
+
+@keyframes dice-roll {
+  0% { transform: rotate(0) scale(1); }
+  40% { transform: rotate(200deg) scale(0.85); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@utility animate-dice { animation: dice-roll 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+
+@keyframes float-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@utility animate-float { animation: float-soft 4s ease-in-out infinite; }
