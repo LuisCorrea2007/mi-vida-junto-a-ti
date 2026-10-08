@@ -8,7 +8,7 @@ const RELATED_KEYS: Record<string, string[]> = {
   private_messages: ["private-messages"], private_message_reactions: ["private-messages"],
   time_capsules: ["time-capsules"], couple_tasks: ["tasks"], couple_goals: ["goals"],
   goal_contributions: ["goals", "goal-contributions"], couple_checkins: ["checkins"], couple_agreements: ["agreements"],
-  cinema_movies: ["cinema-movies"],
+  love_letters: ["love-letters"],
 };
 
 /**
