@@ -524,11 +524,11 @@ function MobileNav({ pathname }: { pathname: string }) {
                     to={item.to}
                     onClick={() => setMoreOpen(false)}
                     className={cn(
-                      "flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                      isRouteActive(pathname, item.to) && "bg-accent text-primary",
+                      "group flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground active:scale-95",
+                      isRouteActive(pathname, item.to) && "bg-primary/15 text-primary",
                     )}
                   >
-                    <item.icon className="size-5" />
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-background/50 ring-1 ring-border transition-colors group-hover:ring-primary/40"><item.icon className="size-5" /></span>
                     {item.label}
                   </Link>
                 ))}
