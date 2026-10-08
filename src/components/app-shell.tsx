@@ -461,7 +461,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {mounted && user && <PushBanner userId={user.id} />}
       {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
-      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">{children}</main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
       <MobileNav pathname={pathname} />
