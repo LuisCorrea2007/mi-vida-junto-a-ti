@@ -66,7 +66,7 @@ export function MoodBar() {
         await notifyPartner({
           toUserId: couple.partnerId,
           type: "animo",
-          title: `Se siente ${mood.label.toLowerCase()} $<Glyph name={mood.emoji} />`,
+          title: `Se siente ${mood.label.toLowerCase()}`,
           message: note.trim() || null,
           link: "/panel",
         });
@@ -117,14 +117,14 @@ export function MoodBar() {
         <div className="rounded-xl bg-muted/50 p-4">
           <p className="text-xs uppercase tracking-[0.2em] text-primary">Tú</p>
           <p className="mt-2 text-sm">
-            {mine ? `$<Glyph name={mine.emoji} /> ${mine.label}` : "Todavía no elegiste tu ánimo"}
+            {mine ? <><Glyph name={mine.emoji} /> {mine.label}</> : "Todavía no elegiste tu ánimo"}
           </p>
           {mine?.note && <p className="mt-1 text-xs text-muted-foreground">{mine.note}</p>}
         </div>
         <div className="rounded-xl bg-muted/50 p-4">
           <p className="text-xs uppercase tracking-[0.2em] text-primary">{partnerName}</p>
           <p className="mt-2 text-sm">
-            {partner ? `$<Glyph name={partner.emoji} /> ${partner.label}` : "Sin ánimo por ahora"}
+            {partner ? <><Glyph name={partner.emoji} /> {partner.label}</> : "Sin ánimo por ahora"}
           </p>
           {partner?.note && <p className="mt-1 text-xs text-muted-foreground">{partner.note}</p>}
         </div>

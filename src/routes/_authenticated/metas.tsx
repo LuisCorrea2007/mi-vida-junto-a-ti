@@ -151,7 +151,7 @@ function MetasPage() {
           toUserId: couple.partnerId,
           type: "meta",
           title: "Avanzamos en una meta",
-          message: `$<Glyph name={goal.emoji} /> ${goal.title}`,
+          message: goal.title,
           link: "/metas",
         });
       }

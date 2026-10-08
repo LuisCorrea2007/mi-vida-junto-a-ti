@@ -114,7 +114,7 @@ function EstadisticasPage() {
   const moodStats = useMemo(() => {
     const map = new Map<string, { emoji: string; label: string; n: number }>();
     for (const m of moods) {
-      const k = `$<Glyph name={m.emoji} /> ${m.label}`;
+      const k = `${m.emoji} ${m.label}`;
       const cur = map.get(k);
       if (cur) cur.n += 1;
       else map.set(k, { emoji: m.emoji, label: m.label, n: 1 });
@@ -169,7 +169,7 @@ function EstadisticasPage() {
         ) : (
           <div className="space-y-2">
             {moodStats.map((m) => (
-              <div key={`$<Glyph name={m.emoji} />${m.label}`} className="flex items-center gap-3">
+              <div key={`${m.emoji}${m.label}`} className="flex items-center gap-3">
                 <span className="w-32 truncate text-sm">
                   <Glyph name={m.emoji} /> {m.label}
                 </span>

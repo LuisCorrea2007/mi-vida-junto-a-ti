@@ -165,7 +165,7 @@ function CuponesPage() {
           toUserId: couple.partnerId,
           type: "cupon",
           title: "Canjeó tu cupón",
-          message: `$<Glyph name={coupon.emoji} /> ${coupon.title}`,
+          message: coupon.title,
           link: "/cupones",
         });
       }

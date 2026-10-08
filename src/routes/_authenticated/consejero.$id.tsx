@@ -381,7 +381,7 @@ async function buildAdvisorSystem(userId: string) {
       ? `Ánimos recientes: ${moods
           .map(
             (mood) =>
-              `${nameOf(mood.user_id)} $<Glyph name={mood.emoji} /> ${mood.label}${mood.note ? ` (${mood.note})` : ""}`,
+              `${nameOf(mood.user_id)} ${mood.label}${mood.note ? ` (${mood.note})` : ""}`,
           )
           .join("; ")}.`
       : "",
