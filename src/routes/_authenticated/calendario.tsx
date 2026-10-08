@@ -35,6 +35,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/calendario")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Citas — Nuestro Espacio" },
       { name: "description", content: "Calendario de citas, planes y aniversarios de la pareja." },
       { property: "og:title", content: "Citas — Nuestro Espacio" },

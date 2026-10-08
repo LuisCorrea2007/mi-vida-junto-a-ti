@@ -44,6 +44,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/dedicatorias")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Dedicatorias — Nuestro Espacio" },
       { name: "description", content: "Cartas, enlaces y archivos que se dedican el uno al otro, para siempre." },
       { property: "og:title", content: "Dedicatorias — Nuestro Espacio" },

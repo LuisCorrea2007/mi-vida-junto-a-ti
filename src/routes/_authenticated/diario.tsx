@@ -24,6 +24,8 @@ import {
 export const Route = createFileRoute("/_authenticated/diario")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Diario — Nuestro Espacio" },
       { name: "description", content: "Línea de tiempo con los hitos importantes de la relación." },
       { property: "og:title", content: "Diario — Nuestro Espacio" },

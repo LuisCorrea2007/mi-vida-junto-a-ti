@@ -19,6 +19,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 export const Route = createFileRoute("/_authenticated/videos")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { property: "og:title", content: "Videos — Nuestro Espacio" },
+      { property: "og:description", content: "Videos y recuerdos compartidos de la pareja." },
       { title: "Videos Diarios — Nuestro Espacio" },
       { name: "description", content: "Videos de lo que hacemos en el día." },
     ],

@@ -13,12 +13,18 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NavalBoard } from "@/components/naval-game";
 import { BotArcade } from "@/components/bot-arcade";
+import { SportsArcade } from "@/components/arcade/sports-arcade";
 
 export const Route = createFileRoute("/_authenticated/juegos")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Juegos en pareja — Nuestro Espacio" },
       { name: "description", content: "Tres en raya, Conecta 4 y Batalla naval por turnos para jugar en pareja." },
+      { property: "og:title", content: "Juegos y deportes 3D — Nuestro Espacio" },
+      { property: "og:description", content: "Minigolf, bolos, curling, canastas y juegos de mesa para compartir partidas." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: JuegosPage,
@@ -132,8 +138,10 @@ function JuegosPage() {
     <div className="space-y-6">
       <header className="space-y-1">
         <h1 className="flex items-center gap-2 font-display text-3xl font-semibold"><Gamepad2 className="size-7 text-primary" /> Juegos</h1>
-        <p className="text-sm text-muted-foreground">Partidas por turnos: juega cuando quieras y tu pareja recibe el aviso.</p>
+        <p className="text-sm text-muted-foreground">Deportes, desafíos y partidas con tu pareja.</p>
       </header>
+
+      <SportsArcade />
 
       <div className="grid grid-cols-3 gap-3">
         {[

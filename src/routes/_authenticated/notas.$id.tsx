@@ -289,6 +289,8 @@ function DocumentCard({
 export const Route = createFileRoute("/_authenticated/notas/$id")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Nota — Nuestro Espacio" },
       { name: "description", content: "Una nota compartida con sus respuestas y reacciones." },
       { property: "og:title", content: "Nota — Nuestro Espacio" },

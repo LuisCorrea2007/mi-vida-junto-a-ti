@@ -121,14 +121,14 @@ export function BotArcade() {
 }
 
 /** Ejecuta el turno del bot con una pequeña pausa para que se vea "pensando". */
-function useBotTurn(active: boolean, d: Difficulty, fn: () => void) {
+function useBotTurn(active: boolean, d: Difficulty, fn: () => void, sequence = 0) {
   const ref = useRef(fn);
   ref.current = fn;
   useEffect(() => {
     if (!active) return;
     const t = window.setTimeout(() => ref.current(), delay(d));
     return () => window.clearTimeout(t);
-  }, [active, d]);
+  }, [active, d, sequence]);
 }
 
 function Status({ text }: { text: string }) {
@@ -229,8 +229,7 @@ function Naval({ difficulty, onEnd }: GameProps) {
     setBotShots(n);
     if (Object.values(n).filter(Boolean).length >= 17) { setBotTurn(false); onEnd("l"); return; }
     if (!hit) setBotTurn(false);
-    else setBotShots({ ...n }); // vuelve a disparar
-  });
+  }, Object.keys(botShots).length);
 
   function fire(i: number) {
     if (botTurn || over || i in myShots) return;
@@ -296,7 +295,7 @@ function Memory({ difficulty, onEnd }: GameProps) {
         if (Object.keys(n).length === cards.length) {
           const m = Object.values(n).filter((o) => o === 1).length;
           onEnd(m > 8 ? "w" : m < 8 ? "l" : "d");
-        } else if (who === 2) setBotTurn(true);
+        } else setBotTurn(who === 2);
       } else setBotTurn(who === 1);
       setOpen([]);
     }, 900);
@@ -378,6 +377,7 @@ function Die3D({ value, spin }: { value: number; spin: number }) {
 
 const roll = () => 1 + Math.floor(Math.random() * 6);
 function Dice({ difficulty, onEnd }: GameProps) {
+  const finishing = useRef(false);
   const [round, setRound] = useState(1);
   const [me, setMe] = useState<[number, number]>([1, 1]);
   const [bot, setBot] = useState<[number, number]>([1, 1]);
@@ -386,9 +386,12 @@ function Dice({ difficulty, onEnd }: GameProps) {
   const [rerolled, setRerolled] = useState(false);
   const [wins, setWins] = useState({ me: 0, bot: 0 });
 
-  function throwMine() { setMe([roll(), roll()]); setSpin((s) => s + 1); setPhase("decidir"); setRerolled(false); }
+  function throwMine() { finishing.current = false; setMe([roll(), roll()]); setSpin((s) => s + 1); setPhase("decidir"); setRerolled(false); }
 
   function finish(mine: [number, number]) {
+    if (finishing.current) return;
+    finishing.current = true;
+    setPhase("fin");
     let b: [number, number] = [roll(), roll()];
     const limit = difficulty === "dificil" ? 7 : difficulty === "normal" ? 5 : 0;
     if (b[0] + b[1] < limit) b = [roll(), roll()];
@@ -413,7 +416,7 @@ function Dice({ difficulty, onEnd }: GameProps) {
         {phase === "tirar" && <Button onClick={throwMine}>🎲 Tirar dados</Button>}
         {phase === "decidir" && (<>
           <Button onClick={() => finish(me)}>Me quedo</Button>
-          <Button variant="secondary" disabled={rerolled} onClick={() => { const n: [number, number] = [roll(), roll()]; setMe(n); setSpin((s) => s + 1); setRerolled(true); window.setTimeout(() => finish(n), 950); }}>Arriesgar (volver a tirar)</Button>
+          <Button variant="secondary" disabled={rerolled} onClick={() => { setPhase("fin"); const n: [number, number] = [roll(), roll()]; setMe(n); setSpin((s) => s + 1); setRerolled(true); window.setTimeout(() => finish(n), 950); }}>Arriesgar (volver a tirar)</Button>
         </>)}
       </div>
     </div>

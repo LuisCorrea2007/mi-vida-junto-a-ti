@@ -34,6 +34,8 @@ import {
 export const Route = createFileRoute("/_authenticated/notas/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { title: "Notas — Nuestro Espacio" },
       { name: "description", content: "Cartas, agradecimientos y recuerdos escritos entre los dos." },
       { property: "og:title", content: "Notas — Nuestro Espacio" },
