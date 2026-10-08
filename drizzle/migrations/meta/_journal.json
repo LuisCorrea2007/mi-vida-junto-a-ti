@@ -78,6 +78,13 @@
       "when": 1791147514409,
       "tag": "0010_create_naval_fleets",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791455158064,
+      "tag": "0011_couple_cinema",
+      "breakpoints": true
     }
   ]
 }

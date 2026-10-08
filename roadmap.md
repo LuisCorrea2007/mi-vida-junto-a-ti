@@ -1,14 +1,10 @@
 ## Roadmap
-- [x] Ampliar Juegos con cuatro deportes 3D, personajes, física, bot y modos locales
-- [x] Mejorar catálogo y corregir turnos de los juegos actuales
-- [x] Comprobar escenarios 3D, tiros puntuados y partidas de bolos/canastas en escritorio y móvil
-- [ ] Completar pruebas de todos los juegos y dificultades con partidas enteras
-- [x] Auditar rendimiento, diseño, ubicación y Consejero
-- [x] Definir rediseño y nuevas secciones sin romper funciones
-- [x] Implementar sección Conexión (Check-ins, Acuerdos, Preguntas, Planes)
-- [x] Crear migración de base de datos para Conexión
-- [x] Implementar hooks de React Query para Conexión
-- [ ] Implementar ubicación en vivo con watchPosition (ahora: getCurrentPosition + intervalo 2min)
-- [ ] Rediseñar sistema visual (paleta nocturna premium con rosa/dorado)
-- [ ] Optimizar rendimiento (código dividido, lazy loading, menos re-renders)
-- [ ] Verificar móvil, escritorio y flujos principales
+- [x] Retirar Juegos, sus accesos y recursos exclusivos, sin borrar los datos de la pareja.
+- [x] Mantener la ubicación en vivo al navegar por toda la app, respetando permiso y duración elegida; verificado con GPS simulado, sin modificar ubicaciones reales.
+- [x] Mejorar actualizaciones en vivo con invalidación agrupada y recuperación al volver o recuperar conexión.
+- [x] Facilitar encontrar secciones y acceder a mensajes desde el menú.
+- [x] Verificar navegación, ubicación y ausencia de errores.
+- [x] Añadir cine en pareja con archivos o enlaces autorizados, controles e infraestructura de sincronización; subida, play, pausa, avance y borrado verificados.
+- [x] Investigar e integrar catálogo de licencias abiertas declaradas; disponibilidad limitada en español, sin prometer doblaje o estrenos.
+- [x] Mejorar la experiencia compartida mediante navegación y actualizaciones transversales; no equivale a añadir funciones específicas nuevas en cada sección.
+- [ ] Verificar sincronización de cine entre cuentas distintas: requiere una segunda sesión autorizada de la pareja.

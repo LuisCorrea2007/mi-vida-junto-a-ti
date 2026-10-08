@@ -34,10 +34,11 @@ export function useMyProfile(userId?: string) {
     queryKey: ["profiles", userId],
     enabled: !!userId,
     queryFn: async (): Promise<Profile | null> => {
+      if (!userId) return null;
       const { data, error } = await supabase
         .from("profiles")
         .select(COLUMNS)
-        .eq("id", userId!)
+        .eq("id", userId)
         .maybeSingle();
       if (error) throw error;
       if (data) return data as Profile;

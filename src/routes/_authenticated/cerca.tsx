@@ -96,7 +96,8 @@ function useDrivingRoute(a: MapPerson | undefined, b: MapPerson | undefined) {
     staleTime: 5 * 60_000,
     retry: false,
     queryFn: async (): Promise<DrivingRoute | null> => {
-      const url = `https://router.project-osrm.org/route/v1/driving/${a!.lng},${a!.lat};${b!.lng},${b!.lat}?overview=full&geometries=geojson`;
+      if (!a || !b) return null;
+      const url = `https://router.project-osrm.org/route/v1/driving/${a.lng},${a.lat};${b.lng},${b.lat}?overview=full&geometries=geojson`;
       const res = await fetch(url);
       if (!res.ok) return null;
       const json = (await res.json()) as {
@@ -174,92 +175,6 @@ function readPosition() {
   );
 }
 
-/** Hook para seguimiento continuo de ubicación con watchPosition */
-function useLiveLocationTracking(
-  userId: string | null,
-  isSharing: boolean,
-) {
-  const qc = useQueryClient();
-  const watchIdRef = useRef<number | null>(null);
-  const lastUpdateRef = useRef<number>(0);
-  const lastPositionRef = useRef<{ lat: number; lng: number } | null>(null);
-
-  // Configuración del seguimiento
-  const MIN_DISTANCE_METERS = 20; // Solo actualizar si se mueve más de 20m
-  const MIN_TIME_MS = 10_000; // Mínimo 10 segundos entre actualizaciones
-
-  useEffect(() => {
-    if (!isSharing || !userId) {
-      // Detener seguimiento si no está compartiendo
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-      return;
-    }
-
-    // Iniciar watchPosition para seguimiento continuo
-    if ("geolocation" in navigator) {
-      watchIdRef.current = navigator.geolocation.watchPosition(
-        (position) => {
-          const now = Date.now();
-          const { latitude, longitude, accuracy } = position.coords;
-
-          // Verificar si pasó suficiente tiempo
-          const timeElapsed = now - lastUpdateRef.current;
-          if (timeElapsed < MIN_TIME_MS) return;
-
-          // Verificar si se movió suficiente distancia
-          if (lastPositionRef.current) {
-            const dist = distanceKm(
-              lastPositionRef.current.lat,
-              lastPositionRef.current.lng,
-              latitude,
-              longitude
-            ) * 1000; // convertir a metros
-            if (dist < MIN_DISTANCE_METERS) return;
-          }
-
-          // Actualizar posición en Supabase
-          lastUpdateRef.current = now;
-          lastPositionRef.current = { lat: latitude, lng: longitude };
-
-          supabase
-            .from("profiles")
-            .update({
-              latitude,
-              longitude,
-              location_accuracy: accuracy ?? null,
-              location_updated_at: new Date().toISOString(),
-            })
-            .eq("id", userId)
-            .then(({ error }) => {
-              if (!error) {
-                qc.invalidateQueries({ queryKey: ["profiles"] });
-              }
-            });
-        },
-        (error) => {
-          console.error("Error en seguimiento de ubicación:", error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 20_000,
-          maximumAge: 10_000,
-        }
-      );
-    }
-
-    // Limpieza al desmontar o dejar de compartir
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-    };
-  }, [isSharing, userId, qc]);
-}
-
 function PersonChip({ p, mine }: { p: Profile | undefined; mine: boolean }) {
   const { data: avatar } = useSignedUrl(p?.avatar_url);
   const sharing = isSharingLocation(p);
@@ -285,23 +200,23 @@ function useMapPeople(me: Profile | undefined, partner: Profile | undefined): Ma
   const { data: myAvatar } = useSignedUrl(me?.avatar_url);
   const { data: partnerAvatar } = useSignedUrl(partner?.avatar_url);
   const people: MapPerson[] = [];
-  if (me && isSharingLocation(me)) {
+  if (me && isSharingLocation(me) && me.latitude !== null && me.longitude !== null) {
     people.push({
       id: me.id,
       name: me.name ?? "Tú",
-      lat: me.latitude!,
-      lng: me.longitude!,
+      lat: me.latitude,
+      lng: me.longitude,
       avatarUrl: myAvatar ?? null,
       mine: true,
       updatedLabel: timeAgo(me.location_updated_at),
     });
   }
-  if (partner && isSharingLocation(partner)) {
+  if (partner && isSharingLocation(partner) && partner.latitude !== null && partner.longitude !== null) {
     people.push({
       id: partner.id,
       name: partner.name ?? "Tu pareja",
-      lat: partner.latitude!,
-      lng: partner.longitude!,
+      lat: partner.latitude,
+      lng: partner.longitude,
       avatarUrl: partnerAvatar ?? null,
       mine: false,
       updatedLabel: timeAgo(partner.location_updated_at),
@@ -319,8 +234,11 @@ function DistanceAndMap({ userId }: { userId: string }) {
   const people = useMapPeople(me, partner);
   const sharing = isSharingLocation(me);
 
-  // Usar seguimiento en vivo con watchPosition
-  useLiveLocationTracking(userId, sharing);
+  const [, refreshClock] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => refreshClock((value) => value + 1), 15_000);
+    return () => clearInterval(timer);
+  }, []);
 
   const share = useMutation({
     mutationFn: async (opts: { hours: number; silent?: boolean }) => {
@@ -360,10 +278,8 @@ function DistanceAndMap({ userId }: { userId: string }) {
       toast.success("Dejaste de compartir tu ubicación");
       qc.invalidateQueries({ queryKey: ["profiles"] });
     },
+    onError: () => toast.error("No se pudo detener la ubicación. Inténtalo de nuevo."),
   });
-
-  // Eliminar el intervalo anterior ya que ahora usamos watchPosition
-  // El seguimiento continuo se maneja en useLiveLocationTracking
 
   // Actualiza la vista cuando la pareja cambia su ubicación.
   useEffect(() => {
@@ -378,10 +294,9 @@ function DistanceAndMap({ userId }: { userId: string }) {
     };
   }, [qc]);
 
-  const both = people.length === 2;
   const mePerson = people.find((p) => p.mine);
   const otherPerson = people.find((p) => !p.mine);
-  const km = both ? distanceKm(people[0]!.lat, people[0]!.lng, people[1]!.lat, people[1]!.lng) : null;
+  const km = mePerson && otherPerson ? distanceKm(mePerson.lat, mePerson.lng, otherPerson.lat, otherPerson.lng) : null;
   const { data: driving } = useDrivingRoute(mePerson, otherPerson);
   const accuracy = me?.location_accuracy ?? null;
 
@@ -453,14 +368,14 @@ function DistanceAndMap({ userId }: { userId: string }) {
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
                 <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
               </span>
-              Compartiendo {untilLabel(me?.location_shares_until ?? null)}
+              En vivo · {untilLabel(me?.location_shares_until ?? null)}
             </p>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 className="rounded-full"
-                onClick={() => share.mutate({ hours: 0, silent: false })}
+                onClick={() => share.mutate({ hours: 0, silent: true })}
                 disabled={share.isPending}
               >
                 <LocateFixed className="mr-1 size-4" /> Actualizar
@@ -483,7 +398,10 @@ function DistanceAndMap({ userId }: { userId: string }) {
             </p>
             <div className="flex flex-wrap gap-2">
               {SHARE_OPTIONS.map((o) => (
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-pressed={hours === o.hours}
                   key={o.label}
                   onClick={() => setHours(o.hours)}
                   className={cn(
@@ -494,7 +412,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
                   )}
                 >
                   {o.label}
-                </button>
+                </Button>
               ))}
             </div>
             <Button
@@ -508,7 +426,7 @@ function DistanceAndMap({ userId }: { userId: string }) {
           </>
         )}
         <p className="text-[11px] text-muted-foreground">
-          Solo tu pareja ve dónde estás. Cuando pase la hora elegida, tu ubicación deja de mostrarse.
+          Solo tu pareja ve dónde estás. Se actualiza mientras Nuestro Espacio está abierto; al vencer el tiempo elegido, deja de mostrarse.
         </p>
       </div>
     </section>

@@ -218,6 +218,80 @@ export type Database = {
         }
         Relationships: []
       }
+      cinema_commands: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          language: string
+          movie_id: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          language?: string
+          movie_id: string
+          position?: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          language?: string
+          movie_id?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cinema_commands_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "cinema_movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cinema_movies: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          id: string
+          is_favorite: boolean
+          source_en: string | null
+          source_es: string | null
+          title: string
+          user_id: string
+          watched: boolean
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          is_favorite?: boolean
+          source_en?: string | null
+          source_es?: string | null
+          title: string
+          user_id: string
+          watched?: boolean
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          is_favorite?: boolean
+          source_en?: string | null
+          source_es?: string | null
+          title?: string
+          user_id?: string
+          watched?: boolean
+        }
+        Relationships: []
+      }
       compliments: {
         Row: {
           created_at: string

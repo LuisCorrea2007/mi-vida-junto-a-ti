@@ -8,8 +8,8 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
+  Clapperboard,
   Flame,
-  Gamepad2,
   Gift,
   HandHeart,
   Handshake,
@@ -37,6 +37,9 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useLiveLocation } from "@/hooks/use-live-location";
+import { useRealtime } from "@/hooks/use-realtime";
+import { Input } from "@/components/ui/input";
 import { useMyProfile } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
 import { enablePush, pushSupported } from "@/lib/notify";
@@ -64,6 +67,7 @@ const NAV = [
   { to: "/galeria", label: "Galería", icon: Images },
   { to: "/conexion", label: "Conexión", icon: Handshake },
   { to: "/videos", label: "Videos", icon: Video },
+  { to: "/cine", label: "Cine", icon: Clapperboard },
   { to: "/calendario", label: "Citas", icon: CalendarHeart },
   { to: "/cerca", label: "Ahora", icon: MapPin },
   { to: "/deseos", label: "Deseos", icon: Stars },
@@ -77,7 +81,6 @@ const NAV = [
   { to: "/metas", label: "Metas", icon: PiggyBank },
   { to: "/tareas", label: "Lista", icon: ListChecks },
   { to: "/libro", label: "Libro", icon: BookOpen },
-  { to: "/juegos", label: "Juegos", icon: Gamepad2 },
   { to: "/ruleta", label: "Ruleta", icon: Dices },
   { to: "/lugares", label: "Lugares", icon: MapPin },
   { to: "/estadisticas", label: "Números", icon: BarChart3 },
@@ -87,7 +90,7 @@ const NAV = [
 ] as const;
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
-const MOBILE_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria"] as const;
+const MOBILE_PRIMARY = ["/panel", "/mensajes", "/notas", "/galeria"] as const;
 
 /** En escritorio mantenemos visibles las secciones más usadas y agrupamos el resto. */
 const DESKTOP_PRIMARY = ["/panel", "/consejero", "/notas", "/galeria", "/calendario"] as const;
@@ -280,6 +283,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { data: profile } = useMyProfile(user?.id);
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
+  const locationError = useLiveLocation(profile);
+  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "cinema_movies");
+  const [sectionSearch, setSectionSearch] = useState("");
+  const visibleNav = NAV.filter((item) => item.label.toLocaleLowerCase("es").includes(sectionSearch.trim().toLocaleLowerCase("es")));
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const hash = useRouterState({ select: (s) => s.location.hash });
@@ -335,9 +342,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           </span>
           <span className="font-display text-lg font-semibold text-sidebar-foreground">Nuestro Espacio</span>
         </Link>
+        <Input aria-label="Buscar sección" placeholder="Buscar sección…" value={sectionSearch} onChange={(event) => setSectionSearch(event.target.value)} className="mb-3 h-9" />
         <ScrollArea className="min-h-0 flex-1 pr-2">
           <nav className="space-y-1">
-            {NAV.map((item) => (
+            {visibleNav.map((item) => (
               <Link key={item.to} to={item.to} className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
                 isRouteActive(pathname, item.to) && "bg-sidebar-accent text-primary shadow-[inset_0_0_18px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
@@ -451,6 +459,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       {mounted && user && <PushBanner userId={user.id} />}
+      {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
       <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16">{children}</main>
       </div>
@@ -462,6 +471,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function MobileNav({ pathname }: { pathname: string }) {
   const [moreOpen, setMoreOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const primary = NAV.filter((n) => (MOBILE_PRIMARY as readonly string[]).includes(n.to));
   const secondary = NAV.filter((n) => !(MOBILE_PRIMARY as readonly string[]).includes(n.to));
   const moreActive = secondary.some((n) => isRouteActive(pathname, n.to)) || pathname === "/ajustes";
@@ -493,7 +503,7 @@ function MobileNav({ pathname }: { pathname: string }) {
         <li className="flex min-w-0 flex-1">
           <Popover open={moreOpen} onOpenChange={setMoreOpen}>
             <PopoverTrigger asChild>
-              <button className={itemClass(moreActive)} aria-label="Más secciones">
+              <Button variant="ghost" className={itemClass(moreActive)} aria-label="Más secciones">
                 <span
                   className={cn(
                     "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
@@ -503,11 +513,12 @@ function MobileNav({ pathname }: { pathname: string }) {
                   <LayoutGrid className="size-5" />
                 </span>
                 Más
-              </button>
+              </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" side="top" sideOffset={10} className="w-64 p-2">
-              <div className="grid grid-cols-3 gap-1">
-                {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].map((item) => (
+            <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] p-3">
+              <Input aria-label="Buscar sección" placeholder="Buscar sección…" value={search} onChange={(event) => setSearch(event.target.value)} className="mb-2 h-9" />
+              <div className="grid max-h-[55vh] grid-cols-3 gap-1 overflow-y-auto">
+                {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].filter((item) => item.label.toLocaleLowerCase("es").includes(search.trim().toLocaleLowerCase("es"))).map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
