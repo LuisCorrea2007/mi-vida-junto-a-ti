@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, useAnimations, useGLTF } from "@react-three/drei";
-import { Physics, RigidBody, CuboidCollider, BallCollider, type RapierRigidBody } from "@react-three/rapier";
+import { Physics, RigidBody, CuboidCollider, BallCollider, useBeforePhysicsStep, type RapierRigidBody } from "@react-three/rapier";
 import * as THREE from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import boy from "@/assets/games/boy.glb.asset.json";
@@ -89,9 +89,9 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
   const body = useRef<RapierRigidBody>(null);
   const elapsed = useRef(0); const settled = useRef(0); const done = useRef(false); const launched = useRef(false); const basket = useRef(false); const lastY = useRef(1);
   const radius = sport === "bowling" ? 0.3 : sport === "basket" ? 0.25 : sport === "curling" ? 0.28 : 0.16;
-  useFrame((_, raw) => {
+  useBeforePhysicsStep(() => {
     if (paused || done.current || !body.current) return;
-    const dt = Math.min(raw,0.05); const rb = body.current;
+    const dt = 1/60; const rb = body.current;
     if (!launched.current) {
       launched.current = true;
       const a = shot.angle * Math.PI/180;
