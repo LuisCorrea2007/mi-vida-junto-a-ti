@@ -95,8 +95,8 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
     if (!launched.current) {
       launched.current = true;
       const a = shot.angle * Math.PI/180;
-      const speed = sport === "basket" ? 6 + shot.power*0.04 : sport === "curling" ? 3 + shot.power*0.095 : sport === "golf" ? 4+shot.power*0.22 : 4 + shot.power*0.12;
-      rb.setLinvel({x:Math.sin(a)*speed,y:sport === "basket" ? 4.5+shot.power*0.036 : 0,z:-Math.cos(a)*speed},true);
+      const speed = sport === "basket" ? 5 + shot.power*0.04 : sport === "curling" ? 3 + shot.power*0.095 : sport === "golf" ? 2+shot.power*0.14 : 4 + shot.power*0.12;
+      rb.setLinvel({x:Math.sin(a)*speed,y:sport === "basket" ? 6+shot.power*0.036 : 0,z:-Math.cos(a)*speed},true);
       rb.setAngvel({x:sport==="curling" ? 0 : -speed/radius,y:0,z:0},true);
     }
     elapsed.current += dt;

@@ -10,7 +10,7 @@ export function targetX(round: number) { return [0, 1.15, -1.15][(round - 1) % 3
 export function botAim(sport: Sport, round: number, difficulty: SportDifficulty) {
   const error = difficulty === "facil" ? 11 : difficulty === "normal" ? 5 : 1.5;
   const angle = sport === "golf" ? Math.atan2(targetX(round), 9) * 180 / Math.PI : 0;
-  const power = sport === "bowling" ? 85 : sport === "basket" ? 62 : sport === "curling" ? 24 : 57;
+  const power = sport === "bowling" ? 85 : sport === "basket" ? 62 : sport === "curling" ? 10 : 40;
   return { angle: angle + (Math.random() - 0.5) * error, power: power + (Math.random() - 0.5) * error };
 }
 export function curlingScore(x: number, z: number) {
