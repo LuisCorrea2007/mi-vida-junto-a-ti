@@ -8,7 +8,7 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
-  Clapperboard, Mail,
+  Mail,
   Flame,
   Gift,
   HandHeart,
