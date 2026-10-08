@@ -58,9 +58,9 @@ export function SportsArcade() {
 function Match({sport,mode,difficulty,avatar,onExit,onRecord}: {sport: Sport; mode:"bot"|"local"; difficulty:SportDifficulty; avatar:number; onExit:()=>void; onRecord:(sport:Sport,score:number)=>void}) {
   const definition = SPORTS.find(s=>s.id===sport);
   const [ready,setReady] = useState(false); const [paused,setPaused] = useState(false); const [shot,setShot] = useState<Shot|null>(null);
-  const [angle,setAngle] = useState(0); const [power,setPower] = useState(sport==="basket" ? 62 : sport==="curling" ? 24 : sport==="bowling" ? 85 : 57);
+  const [angle,setAngle] = useState(0); const [power,setPower] = useState(sport==="basket" ? 62 : sport==="curling" ? 10 : sport==="bowling" ? 85 : 40);
   const [player,setPlayer] = useState(0); const [round,setRound] = useState(1); const [score,setScore] = useState<[number,number]>([0,0]);
-  const [strokes,setStrokes] = useState(0); const [position,setPosition] = useState<[number,number]>([0,5]); const [result,setResult] = useState<string|null>(null); const [finished,setFinished] = useState(false); const [version,setVersion] = useState(0);
+  const [strokes,setStrokes] = useState(0); const [position,setPosition] = useState<[number,number]>([0,5]); const [result,setResult] = useState<string|null>(null); const [finished,setFinished] = useState(false);
   const lock = useRef(false); const shotId = useRef(0); const root = useRef<HTMLDivElement>(null);
   const onReady = useCallback(()=>setReady(true),[]);
   useEffect(()=>{ const previous=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{document.body.style.overflow=previous;};},[]);
@@ -69,7 +69,7 @@ function Match({sport,mode,difficulty,avatar,onExit,onRecord}: {sport: Sport; mo
   useEffect(()=>{if(mode!=="bot" || player!==1 || shot || paused || finished || !ready) return; const timer=window.setTimeout(()=>{const aim=botAim(sport,round,difficulty);if(sport==="golf"){aim.angle=Math.atan2(([0,1.15,-1.15][(round-1)%3]??0)-position[0],position[1]+4)*180/Math.PI;aim.power=Math.min(95,Math.hypot(position[0],position[1]+4)*6.3);}launch(aim.angle,aim.power);},1100);return()=>window.clearTimeout(timer);},[mode,player,shot,paused,finished,ready,sport,round,difficulty,launch,position]);
   const finishShot = useCallback((r:ShotResult)=>{
     if(!lock.current) return;lock.current=false;
-    setShot(null);setVersion(v=>v+1);
+    setShot(null);
     const count=strokes+1;
     if(sport==="golf" && !r.hole && count<6){setStrokes(count);setPosition([r.x,r.z]);setResult(`Cerca del hoyo · ${count} ${count===1 ? "golpe" : "golpes"}`);return;}
     const points=sport==="golf" ? r.hole ? 7-count : 0 : r.points;
@@ -77,7 +77,7 @@ function Match({sport,mode,difficulty,avatar,onExit,onRecord}: {sport: Sport; mo
     setStrokes(0);setPosition([0,5]);setAngle(0);
     if(player===0) setPlayer(1); else if(round>=(definition?.rounds??3)){setFinished(true);onRecord(sport,next[0]);}else{setRound(n=>n+1);setPlayer(0);}
   },[strokes,sport,score,player,round,definition,onRecord]);
-  function restart(){lock.current=false;setShot(null);setScore([0,0]);setRound(1);setPlayer(0);setStrokes(0);setPosition([0,5]);setFinished(false);setResult(null);setPaused(false);setVersion(v=>v+1);}
+  function restart(){lock.current=false;setShot(null);setScore([0,0]);setRound(1);setPlayer(0);setStrokes(0);setPosition([0,5]);setFinished(false);setResult(null);setPaused(false);}
   const names=["Tú",mode==="bot" ? "Bot" : "Jugador 2"];
   return <div ref={root} role="dialog" aria-modal="true" aria-label={definition?.name} className="fixed inset-0 z-[100] flex flex-col bg-background">
     <header className="flex flex-wrap items-center justify-between gap-2 border-b bg-background px-3 py-3 sm:px-6">
@@ -85,7 +85,7 @@ function Match({sport,mode,difficulty,avatar,onExit,onRecord}: {sport: Sport; mo
       <div className="flex items-center gap-1"><Button size="icon" variant="ghost" aria-label={paused ? "Continuar" : "Pausar"} onClick={()=>setPaused(p=>!p)}>{paused ? <Play className="size-4" /> : <Pause className="size-4" />}</Button><Button size="icon" variant="ghost" aria-label="Reiniciar partida" onClick={restart}><RotateCcw className="size-4" /></Button><Button size="icon" variant="ghost" aria-label="Pantalla completa" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else root.current?.requestFullscreen?.().catch(()=>{});}}><Expand className="size-4" /></Button></div>
     </header>
     <div className="relative min-h-0 flex-1 bg-arcade-sky">
-      <SceneBoundary onExit={onExit}><Suspense fallback={<div className="absolute inset-0 grid place-items-center text-arcade-ink">Preparando escenario…</div>}><Scene key={version} sport={sport} round={round} shot={shot} paused={paused} avatar={avatar} onReady={onReady} onFinish={finishShot} /></Suspense></SceneBoundary>
+      <SceneBoundary onExit={onExit}><Suspense fallback={<div className="absolute inset-0 grid place-items-center text-arcade-ink">Preparando escenario…</div>}><Scene sport={sport} round={round} shot={shot} paused={paused} avatar={avatar} onReady={onReady} onFinish={finishShot} /></Suspense></SceneBoundary>
       <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-center gap-2">{names.map((name,i)=><div key={name} className={cn("min-w-24 rounded-lg border bg-background/90 px-4 py-2 text-center shadow-soft",player===i && !finished && "border-primary")}><p className="text-xs text-muted-foreground">{name}</p><p className="font-display text-2xl font-semibold">{score[i]}</p></div>)}</div>
       {paused && !finished && <div className="absolute inset-0 grid place-content-center bg-background/25"><Button onClick={()=>setPaused(false)}><Play className="size-5" /> Continuar partida</Button></div>}
       {finished && <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/55 backdrop-blur-sm"><Trophy className="size-12 text-arcade-yellow" /><h3 className="font-display text-3xl font-semibold">{score[0]===score[1] ? "¡Empate!" : score[0]>score[1] ? "¡Ganaste!" : `Ganó ${names[1]}`}</h3><p>{score[0]} — {score[1]}</p><Button onClick={restart}><RotateCcw className="size-4" /> Revancha</Button><Button variant="secondary" onClick={onExit}>Volver a Juegos</Button></div>}

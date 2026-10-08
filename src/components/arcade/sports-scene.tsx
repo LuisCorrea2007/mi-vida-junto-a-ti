@@ -101,7 +101,7 @@ function Ball({ sport, round, shot, paused, colors, pins, onFinish }: { sport: S
     }
     elapsed.current += dt;
     const p = rb.translation(); const v = rb.linvel();
-    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0 && Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true;
+    if (sport === "basket" && lastY.current > 2.65 && p.y <= 2.65 && v.y < 0) { console.info("basket-cross",p.x,p.z); if(Math.hypot(p.x,p.z+3.9)<0.55) basket.current = true; }
     lastY.current = p.y;
     const hole = sport === "golf" && Math.hypot(p.x-targetX(round),p.z+4)<0.38 && Math.hypot(v.x,v.z)<3.8;
     if (Math.hypot(v.x,v.y,v.z)<0.13) settled.current += dt; else settled.current = 0;
