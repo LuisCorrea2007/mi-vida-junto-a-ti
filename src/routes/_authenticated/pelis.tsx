@@ -58,7 +58,7 @@ function PelisPage() {
   async function add() {
     if (!title.trim() || !user) return;
     const { error } = await supabase.from("watchlist").insert({ user_id: user.id, title: title.trim(), kind, platform: platform.trim() || null });
-    if (error) return toast.error("No se pudo guardar");
+    if (error) { toast.error("No se pudo guardar"); return; }
     setTitle(""); setPlatform(""); refresh();
   }
   async function patch(id: string, v: Partial<Item>) {
@@ -67,7 +67,7 @@ function PelisPage() {
   }
   function choose() {
     const pending = items.filter((i) => !i.watched);
-    if (!pending.length) return toast("Agreguen algo a la lista primero");
+    if (!pending.length) { toast("Agreguen algo a la lista primero"); return; }
     setPick(pending[Math.floor(Math.random() * pending.length)]!);
   }
 

@@ -66,7 +66,7 @@ function TriviaPage() {
   async function add() {
     if (!question.trim() || !answer.trim() || !user) return;
     const { error } = await supabase.from("trivia_questions").insert({ user_id: user.id, question: question.trim(), answer: answer.trim() });
-    if (error) return toast.error("No se pudo guardar la pregunta");
+    if (error) { toast.error("No se pudo guardar la pregunta"); return; }
     notifyPartner(user.id, { type: "trivia", title: "Te dejé una pregunta: ¿cuánto me conoces?", message: question.trim(), link: "/trivia" }).catch(() => {});
     setQuestion(""); setAnswer(""); refresh();
     toast.success("Pregunta enviada. A ver si te conoce…");
@@ -76,7 +76,7 @@ function TriviaPage() {
     const g = guesses[q.id]?.trim();
     if (!g) return;
     const { error } = await supabase.from("trivia_questions").update({ guess: g, guessed_at: new Date().toISOString() }).eq("id", q.id);
-    if (error) return toast.error("No se pudo enviar");
+    if (error) { toast.error("No se pudo enviar"); return; }
     notifyPartner(user!.id, { type: "trivia", title: "Respondió tu pregunta", message: q.question, link: "/trivia" }).catch(() => {});
     refresh();
   }
