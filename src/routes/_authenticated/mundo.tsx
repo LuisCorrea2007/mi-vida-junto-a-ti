@@ -10,7 +10,7 @@ import { mergeWorlds } from "@/lib/world-merge";
 import {
   ITEMS, WORLD_W, WORLD_H, pointKey, canWalk, canPlace, findPath,
   initialWorld, parseWorld, outsideSpawn, insideSpawn,
-  type Point, type Scene, type Skin, type DecorId, type WorldDoc
+  type Point, type Scene, type Skin, type HairStyle, type Emote, type DecorId, type WorldDoc
 } from "@/lib/couple-world";
 import { Button } from "@/components/ui/button";
 
@@ -22,12 +22,21 @@ export const Route = createFileRoute("/_authenticated/mundo")({
   component: MundoPage
 });
 
-type Peer = {id:string;x:number;y:number;scene:Scene;skin:Skin;name:string;updated_at:string};
+type Peer = {id:string;x:number;y:number;scene:Scene;skin:Skin;hair:HairStyle;emote:Emote|null;name:string;updated_at:string};
 const skins:{id:Skin;label:string;color:string}[] = [
   {id:"rose",label:"Rosa",color:"#e6789d"},
   {id:"mint",label:"Menta",color:"#63b8aa"},
   {id:"lavender",label:"Lila",color:"#a38bd4"},
   {id:"gold",label:"Miel",color:"#e6af5f"},
+];
+const hairStyles:{id:HairStyle;label:string}[]=[
+  {id:"short",label:"Corto"},{id:"long",label:"Largo"},
+  {id:"curly",label:"Rizado"},{id:"cap",label:"Gorra"},
+];
+const gestures:{id:Emote;label:string;symbol:string}[]=[
+  {id:"heart",label:"Enviar corazón",symbol:"💗"},
+  {id:"wave",label:"Saludar",symbol:"👋"},
+  {id:"dance",label:"Bailar",symbol:"🎵"},
 ];
 const needsDoor=(scene:Scene,p:Point)=>scene==="garden"
   ? Math.abs(p.x-13)<=1&&Math.abs(p.y-13)<=1
@@ -41,6 +50,8 @@ function MundoPage(){
   const [scene,setScene]=useState<Scene>("garden");
   const [hero,setHero]=useState<Point>(outsideSpawn);
   const [skin,setSkin]=useState<Skin>("rose");
+  const [hair,setHair]=useState<HairStyle>("short");
+  const [emote,setEmote]=useState<Emote|null>(null);
   const [partner,setPartner]=useState<Peer>();
   const [editing,setEditing]=useState(false);
   const [selected,setSelected]=useState<DecorId>("flowers");
@@ -57,6 +68,8 @@ function MundoPage(){
   const sceneRef=useRef(scene);
   const heroRef=useRef(hero);
   const skinRef=useRef(skin);
+  const hairRef=useRef(hair);
+  const emoteRef=useRef<{name:Emote|null;at:string|null}>({name:null,at:null});
   const dirtyRef=useRef(false);
   const savedVersion=useRef<string|null>(null);
   const walkingRef=useRef<Point[]>([]);
@@ -68,6 +81,8 @@ function MundoPage(){
   useEffect(()=>{sceneRef.current=scene;},[scene]);
   useEffect(()=>{heroRef.current=hero;},[hero]);
   useEffect(()=>{skinRef.current=skin;},[skin]);
+  useEffect(()=>{hairRef.current=hair;},[hair]);
+  useEffect(()=>{if(!emote)return;const timeout=setTimeout(()=>{emoteRef.current={name:null,at:null};setEmote(null);},4700);return()=>clearTimeout(timeout);},[emote]);
   useEffect(()=>{worldRef.current=world;},[world]);
 
   const apply=useCallback((next:WorldDoc)=>{
@@ -127,6 +142,8 @@ function MundoPage(){
     savedVersion.current=lastVersion;setRemoteVersion(lastVersion);undoRef.current=[];
     try{const saved=localStorage.getItem("ne-world-skin-"+user.id) as Skin | null;
       if(saved&&skins.some(v=>v.id===saved))setSkin(saved);
+      const savedHair=localStorage.getItem("ne-world-hair-"+user.id) as HairStyle|null;
+      if(savedHair&&hairStyles.some(v=>v.id===savedHair)){hairRef.current=savedHair;setHair(savedHair);}
     }catch{}
     setStatus(couple?.coupleId?"connecting":"local");
     if(couple?.coupleId)void loadRemote();
@@ -140,31 +157,41 @@ function MundoPage(){
       if(!active||!couple.partnerId)return;
       try{
         const {data,error}=await supabase.from("couple_world_players" as any)
-          .select("user_id,x,y,scene,skin,name,updated_at")
+          .select("user_id,x,y,scene,skin,hair,emote,emote_at,name,updated_at")
           .eq("couple_id",couple.coupleId).eq("user_id",couple.partnerId).maybeSingle();
         if(error||!active)return;
-        const p=data as {user_id:string;x:number;y:number;scene:string;skin:string;name:string;updated_at:string}|null;
+        const p=data as {user_id:string;x:number;y:number;scene:string;skin:string;hair:string;emote:string|null;emote_at:string|null;name:string;updated_at:string}|null;
         if(!p||Date.now()-Date.parse(p.updated_at)>20000||!["home","garden"].includes(p.scene)){setPartner(undefined);return;}
         setPartner({id:p.user_id,x:p.x,y:p.y,scene:p.scene as Scene,
-          skin:skins.find(s=>s.id===p.skin)?.id??"mint",name:p.name,updated_at:p.updated_at});
+          skin:skins.find(s=>s.id===p.skin)?.id??"mint",hair:hairStyles.find(s=>s.id===p.hair)?.id??"short",
+          emote:p.emote_at && Date.now()-Date.parse(p.emote_at)<5500 && gestures.some(g=>g.id===p.emote) ? p.emote as Emote : null,
+          name:p.name,updated_at:p.updated_at});
       }catch{}
     };
+    let busy=false, lastSent=0, lastSignature="";
     const presence=async()=>{
-      if(!active||document.visibilityState!=="visible")return;
+      if(!active||document.visibilityState!=="visible"||busy)return;
+      const pos=heroRef.current,gesture=emoteRef.current;
+      const signature=[pos.x,pos.y,sceneRef.current,skinRef.current,hairRef.current,gesture.name,gesture.at].join("|");
+      if(signature===lastSignature&&Date.now()-lastSent<12000)return;
+      busy=true;
       try{
-        const pos=heroRef.current;
-        await supabase.from("couple_world_players" as any).upsert({
+        const {error}=await supabase.from("couple_world_players" as any).upsert({
           couple_id:couple.coupleId,user_id:user.id,x:pos.x,y:pos.y,
-          scene:sceneRef.current,skin:skinRef.current,name:"Mi amor"
+          scene:sceneRef.current,skin:skinRef.current,hair:hairRef.current,
+          name:"Mi amor",emote:gesture.name,emote_at:gesture.at
         } as any,{onConflict:"couple_id,user_id"});
-      }catch{}
+        if(error)throw error;
+        lastSignature=signature;lastSent=Date.now();
+      }catch{lastSignature=signature;lastSent=Date.now();}
+      finally{busy=false;}
     };
     const channel=supabase.channel("couple-world-db-"+couple.coupleId);
     channel.on("postgres_changes",{event:"*",schema:"public",table:"couple_world_players",filter:"couple_id=eq."+couple.coupleId},()=>void refresh());
     channel.on("postgres_changes",{event:"*",schema:"public",table:"couple_worlds",filter:"couple_id=eq."+couple.coupleId},()=>void loadRemote());
     channel.subscribe();
     void refresh();void presence();
-    const handle=setInterval(()=>{void presence();void refresh();},4000);
+    const handle=setInterval(()=>{void presence();void refresh();},1800);
     const onVisible=()=>{if(document.visibilityState==="visible"){void refresh();void loadRemote();void presence();}};
     document.addEventListener("visibilitychange",onVisible);
     return()=>{active=false;clearInterval(handle);void supabase.removeChannel(channel);document.removeEventListener("visibilitychange",onVisible);};
@@ -275,6 +302,13 @@ function MundoPage(){
     skinRef.current=skin;setSkin(skin);
     try{if(user)localStorage.setItem("ne-world-skin-"+user.id,skin);}catch{}
   };
+  const chooseHair=(value:HairStyle)=>{
+    hairRef.current=value;setHair(value);
+    try{if(user)localStorage.setItem("ne-world-hair-"+user.id,value);}catch{}
+  };
+  const sendGesture=(value:Emote)=>{
+    emoteRef.current={name:value,at:new Date().toISOString()};setEmote(value);
+  };
   const options=ITEMS.filter(item=>item.scene==="both"||item.scene===scene);
   return <main className="mx-auto max-w-6xl space-y-5 pb-16">
     <section className="surface warm-gradient flex flex-wrap items-center justify-between gap-4 p-5 sm:p-8">
@@ -298,7 +332,7 @@ function MundoPage(){
       <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={exportBackup}>Descargar respaldo</Button><Button size="sm" onClick={combineChanges}>Combinar cambios</Button></div>
     </div>}
     <div className="relative rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
-      <WorldCanvas scene={scene} hero={hero} skin={skin} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,name:partner.name}:undefined}
+      <WorldCanvas scene={scene} hero={hero} skin={skin} hair={hair} emote={emote} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,hair:partner.hair,emote:partner.emote,name:partner.name}:undefined}
         decor={decor} editing={editing} night={night} onTile={clickTile}/>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/80">
         <span>WASD / flechas: moverte · Toca el mapa: caminar · E: entrar o salir</span>
@@ -330,6 +364,14 @@ function MundoPage(){
             aria-pressed={skin===option.id} onClick={()=>chooseSkin(option.id)}
             className={"flex size-11 items-center justify-center rounded-xl border-2 "+(skin===option.id?"border-primary":"border-border")}
             ><span className="size-6 rounded-lg shadow-sm" style={{backgroundColor:option.color}}/></button>)}</div>
+        </div>
+        <div><p className="mb-2 text-sm font-medium">Peinado</p>
+          <div className="flex flex-wrap gap-2">{hairStyles.map(style=><Button key={style.id} size="sm" type="button"
+            variant={hair===style.id?"default":"outline"} onClick={()=>chooseHair(style.id)}>{style.label}</Button>)}</div>
+        </div>
+        <div><p className="mb-2 text-sm font-medium">Gestos para tu pareja</p>
+          <div className="flex flex-wrap gap-2">{gestures.map(gesture=><Button key={gesture.id} size="sm" type="button"
+            variant="outline" onClick={()=>sendGesture(gesture.id)}>{gesture.symbol} {gesture.label}</Button>)}</div>
         </div>
       </section>
       <aside className="surface flex flex-col items-center justify-center gap-3 p-5">
