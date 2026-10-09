@@ -107,7 +107,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preconnect", href: "https://js.puter.com" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&display=swap",
@@ -132,7 +131,6 @@ function RootShell({ children }: { children: ReactNode }) {
       <body>
         {children}
         {/* Puter provides browser-side AI without a developer API key. */}
-        <script src="https://js.puter.com/v2/" />
         <Scripts />
       </body>
     </html>

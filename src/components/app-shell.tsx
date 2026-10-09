@@ -12,7 +12,6 @@ import {
   CalendarHeart,
   Mail,
   Dice5,
-  Gamepad2,
   Flame,
   Gift,
   HandHeart,
@@ -76,6 +75,8 @@ const NAV = [
   { to: "/cumplidos", label: "Cumplidos", icon: Quote, cat: "Amor" },
   { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper, cat: "Amor" },
   { to: "/dedicatorias", label: "Dedicatorias", icon: Gift, cat: "Amor" },
+  { to: "/rituales", label: "Rituales", icon: Heart, cat: "Amor" },
+  { to: "/cuidarnos", label: "Cuidarnos", icon: HandHeart, cat: "Amor" },
   { to: "/promesas", label: "Promesas", icon: HandHeart, cat: "Amor" },
   { to: "/calendario", label: "Citas", icon: CalendarHeart, cat: "Vida" },
   { to: "/cerca", label: "Ahora", icon: MapPin, cat: "Vida" },
@@ -98,7 +99,6 @@ const NAV = [
   { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
   { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
   { to: "/trivia", label: "Trivia", icon: Brain, cat: "Risas" },
-  { to: "/juegos", label: "Juegos", icon: Gamepad2, cat: "Risas" },
 ] as const;
 
 type NavItem = (typeof NAV)[number];
@@ -107,7 +107,7 @@ type NavItem = (typeof NAV)[number];
 const FAMILIES: { label: string; members: readonly string[] }[] = [
   { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
   { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
-  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
+  { label: "Complicidad", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
 ];
 const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
 const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
@@ -128,7 +128,8 @@ function FamilyTabs({ pathname }: { pathname: string }) {
   return (
     <div className="mb-5 flex gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/50 p-1 backdrop-blur">
       {family.members.map((to) => {
-        const item = NAV.find((n) => n.to === to)!;
+        const item = NAV.find((n) => n.to === to);
+        if (!item) return null;
         const active = isRouteActive(pathname, to);
         return (
           <Link key={to} to={item.to} className={cn("flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground", active && "bg-primary/15 text-primary shadow-[var(--shadow-glow)]")}>
