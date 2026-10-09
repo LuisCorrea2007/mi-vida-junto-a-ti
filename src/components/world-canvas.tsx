@@ -7,7 +7,7 @@ import {
 type Player={id:string;x:number;y:number;skin:Skin;hair:HairStyle;emote?:Emote|null;name:string};
 type Props={
   scene:Scene; decor:Record<string,DecorId>; hero:Point; skin:Skin;hair:HairStyle;emote?:Emote|null;
-  partner?:Player; editing:boolean; night:boolean; onTile:(p:Point)=>void;
+  partner?:Player|undefined; editing:boolean; night:boolean; onTile:(p:Point)=>void;
 };
 type Ctx=CanvasRenderingContext2D;
 const C=(ctx:Ctx,color:string,x:number,y:number,w:number,h:number)=>{
@@ -171,7 +171,7 @@ export function WorldCanvas({scene,decor,hero,skin,hair,emote,partner,editing,ni
         for(let y=0;y<WORLD_H;y++)for(let x=0;x<WORLD_W;x++)ground(ctx,x,y,scene,night,t);
         if(scene==="garden")house(ctx);
         for(const [where,id] of Object.entries(decor)){
-          const [x,y]=where.split(",").map(Number);
+          const [x=0,y=0]=where.split(",").map(Number);
           if(Number.isInteger(x)&&Number.isInteger(y))drawDecor(ctx,id,x,y,t);
         }
         if(scene==="home"){
