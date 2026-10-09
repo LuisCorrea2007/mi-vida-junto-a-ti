@@ -11,7 +11,7 @@ export function WorldAdventures({userId,scene,hero,steps,furnitureCount}:Props){
   const [walked,setWalked]=useState(0);
   const [loaded,setLoaded]=useState(false);
   const [tries,setTries]=useState(0);
-  const timeout=useRef<ReturnType<typeof setTimeout>>();
+  const timeout=useRef<ReturnType<typeof setTimeout>|null>(null);
   const lastSteps=useRef(steps);
   const storageKey="ne-world-progress-"+(userId??"guest");
   const nearPond=scene==="garden"&&Math.hypot(hero.x-22,hero.y-16)<6;
