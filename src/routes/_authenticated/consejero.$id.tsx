@@ -81,6 +81,7 @@ function ConsejeroThread() {
 
   const { data: rows, isLoading } = useQuery({
     queryKey: ["advisor-messages", id],
+    staleTime:0, refetchOnMount:"always",
     queryFn: async (): Promise<Row[]> => {
       const { data, error } = await supabase
         .from("advisor_messages")
@@ -197,10 +198,11 @@ function ChatWindow({
     }}),
     sendAutomaticallyWhen:lastAssistantMessageIsCompleteWithApprovalResponses,
     onError:(error)=>toast.error(error.message),
-    onFinish:()=>{void qc.invalidateQueries({queryKey:['advisor-threads']});void qc.invalidateQueries({queryKey:['advisor-thread',threadId]});},
+    onFinish:()=>{void qc.invalidateQueries({queryKey:['advisor-messages',threadId]});void qc.invalidateQueries({queryKey:['advisor-threads']});void qc.invalidateQueries({queryKey:['advisor-thread',threadId]});},
   });
   const busy=status==='submitted'||status==='streaming';
   const chatError=error?.message;
+  useEffect(()=>{if(!busy&&initialMessages.length>messages.length)setMessages(initialMessages);},[initialMessages,busy,messages.length,setMessages]);
   async function send(value:string){const clean=value.trim();if(!clean||busy)return;setText('');await sendMessage({text:clean});}
   // A contextual suggestion is drafted, never sent or billed automatically.
   useEffect(()=>{if(autoSend&&!autoSentRef.current&&messages.length===0){autoSentRef.current=true;setText(autoSend);}},[autoSend,messages.length]);
