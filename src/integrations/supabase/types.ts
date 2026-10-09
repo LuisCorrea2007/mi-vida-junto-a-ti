@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_action_receipts: {
+        Row: {
+          created_at: string
+          result: string | null
+          thread_id: string
+          tool_call_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          result?: string | null
+          thread_id: string
+          tool_call_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          result?: string | null
+          thread_id?: string
+          tool_call_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       advisor_gateway_guard: {
         Row: {
           blocked_at: string
