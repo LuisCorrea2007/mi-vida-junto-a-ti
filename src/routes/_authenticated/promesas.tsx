@@ -1,3 +1,4 @@
+import { celebrate } from "@/lib/celebrate";
 import { useMemo, useState } from "react";
 import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";

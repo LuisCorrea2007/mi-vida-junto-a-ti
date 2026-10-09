@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Feather, Flame, HeartHandshake, Mail, MailOpen, Moon, Send, Sparkles, Trash2 } from "lucide-react";
+import { Feather, Flame, Heart, HeartHandshake, Mail, MailOpen, Moon, Send, Sparkles, Trash2 } from "lucide-react";
+import { celebrate } from "@/lib/celebrate";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -47,6 +48,7 @@ function CartasPage() {
   const [mood, setMood] = useState<string>("ternura");
   const [tab, setTab] = useState<"recibidas" | "enviadas">("recibidas");
   const [reading, setReading] = useState<Letter | null>(null);
+  const [breaking, setBreaking] = useState(false);
 
   const { data: letters = [], isPending } = useQuery({
     queryKey: ["love-letters"],
@@ -79,6 +81,8 @@ function CartasPage() {
   async function open(letter: Letter) {
     setReading(letter);
     if (letter.user_id !== user?.id && !letter.opened_at) {
+      setBreaking(true);
+      window.setTimeout(() => { setBreaking(false); celebrate(24); }, 950);
       await supabase.rpc("open_love_letter", { _id: letter.id });
       void qc.invalidateQueries({ queryKey: ["love-letters"] });
     }
@@ -137,12 +141,19 @@ function CartasPage() {
         </div>
       )}
 
-      {reading && (
+      {reading && breaking && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-background/85 backdrop-blur-md">
+          <div className="wax-seal wax-break"><Heart className="size-12 fill-primary-foreground/80 text-primary-foreground/80" /></div>
+          <p className="font-display text-lg text-muted-foreground">Rompiendo el sello…</p>
+        </div>
+      )}
+      {reading && !breaking && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md" onClick={() => setReading(null)}>
           <article className="surface animate-fade-up max-h-[85vh] w-full max-w-2xl overflow-y-auto p-6 sm:p-10" onClick={(e) => e.stopPropagation()}>
             <p className="text-xs uppercase tracking-[0.2em] text-primary">{moodOf(reading.mood).label}</p>
             <h2 className="mt-2 font-display text-3xl font-semibold">{reading.title}</h2>
             <p className="mt-6 whitespace-pre-wrap font-serif text-lg leading-relaxed">{reading.content}</p>
+            <p className="mt-6 text-right font-display text-sm italic text-muted-foreground">Escrita el {new Date(reading.created_at).toLocaleDateString("es", { day: "numeric", month: "long", year: "numeric" })}</p>
             <div className="mt-8 flex gap-2">
               <Button variant="outline" onClick={() => setReading(null)}>Guardar en el corazón</Button>
               {reading.user_id === user?.id && <Button variant="ghost" size="icon" aria-label="Borrar carta" onClick={() => void remove(reading)}><Trash2 className="size-4" /></Button>}
