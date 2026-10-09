@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_gateway_guard: {
+        Row: {
+          blocked_at: string
+          message: string
+          scope: string
+          status: number
+        }
+        Insert: {
+          blocked_at?: string
+          message: string
+          scope: string
+          status: number
+        }
+        Update: {
+          blocked_at?: string
+          message?: string
+          scope?: string
+          status?: number
+        }
+        Relationships: []
+      }
       advisor_messages: {
         Row: {
           created_at: string
