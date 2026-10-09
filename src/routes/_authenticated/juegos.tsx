@@ -14,6 +14,7 @@ import { celebrate } from "@/lib/celebrate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { LocalGames } from "@/components/juegos-locales";
 
 export const Route = createFileRoute("/_authenticated/juegos")({
   component: JuegosPage,
@@ -69,7 +70,7 @@ function JuegosPage() {
   const couple = useCouple(userId);
   const partnerId = couple.data?.partnerId ?? null;
 
-  const [tab, setTab] = useState<"pareja" | "arcade">("pareja");
+  const [tab, setTab] = useState<"pareja" | "juntos" | "arcade">("pareja");
   const [activeGame, setActiveGame] = useState<GameRow | null>(null);
   const [arcade, setArcade] = useState<null | { kind: string; difficulty: Difficulty }>(null);
 
@@ -174,7 +175,7 @@ function JuegosPage() {
 
       {/* Pestañas */}
       <div className="flex gap-1 rounded-2xl border border-border/70 bg-card/50 p-1">
-        {([["pareja", "En pareja", Users], ["arcade", "Contra el bot", Bot]] as const).map(([k, label, Icon]) => (
+        {([["pareja", "A distancia", Users], ["juntos", "Mismo celular", Hand], ["arcade", "Contra el bot", Bot]] as const).map(([k, label, Icon]) => (
           <button key={k} onClick={() => setTab(k)}
             className={cn("flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all",
               tab === k && "bg-primary/15 text-primary shadow-[var(--shadow-glow)]")}>
@@ -266,6 +267,8 @@ function JuegosPage() {
             </section>
           )}
         </div>
+      ) : tab === "juntos" ? (
+        <LocalGames />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {ARCADE_GAMES.map((g) => (
