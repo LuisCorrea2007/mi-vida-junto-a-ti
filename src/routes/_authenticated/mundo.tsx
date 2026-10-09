@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCouple } from "@/hooks/use-couple";
 import { WorldCanvas } from "@/components/world-canvas";
+import { mergeWorlds } from "@/lib/world-merge";
 import {
   ITEMS, WORLD_W, WORLD_H, pointKey, canWalk, canPlace, findPath,
   initialWorld, parseWorld, outsideSpawn, insideSpawn,
@@ -51,6 +52,8 @@ function MundoPage(){
   const [conflict,setConflict]=useState(false);
   const [steps,setSteps]=useState(0);
   const worldRef=useRef(world);
+  const baseRef=useRef<WorldDoc>(initialWorld());
+  const pendingRemote=useRef<{world:WorldDoc;updated_at:string}|null>(null);
   const sceneRef=useRef(scene);
   const heroRef=useRef(hero);
   const skinRef=useRef(skin);
@@ -70,48 +73,58 @@ function MundoPage(){
   const apply=useCallback((next:WorldDoc)=>{
     undoRef.current=[...undoRef.current.slice(-19),worldRef.current];
     worldRef.current=next;dirtyRef.current=true;setWorld(next);setDirty(true);
-    try{localStorage.setItem(bucket,JSON.stringify(next));}
+    try{localStorage.setItem(bucket,JSON.stringify(next));localStorage.setItem(bucket+":dirty","1");}
     catch{toast.error("No se pudo guardar la versión local");}
   },[bucket]);
   const undo=()=>{
     const previous=undoRef.current.pop();
     if(!previous)return;
     worldRef.current=previous;dirtyRef.current=true;setDirty(true);setWorld(previous);
-    try{localStorage.setItem(bucket,JSON.stringify(previous));}catch{}
+    try{localStorage.setItem(bucket,JSON.stringify(previous));localStorage.setItem(bucket+":dirty","1");}catch{}
   };
 
   const loadRemote=useCallback(async()=>{
     if(!couple?.coupleId)return;
     try{
       const {data,error}=await supabase.from("couple_worlds" as any)
-        .select("world,updated_at")
-        .eq("couple_id",couple.coupleId).maybeSingle();
+        .select("world,updated_at").eq("couple_id",couple.coupleId).maybeSingle();
       if(error)throw error;
       const row=data as {world:unknown;updated_at:string}|null;
       if(row){
-        if(dirtyRef.current && savedVersion.current!==row.updated_at){
-          setConflict(true);
-        }else if(!dirtyRef.current){
-          const parsed=parseWorld(row.world);
-          worldRef.current=parsed;setWorld(parsed);
-          try{localStorage.setItem(bucket,JSON.stringify(parsed));}catch{}
+        const remote=parseWorld(row.world);
+        if(dirtyRef.current){
+          if(savedVersion.current!==row.updated_at){
+            pendingRemote.current={world:remote,updated_at:row.updated_at};
+            setConflict(true);
+          }
+        }else{
+          pendingRemote.current=null;
+          worldRef.current=remote;setWorld(remote);
+          baseRef.current=remote;
+          savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);
           setConflict(false);
+          try{localStorage.setItem(bucket,JSON.stringify(remote));localStorage.setItem(bucket+":base",JSON.stringify(remote));localStorage.setItem(bucket+":version",row.updated_at);localStorage.setItem(bucket+":dirty","0");}catch{}
         }
-        if(!dirtyRef.current){savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);}
       }
       setStatus("ready");
-    }catch{
-      setStatus("local");
-    }
+    }catch{setStatus("local");}
   },[couple?.coupleId,bucket]);
 
   useEffect(()=>{
     if(!user)return;
-    let next=initialWorld();
-    try{const cached=localStorage.getItem(bucket);if(cached)next=parseWorld(JSON.parse(cached));}catch{}
+    let next=initialWorld(),lastVersion:string|null=null,isDirty=false;
+    try{
+      const cached=localStorage.getItem(bucket);
+      if(cached)next=parseWorld(JSON.parse(cached));
+      const base=localStorage.getItem(bucket+":base");
+      baseRef.current=base?parseWorld(JSON.parse(base)):initialWorld();
+      lastVersion=localStorage.getItem(bucket+":version");
+      isDirty=!!cached&&(localStorage.getItem(bucket+":dirty")==="1"||!lastVersion);
+    }catch{baseRef.current=initialWorld();}
     worldRef.current=next;setWorld(next);
-    dirtyRef.current=false;setDirty(false);setConflict(false);
-    savedVersion.current=null;setRemoteVersion(null);undoRef.current=[];
+    dirtyRef.current=isDirty;setDirty(isDirty);setConflict(false);
+    pendingRemote.current=null;
+    savedVersion.current=lastVersion;setRemoteVersion(lastVersion);undoRef.current=[];
     try{const saved=localStorage.getItem("ne-world-skin-"+user.id) as Skin | null;
       if(saved&&skins.some(v=>v.id===saved))setSkin(saved);
     }catch{}
@@ -228,10 +241,35 @@ function MundoPage(){
       if(!data){setConflict(true);toast.error("Tu pareja guardó otra versión. Guarda una copia local antes de recargar.");return;}
       const version=(data as {updated_at:string}).updated_at;
       savedVersion.current=version;setRemoteVersion(version);dirtyRef.current=false;
+      baseRef.current=worldRef.current;pendingRemote.current=null;
+      try{localStorage.setItem(bucket+":version",version);localStorage.setItem(bucket+":base",JSON.stringify(worldRef.current));localStorage.setItem(bucket+":dirty","0");}catch{}
       setDirty(false);setConflict(false);setStatus("ready");toast.success("Mundo guardado para los dos");
     }catch{
       setStatus("local");toast.error("No se pudo sincronizar con el servidor. La versión local se conserva.");
     }finally{setSaving(false);}
+  };
+  const exportBackup=()=>{
+    const blob=new Blob([JSON.stringify(worldRef.current,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download="nuestro-mundo-respaldo.json";a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  const combineChanges=()=>{
+    const latest=pendingRemote.current;
+    if(!latest)return;
+    const {merged,conflicts}=mergeWorlds(baseRef.current,worldRef.current,latest.world);
+    if(conflicts.length){
+      toast.info("Se combinaron los cambios. En "+conflicts.length+" casilla(s) disputadas se conservaron los tuyos.");
+    }else toast.success("Se unieron los cambios de ambos.");
+    baseRef.current=latest.world;worldRef.current=merged;setWorld(merged);
+    savedVersion.current=latest.updated_at;setRemoteVersion(latest.updated_at);
+    pendingRemote.current=null;setConflict(false);dirtyRef.current=true;setDirty(true);
+    try{
+      localStorage.setItem(bucket,JSON.stringify(merged));
+      localStorage.setItem(bucket+":base",JSON.stringify(latest.world));
+      localStorage.setItem(bucket+":version",latest.updated_at);
+      localStorage.setItem(bucket+":dirty","1");
+    }catch{}
   };
   const chooseSkin=(skin:Skin)=>{
     skinRef.current=skin;setSkin(skin);
@@ -255,7 +293,10 @@ function MundoPage(){
         <span className="rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">{steps} pasos</span></div>
       <span role="status" className="text-xs text-muted-foreground">{formatStatus(status)}{partner&&partner.scene===scene?" · Tu pareja está aquí":""}</span>
     </div>
-    {conflict && <p role="alert" className="rounded-xl border border-amber-400/40 bg-amber-100/10 p-3 text-sm">Hay cambios del otro dispositivo. Tu versión local no se ha borrado. Puedes exportarla copiando tus datos antes de recargar.</p>}
+    {conflict && <div role="alert" className="space-y-2 rounded-xl border border-amber-400/40 bg-amber-100/10 p-4 text-sm">
+      <p><strong>Hay cambios en otro dispositivo.</strong> Tu versión local está protegida. Puedes guardar una copia y combinar las decoraciones de ambos.</p>
+      <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={exportBackup}>Descargar respaldo</Button><Button size="sm" onClick={combineChanges}>Combinar cambios</Button></div>
+    </div>}
     <div className="relative rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
       <WorldCanvas scene={scene} hero={hero} skin={skin} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,name:partner.name}:undefined}
         decor={decor} editing={editing} night={night} onTile={clickTile}/>
@@ -297,7 +338,7 @@ function MundoPage(){
         <div className="grid grid-cols-3 gap-2">
           <span/><Button size="icon" variant="outline" aria-label="Arriba" onClick={()=>{stop();step(0,-1);}}><ArrowUp/></Button><span/>
           <Button size="icon" variant="outline" aria-label="Izquierda" onClick={()=>{stop();step(-1,0);}}><ArrowLeft/></Button>
-          <Button size="icon" variant="outline" aria-label="Centro" onClick={()=>{stop();setHero(scene==="garden"?outsideSpawn:insideSpawn);}}><RotateCcw/></Button>
+          <Button size="icon" variant="outline" aria-label="Centro" onClick={()=>{stop();const spawn=scene==="garden"?outsideSpawn:insideSpawn;heroRef.current=spawn;setHero(spawn);}}><RotateCcw/></Button>
           <Button size="icon" variant="outline" aria-label="Derecha" onClick={()=>{stop();step(1,0);}}><ArrowRight/></Button>
           <span/><Button size="icon" variant="outline" aria-label="Abajo" onClick={()=>{stop();step(0,1);}}><ArrowDown/></Button><span/>
         </div>
