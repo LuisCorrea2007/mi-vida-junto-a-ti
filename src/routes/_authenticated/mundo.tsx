@@ -267,7 +267,7 @@ function MundoPage(){
         : await table.insert(payload as any).select("updated_at").maybeSingle();
       if(error)throw error;
       if(!data){setConflict(true);toast.error("Tu pareja guardó otra versión. Guarda una copia local antes de recargar.");return;}
-      const version=(data as {updated_at:string}).updated_at;
+      const version=(data as unknown as {updated_at:string}).updated_at;
       savedVersion.current=version;setRemoteVersion(version);dirtyRef.current=false;
       baseRef.current=worldRef.current;pendingRemote.current=null;
       try{localStorage.setItem(bucket+":version",version);localStorage.setItem(bucket+":base",JSON.stringify(worldRef.current));localStorage.setItem(bucket+":dirty","0");}catch{}
