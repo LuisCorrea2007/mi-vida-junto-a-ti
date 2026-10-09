@@ -38,6 +38,7 @@ import { Route as AuthenticatedMensajesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
+import { Route as AuthenticatedRecetasRouteImport } from './routes/_authenticated/recetas'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
 import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
 import { Route as AuthenticatedSorpresasRouteImport } from './routes/_authenticated/sorpresas'
@@ -195,6 +196,11 @@ const AuthenticatedPromesasRoute = AuthenticatedPromesasRouteImport.update({
   path: '/promesas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRecetasRoute = AuthenticatedRecetasRouteImport.update({
+  id: '/recetas',
+  path: '/recetas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRetosRoute = AuthenticatedRetosRouteImport.update({
   id: '/retos',
   path: '/retos',
@@ -277,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/promesas': typeof AuthenticatedPromesasRoute
+  '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/promesas': typeof AuthenticatedPromesasRoute
+  '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
@@ -359,6 +367,7 @@ export interface FileRoutesById {
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
+  '/_authenticated/recetas': typeof AuthenticatedRecetasRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
   '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
   '/_authenticated/sorpresas': typeof AuthenticatedSorpresasRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/panel'
     | '/promesas'
+    | '/recetas'
     | '/retos'
     | '/ruleta'
     | '/sorpresas'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/metas'
     | '/panel'
     | '/promesas'
+    | '/recetas'
     | '/retos'
     | '/ruleta'
     | '/sorpresas'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/metas'
     | '/_authenticated/panel'
     | '/_authenticated/promesas'
+    | '/_authenticated/recetas'
     | '/_authenticated/retos'
     | '/_authenticated/ruleta'
     | '/_authenticated/sorpresas'
@@ -708,6 +720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPromesasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/recetas': {
+      id: '/_authenticated/recetas'
+      path: '/recetas'
+      fullPath: '/recetas'
+      preLoaderRoute: typeof AuthenticatedRecetasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/retos': {
       id: '/_authenticated/retos'
       path: '/retos'
@@ -806,6 +825,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
+  AuthenticatedRecetasRoute: typeof AuthenticatedRecetasRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
   AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
   AuthenticatedSorpresasRoute: typeof AuthenticatedSorpresasRoute
@@ -842,6 +862,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
+  AuthenticatedRecetasRoute: AuthenticatedRecetasRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
   AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
   AuthenticatedSorpresasRoute: AuthenticatedSorpresasRoute,
