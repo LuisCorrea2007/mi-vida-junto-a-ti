@@ -372,3 +372,7 @@ button { transition-property: color, background-color, border-color, box-shadow,
   60% { transform: scale(1.05) rotate(4deg); filter: brightness(1.3); }
   100% { transform: scale(0.2) rotate(40deg); opacity: 0; }
 }
+
+/* Shared 3D game viewport. */
+.game-scene { position: relative; min-height: 280px; overflow: hidden; border-radius: 8px; background: var(--arcade-ink); }
+.game-scene canvas { display: block; width: 100%; height: 100%; }

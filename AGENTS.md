@@ -16,3 +16,5 @@
 - Retired published sections keep a redirect without loading removed feature code, preserving old links.
 - Realtime refreshes are debounced and recover on reconnect or visibility changes to avoid stale couple data.
 - Love letters stay owner-editable; the recipient marks them opened only through a security-definer function.
+- Games share browser-safe board rules with local search bots; lazy-loaded Three.js views and fixed-step Matter.js sports keep rendering separate from decisions and avoid billed AI calls per move.
+- Online turn-based games reuse couple_games; optimistic updates compare turn and updated_at, while removed game types stay hidden without deleting private history.
