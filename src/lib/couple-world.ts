@@ -4,6 +4,8 @@ export const WORLD_W = 28;
 export const WORLD_H = 20;
 export type Scene = "garden" | "home";
 export type Skin = "rose" | "mint" | "lavender" | "gold";
+export type HairStyle = "short" | "long" | "curly" | "cap";
+export type Emote = "heart" | "wave" | "dance";
 export type DecorId =
   | "tree" | "flowers" | "rosebush" | "bench" | "lamp" | "fountain"
   | "sunflower" | "plant" | "gift" | "cat" | "heart"
