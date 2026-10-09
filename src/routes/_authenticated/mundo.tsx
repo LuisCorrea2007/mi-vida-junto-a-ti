@@ -34,7 +34,7 @@ function safeWorld(value: unknown): World {
   const furniture:Record<string,Furniture> = {};
   for (const [position,icon] of Object.entries(source.furniture ?? {})) {
     const [x,y]=position.split(",").map(Number);
-    if (allowed(x,y) && ITEMS.some(item=>item.icon===icon)) furniture[position]=icon;
+    if (Number.isInteger(x) && Number.isInteger(y) && allowed(x,y) && ITEMS.some(item=>item.icon===icon)) furniture[position]=icon;
   }
   return { name:typeof source.name==="string" ? source.name.slice(0,50) : DEFAULT_WORLD.name, furniture };
 }
@@ -49,7 +49,7 @@ function MundoPage() {
   const [sync,setSync]=useState<"local"|"shared"|"loading">("loading");
   const [remoteVersion,setRemoteVersion]=useState<string|null>(null);
   const worldRef=useRef(world);
-  const dirty=useRef(false);
+
   const storageId=couple?.coupleId ? `ne-world-${couple.coupleId}` : `ne-world-${user?.id ?? "guest"}`;
   useEffect(()=>{worldRef.current=world;},[world]);
 
@@ -59,7 +59,7 @@ function MundoPage() {
     let cancelled=false;
     setRemoteVersion(null);
     try{const saved=localStorage.getItem(storageId);setWorld(saved?safeWorld(JSON.parse(saved)):defaultWorld());}catch{setWorld(defaultWorld());}
-    dirty.current=false;
+
     setSync("local");
     if(!couple?.coupleId)return;
     const load=async()=>{
@@ -89,7 +89,7 @@ function MundoPage() {
   },[move]);
 
   const change=useCallback((next:World)=>{
-    worldRef.current=next;dirty.current=true;setWorld(next);
+    worldRef.current=next;setWorld(next);
     try{localStorage.setItem(storageId,JSON.stringify(next));}catch{toast.error("No se pudo guardar en este dispositivo");}
   },[storageId]);
   const place=(x:number,y:number)=>{
@@ -114,7 +114,7 @@ function MundoPage() {
       if(result.error)throw result.error;
       if(!result.data){toast.error("Tu pareja cambió el jardín. Recarga para ver sus cambios.");return;}
       setRemoteVersion((result.data as {updated_at:string}).updated_at);
-      dirty.current=false;setSync("shared");toast.success("Jardín sincronizado con tu pareja");
+setSync("shared");toast.success("Jardín sincronizado con tu pareja");
     }catch{toast.error("No se pudo sincronizar. Tu jardín sigue guardado en este dispositivo.");setSync("local");}
     finally{setLoading(false);}
   };
@@ -131,7 +131,7 @@ function MundoPage() {
           const position=key(x,y),isHouse=house.has(position),isPlayer=avatar.x===x&&avatar.y===y;
           const path=(x===7||x===8)&&y>=5;
           return <button key={position} type="button" onClick={()=>place(x,y)} disabled={isHouse} aria-label={`${x+1},${y+1}${world.furniture[position]?": "+world.furniture[position]:""}`} className="relative flex aspect-square items-center justify-center border border-black/5 text-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:text-2xl" style={{background:isHouse?"#a37658":path?"#c9aa78":(x+y)%3===0?"#82ac70":"#90b979",imageRendering:"pixelated"}}>
-            {isHouse?<span aria-hidden="true" className="text-xl sm:text-3xl">{x===7&&y===4?"🚪":y===3?"🏠":"🧱"}</span>:isPlayer?<span className="animate-bounce drop-shadow-lg" aria-label="Tu personaje">🧑</span>:<span aria-hidden="true">{world.furniture[position]??(x+y)%7===0?"·":""}</span>}
+            {isHouse?<span aria-hidden="true" className="text-xl sm:text-3xl">{x===7&&y===4?"🚪":y===3?"🏠":"🧱"}</span>:isPlayer?<span className="animate-bounce drop-shadow-lg" aria-label="Tu personaje">🧑</span>:<span aria-hidden="true">{world.furniture[position] ?? ((x+y)%7===0 ? "·" : "")}</span>}
           </button>;
         })}
       </div>
