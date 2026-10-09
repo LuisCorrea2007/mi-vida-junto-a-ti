@@ -206,7 +206,7 @@ function ChatWindow({
   useEffect(()=>{if(autoSend&&!autoSentRef.current&&messages.length===0){autoSentRef.current=true;setText(autoSend);}},[autoSend,messages.length]);
   useEffect(()=>{
     if(!isShared)return;
-    const channel=supabase.channel(`advisor:${threadId}`).on('postgres_changes',{event:'INSERT',schema:'public',table:'advisor_messages',filter:`thread_id=eq.${threadId}`},async(payload)=>{
+    const channel=supabase.channel(`advisor:${threadId}`).on('postgres_changes',{event:'*',schema:'public',table:'advisor_messages',filter:`thread_id=eq.${threadId}`},async(payload)=>{
       if(busy||payload.new['user_id']===userId)return;
       const {data,error}=await supabase.from('advisor_messages').select('id,sdk_id,role,parts,user_id,created_at').eq('thread_id',threadId).order('created_at');
       if(!error&&data)setMessages(rowsToMessages(data));
@@ -250,7 +250,8 @@ function ChatWindow({
                     }
                     if (part.type.startsWith('tool-') || part.type==='dynamic-tool') {
                       const toolPart=part as import('ai').ToolUIPart;
-                      return <div key={`${message.id}-${index}`}><Tool defaultOpen={false}><ToolHeader type={toolPart.type} state={toolPart.state} title={toolLabel(toolPart.type)} /><ToolContent><ToolInput input={toolPart.input}/><ToolOutput output={toolPart.output} errorText={toolPart.errorText}/></ToolContent></Tool>{toolPart.state==='approval-requested'&&toolPart.approval&&!toolPart.approval.isAutomatic&&<div className="flex gap-2"><Button size="sm" onClick={()=>addToolApprovalResponse({id:toolPart.approval.id,approved:true})}>Aprobar</Button><Button size="sm" variant="outline" onClick={()=>addToolApprovalResponse({id:toolPart.approval.id,approved:false})}>No guardar</Button></div>}</div>;
+                      const approvalId=toolPart.approval?.id;
+                      return <div key={`${message.id}-${index}`}><Tool defaultOpen={false}><ToolHeader type={toolPart.type} state={toolPart.state} title={toolLabel(toolPart.type)} /><ToolContent><ToolInput input={toolPart.input}/><ToolOutput output={toolPart.output} errorText={toolPart.errorText}/></ToolContent></Tool>{toolPart.state==='approval-requested'&&toolPart.approval&&!toolPart.approval.isAutomatic&&<div className="flex gap-2"><Button size="sm" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:true})}>Aprobar</Button><Button size="sm" variant="outline" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:false})}>No guardar</Button></div>}</div>;
                     }
                     return null;
                   })}

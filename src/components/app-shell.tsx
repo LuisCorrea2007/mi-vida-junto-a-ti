@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { AdvisorShortcut } from "@/components/advisor-shortcut";
 import { ThinkingOfYou } from "@/components/thinking-of-you";
 import { MusicPlayer } from "@/components/music-player";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -336,7 +337,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile(user?.id);
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
   const locationError = useLiveLocation(profile);
-  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters");
+  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters", "couple_rituals", "ritual_completions", "care_cards");
   const [sectionSearch, setSectionSearch] = useState("");
   const searchTerm = sectionSearch.trim().toLocaleLowerCase("es");
   const visibleNav = NAV.filter((item) =>
@@ -528,7 +529,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {mounted && user && <PushBanner userId={user.id} />}
       {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
-      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><FamilyTabs pathname={pathname} /><div key={pathname} className="animate-fade-up">{children}</div></main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><FamilyTabs pathname={pathname} />{!pathname.startsWith("/consejero") && !["/rituales", "/cuidarnos", "/panel"].includes(pathname) && <div className="mb-4 flex justify-end"><AdvisorShortcut subject={NAV.find(item => isRouteActive(pathname,item.to))?.label.toLocaleLowerCase("es") ?? "nuestro día a día"} /></div>}<div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
       <MusicPlayer />
