@@ -24,6 +24,7 @@ export function RitualPicante() {
     let options = pool.filter(a => !seen.includes(a));
     if (!options.length) { setSeen([]); options = pool; }
     const pick = options[Math.floor(Math.random() * options.length)];
+    if (!pick) return;
     setCurrent(pick); setSeen(s => [...s, pick]);
   };
 
