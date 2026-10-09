@@ -6,7 +6,7 @@ import { useCouple } from "@/hooks/use-couple";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 /** Botón "Te estoy pensando": envía un latido en vivo a la pantalla de la pareja. */
-export function ThinkingOfYou({ userId, name }: { userId: string; name?: string | null }) {
+export function ThinkingOfYou({ userId, name }: { userId: string; name?: string | null | undefined }) {
   const { data: couple } = useCouple(userId);
   const channel = useRef<RealtimeChannel | null>(null);
   const [pulse, setPulse] = useState<string | null>(null);
