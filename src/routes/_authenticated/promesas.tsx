@@ -1,3 +1,4 @@
+import { celebrate } from "@/lib/celebrate";
 import { useMemo, useState } from "react";
 import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
@@ -195,7 +196,7 @@ function PromesasPage() {
                 {mine && (
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     <Button size="sm" variant={p.kept_at ? "outline" : "default"} className="h-8 rounded-full"
-                      onClick={() => update(p.id, { kept_at: p.kept_at ? null : new Date().toISOString() })}>
+                      onClick={() => { if (!p.kept_at) celebrate(); void update(p.id, { kept_at: p.kept_at ? null : new Date().toISOString() }); }}>
                       {p.kept_at ? <Undo2 className="size-3.5" /> : <Check className="size-3.5" />}
                       {p.kept_at ? "Pendiente" : "¡Cumplida!"}
                     </Button>

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { ThinkingOfYou } from "@/components/thinking-of-you";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -428,6 +429,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <p className="hidden font-display text-lg font-semibold lg:block">{NAV.find((item) => isRouteActive(pathname, item.to))?.label ?? "Nuestro Espacio"}</p>
           <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+            {mounted && user && <ThinkingOfYou userId={user.id} name={profile?.name} />}
             {mounted && user && <GlobalSearch />}
             {mounted && user && <NotificationBell userId={user.id} />}
             <DropdownMenu>
