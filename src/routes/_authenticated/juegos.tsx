@@ -10,9 +10,9 @@ export const Route = createFileRoute("/_authenticated/juegos")({
 
 type Mark = "X" | "O";
 type Square = Mark | null;
-const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const lines: ReadonlyArray<readonly [number,number,number]> = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 function winner(board: Square[]): Mark | "empate" | null {
-  for (const [a,b,c] of lines) if (board[a] && board[a] === board[b] && board[b] === board[c]) return board[a];
+  for (const [a,b,c] of lines) if (board[a] && board[a] === board[b] && board[b] === board[c]) return board[a]!;
   return board.every(Boolean) ? "empate" : null;
 }
 const icons = ["💗","🌹","🎁","💌","🌷","✨"];
@@ -45,9 +45,10 @@ function GamesHub() {
     if(locked || shown.includes(i) || matched.includes(i) || finished)return;
     if(shown.length===0){setShown([i]);return;}
     const first=shown[0];
+    if(first===undefined || !deck[first] || !deck[i])return;
     setMoves(n=>n+1);
     setShown([first,i]);
-    if(deck[first].icon===deck[i].icon){
+    if(deck[first]!.icon===deck[i]!.icon){
       setMatched(m=>[...m,first,i]);setShown([]);
     }else{
       setLocked(true);

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { AlbumFlipbook, type AlbumStory } from "@/components/album-flipbook";
+import { collectAlbumPages } from "@/lib/album-pages";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, CalendarHeart, ChevronLeft, ChevronRight, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
@@ -47,74 +48,41 @@ function BookPage() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [flipMode,setFlipMode] = useState(false);
-  const years = useMemo(() => [currentYear, currentYear - 1, currentYear - 2], [currentYear]);
+  const years = useMemo(() => Array.from({length:currentYear-1990+1},(_,i)=>currentYear-i), [currentYear]);
 
   const range = { from: `${year}-01-01`, to: `${year}-12-31T23:59:59` };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["libro", year],
     queryFn: async () => {
-      const [photos, milestones, events, notes, videos] = await Promise.all([
-        supabase
-          .from("photos")
+      const [photos,milestones,events,notes,dedications,songs,videos] = await Promise.all([
+        collectAlbumPages<Photo>((from,to)=>supabase.from("photos")
           .select("id, file_path, caption, created_at, is_favorite")
-          .gte("created_at", range.from)
-          .lte("created_at", range.to)
-          .order("is_favorite", { ascending: false })
-          .order("created_at")
-          .limit(30),
-        supabase
-          .from("milestones")
+          .gte("created_at",range.from).lte("created_at",range.to)
+          .order("is_favorite",{ascending:false}).order("created_at").order("id").range(from,to)),
+        collectAlbumPages<Milestone>((from,to)=>supabase.from("milestones")
           .select("id, title, description, date")
-          .gte("date", range.from)
-          .lte("date", `${year}-12-31`)
-          .order("date"),
-        supabase
-          .from("events")
+          .gte("date",range.from).lte("date",`${year}-12-31`).order("date").order("id").range(from,to)),
+        collectAlbumPages<EventRow>((from,to)=>supabase.from("events")
           .select("id, title, date, category, location")
-          .gte("date", range.from)
-          .lte("date", `${year}-12-31`)
-          .order("date"),
-        supabase
-          .from("notes")
+          .gte("date",range.from).lte("date",`${year}-12-31`).order("date").order("id").range(from,to)),
+        collectAlbumPages<NoteRow>((from,to)=>supabase.from("notes")
           .select("id, title, content, category, created_at")
-          .gte("created_at", range.from)
-          .lte("created_at", range.to)
-          .order("is_favorite", { ascending: false })
-          .order("created_at")
-          .limit(20),
-        supabase
-          .from("videos_diarios")
-          .select("id", { count: "exact", head: true })
-          .gte("created_at", range.from)
-          .lte("created_at", range.to),
-      ]);
-      const [dedications, songs] = await Promise.all([
-        supabase
-          .from("dedications")
+          .gte("created_at",range.from).lte("created_at",range.to)
+          .order("created_at").order("id").range(from,to)),
+        collectAlbumPages<DedicationRow>((from,to)=>supabase.from("dedications")
           .select("id, title, content, kind, created_at")
-          .gte("created_at", range.from)
-          .lte("created_at", range.to)
-          .order("is_favorite", { ascending: false })
-          .order("created_at")
-          .limit(12),
-        supabase
-          .from("songs")
+          .gte("created_at",range.from).lte("created_at",range.to)
+          .order("created_at").order("id").range(from,to)),
+        collectAlbumPages<SongRow>((from,to)=>supabase.from("songs")
           .select("id, title, artist, note")
-          .gte("created_at", range.from)
-          .lte("created_at", range.to)
-          .order("is_favorite", { ascending: false })
-          .limit(8),
+          .gte("created_at",range.from).lte("created_at",range.to)
+          .order("created_at").order("id").range(from,to)),
+        supabase.from("videos_diarios").select("id",{count:"exact",head:true})
+          .gte("created_at",range.from).lte("created_at",range.to),
       ]);
-      return {
-        photos: (photos.data ?? []) as Photo[],
-        milestones: (milestones.data ?? []) as Milestone[],
-        events: (events.data ?? []) as EventRow[],
-        notes: (notes.data ?? []) as NoteRow[],
-        dedications: (dedications.data ?? []) as DedicationRow[],
-        songs: (songs.data ?? []) as SongRow[],
-        videoCount: videos.count ?? 0,
-      };
+      if(videos.error)throw new Error(videos.error.message);
+      return {photos,milestones,events,notes,dedications,songs,videoCount:videos.count??0};
     },
   });
 
@@ -145,34 +113,32 @@ function BookPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" className="rounded-full" onClick={()=>{setFlipMode(v=>!v);}}>{flipMode?"Ver libro completo":"Pasar páginas"}</Button>
-          <div className="flex rounded-full border border-border">
-            {years.map((y) => (
-              <button
-                key={y}
-                onClick={() => {setYear(y);}}
-                className={
-                  y === year
-                    ? "rounded-full bg-primary/15 px-4 py-1.5 text-xs font-medium text-primary"
-                    : "px-4 py-1.5 text-xs text-muted-foreground hover:text-foreground"
-                }
-              >
-                {y}
-              </button>
-            ))}
-          </div>
+          <label className="flex items-center gap-2 text-sm">
+            Año
+            <select aria-label="Seleccionar año del álbum" value={year}
+              onChange={event=>setYear(Number(event.target.value))}
+              className="rounded-xl border border-border bg-background px-3 py-2">
+              {years.map(y=><option key={y} value={y}>{y}</option>)}
+            </select>
+          </label>
           <Button className="rounded-full" onClick={() => window.print()}>
             <Printer className="mr-2 size-4" /> Imprimir / PDF
           </Button>
         </div>
       </header>
 
+      {error && <div role="alert" className="surface space-y-3 p-5">
+        <p className="font-semibold">No pudimos cargar todos los recuerdos de este año.</p>
+        <p className="text-sm text-muted-foreground">{error instanceof Error?error.message:"Se produjo un error al consultar tus datos."}</p>
+        <Button size="sm" variant="outline" onClick={()=>void refetch()}>Reintentar</Button>
+      </div>}
       {flipMode && data && <AlbumFlipbook stories={stories} names={names} year={year} />}
-      {isLoading || !data ? (
+      {isLoading || (!data && !error) ? (
         <div className="space-y-4">
           <Skeleton className="h-64 rounded-2xl" />
           <Skeleton className="h-40 rounded-2xl" />
         </div>
-      ) : (
+      ) : !data ? null : (
         <div className={flipMode ? "hidden print:block print:space-y-10" : "space-y-8 print:space-y-10"}>
           {/* Portada */}
           <section className="surface warm-gradient break-inside-avoid p-5 text-center sm:p-10 print:rounded-none">

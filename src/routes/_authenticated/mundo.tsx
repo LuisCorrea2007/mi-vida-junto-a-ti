@@ -6,10 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCouple } from "@/hooks/use-couple";
 import { WorldCanvas } from "@/components/world-canvas";
+import { WorldAdventures } from "@/components/world-adventures";
+import { mergeWorlds } from "@/lib/world-merge";
 import {
   ITEMS, WORLD_W, WORLD_H, pointKey, canWalk, canPlace, findPath,
   initialWorld, parseWorld, outsideSpawn, insideSpawn,
-  type Point, type Scene, type Skin, type DecorId, type WorldDoc
+  type Point, type Scene, type Skin, type HairStyle, type Emote, type DecorId, type WorldDoc
 } from "@/lib/couple-world";
 import { Button } from "@/components/ui/button";
 
@@ -21,12 +23,21 @@ export const Route = createFileRoute("/_authenticated/mundo")({
   component: MundoPage
 });
 
-type Peer = {id:string;x:number;y:number;scene:Scene;skin:Skin;name:string;updated_at:string};
+type Peer = {id:string;x:number;y:number;scene:Scene;skin:Skin;hair:HairStyle;emote:Emote|null;name:string;updated_at:string};
 const skins:{id:Skin;label:string;color:string}[] = [
   {id:"rose",label:"Rosa",color:"#e6789d"},
   {id:"mint",label:"Menta",color:"#63b8aa"},
   {id:"lavender",label:"Lila",color:"#a38bd4"},
   {id:"gold",label:"Miel",color:"#e6af5f"},
+];
+const hairStyles:{id:HairStyle;label:string}[]=[
+  {id:"short",label:"Corto"},{id:"long",label:"Largo"},
+  {id:"curly",label:"Rizado"},{id:"cap",label:"Gorra"},
+];
+const gestures:{id:Emote;label:string;symbol:string}[]=[
+  {id:"heart",label:"Enviar corazón",symbol:"💗"},
+  {id:"wave",label:"Saludar",symbol:"👋"},
+  {id:"dance",label:"Bailar",symbol:"🎵"},
 ];
 const needsDoor=(scene:Scene,p:Point)=>scene==="garden"
   ? Math.abs(p.x-13)<=1&&Math.abs(p.y-13)<=1
@@ -40,6 +51,8 @@ function MundoPage(){
   const [scene,setScene]=useState<Scene>("garden");
   const [hero,setHero]=useState<Point>(outsideSpawn);
   const [skin,setSkin]=useState<Skin>("rose");
+  const [hair,setHair]=useState<HairStyle>("short");
+  const [emote,setEmote]=useState<Emote|null>(null);
   const [partner,setPartner]=useState<Peer>();
   const [editing,setEditing]=useState(false);
   const [selected,setSelected]=useState<DecorId>("flowers");
@@ -51,9 +64,13 @@ function MundoPage(){
   const [conflict,setConflict]=useState(false);
   const [steps,setSteps]=useState(0);
   const worldRef=useRef(world);
+  const baseRef=useRef<WorldDoc>(initialWorld());
+  const pendingRemote=useRef<{world:WorldDoc;updated_at:string}|null>(null);
   const sceneRef=useRef(scene);
   const heroRef=useRef(hero);
   const skinRef=useRef(skin);
+  const hairRef=useRef(hair);
+  const emoteRef=useRef<{name:Emote|null;at:string|null}>({name:null,at:null});
   const dirtyRef=useRef(false);
   const savedVersion=useRef<string|null>(null);
   const walkingRef=useRef<Point[]>([]);
@@ -65,55 +82,69 @@ function MundoPage(){
   useEffect(()=>{sceneRef.current=scene;},[scene]);
   useEffect(()=>{heroRef.current=hero;},[hero]);
   useEffect(()=>{skinRef.current=skin;},[skin]);
+  useEffect(()=>{hairRef.current=hair;},[hair]);
+  useEffect(()=>{if(!emote)return;const timeout=setTimeout(()=>{emoteRef.current={name:null,at:null};setEmote(null);},4700);return()=>clearTimeout(timeout);},[emote]);
   useEffect(()=>{worldRef.current=world;},[world]);
 
   const apply=useCallback((next:WorldDoc)=>{
     undoRef.current=[...undoRef.current.slice(-19),worldRef.current];
     worldRef.current=next;dirtyRef.current=true;setWorld(next);setDirty(true);
-    try{localStorage.setItem(bucket,JSON.stringify(next));}
+    try{localStorage.setItem(bucket,JSON.stringify(next));localStorage.setItem(bucket+":dirty","1");}
     catch{toast.error("No se pudo guardar la versión local");}
   },[bucket]);
   const undo=()=>{
     const previous=undoRef.current.pop();
     if(!previous)return;
     worldRef.current=previous;dirtyRef.current=true;setDirty(true);setWorld(previous);
-    try{localStorage.setItem(bucket,JSON.stringify(previous));}catch{}
+    try{localStorage.setItem(bucket,JSON.stringify(previous));localStorage.setItem(bucket+":dirty","1");}catch{}
   };
 
   const loadRemote=useCallback(async()=>{
     if(!couple?.coupleId)return;
     try{
       const {data,error}=await supabase.from("couple_worlds" as any)
-        .select("world,updated_at")
-        .eq("couple_id",couple.coupleId).maybeSingle();
+        .select("world,updated_at").eq("couple_id",couple.coupleId).maybeSingle();
       if(error)throw error;
       const row=data as {world:unknown;updated_at:string}|null;
       if(row){
-        if(dirtyRef.current && savedVersion.current!==row.updated_at){
-          setConflict(true);
-        }else if(!dirtyRef.current){
-          const parsed=parseWorld(row.world);
-          worldRef.current=parsed;setWorld(parsed);
-          try{localStorage.setItem(bucket,JSON.stringify(parsed));}catch{}
+        const remote=parseWorld(row.world);
+        if(dirtyRef.current){
+          if(savedVersion.current!==row.updated_at){
+            pendingRemote.current={world:remote,updated_at:row.updated_at};
+            setConflict(true);
+          }
+        }else{
+          pendingRemote.current=null;
+          worldRef.current=remote;setWorld(remote);
+          baseRef.current=remote;
+          savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);
           setConflict(false);
+          try{localStorage.setItem(bucket,JSON.stringify(remote));localStorage.setItem(bucket+":base",JSON.stringify(remote));localStorage.setItem(bucket+":version",row.updated_at);localStorage.setItem(bucket+":dirty","0");}catch{}
         }
-        if(!dirtyRef.current){savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);}
       }
       setStatus("ready");
-    }catch{
-      setStatus("local");
-    }
+    }catch{setStatus("local");}
   },[couple?.coupleId,bucket]);
 
   useEffect(()=>{
     if(!user)return;
-    let next=initialWorld();
-    try{const cached=localStorage.getItem(bucket);if(cached)next=parseWorld(JSON.parse(cached));}catch{}
+    let next=initialWorld(),lastVersion:string|null=null,isDirty=false;
+    try{
+      const cached=localStorage.getItem(bucket);
+      if(cached)next=parseWorld(JSON.parse(cached));
+      const base=localStorage.getItem(bucket+":base");
+      baseRef.current=base?parseWorld(JSON.parse(base)):initialWorld();
+      lastVersion=localStorage.getItem(bucket+":version");
+      isDirty=!!cached&&(localStorage.getItem(bucket+":dirty")==="1"||!lastVersion);
+    }catch{baseRef.current=initialWorld();}
     worldRef.current=next;setWorld(next);
-    dirtyRef.current=false;setDirty(false);setConflict(false);
-    savedVersion.current=null;setRemoteVersion(null);undoRef.current=[];
+    dirtyRef.current=isDirty;setDirty(isDirty);setConflict(false);
+    pendingRemote.current=null;
+    savedVersion.current=lastVersion;setRemoteVersion(lastVersion);undoRef.current=[];
     try{const saved=localStorage.getItem("ne-world-skin-"+user.id) as Skin | null;
       if(saved&&skins.some(v=>v.id===saved))setSkin(saved);
+      const savedHair=localStorage.getItem("ne-world-hair-"+user.id) as HairStyle|null;
+      if(savedHair&&hairStyles.some(v=>v.id===savedHair)){hairRef.current=savedHair;setHair(savedHair);}
     }catch{}
     setStatus(couple?.coupleId?"connecting":"local");
     if(couple?.coupleId)void loadRemote();
@@ -127,31 +158,41 @@ function MundoPage(){
       if(!active||!couple.partnerId)return;
       try{
         const {data,error}=await supabase.from("couple_world_players" as any)
-          .select("user_id,x,y,scene,skin,name,updated_at")
+          .select("user_id,x,y,scene,skin,hair,emote,emote_at,name,updated_at")
           .eq("couple_id",couple.coupleId).eq("user_id",couple.partnerId).maybeSingle();
         if(error||!active)return;
-        const p=data as {user_id:string;x:number;y:number;scene:string;skin:string;name:string;updated_at:string}|null;
+        const p=data as {user_id:string;x:number;y:number;scene:string;skin:string;hair:string;emote:string|null;emote_at:string|null;name:string;updated_at:string}|null;
         if(!p||Date.now()-Date.parse(p.updated_at)>20000||!["home","garden"].includes(p.scene)){setPartner(undefined);return;}
         setPartner({id:p.user_id,x:p.x,y:p.y,scene:p.scene as Scene,
-          skin:skins.find(s=>s.id===p.skin)?.id??"mint",name:p.name,updated_at:p.updated_at});
+          skin:skins.find(s=>s.id===p.skin)?.id??"mint",hair:hairStyles.find(s=>s.id===p.hair)?.id??"short",
+          emote:p.emote_at && Date.now()-Date.parse(p.emote_at)<5500 && gestures.some(g=>g.id===p.emote) ? p.emote as Emote : null,
+          name:p.name,updated_at:p.updated_at});
       }catch{}
     };
+    let busy=false, lastSent=0, lastSignature="";
     const presence=async()=>{
-      if(!active||document.visibilityState!=="visible")return;
+      if(!active||document.visibilityState!=="visible"||busy)return;
+      const pos=heroRef.current,gesture=emoteRef.current;
+      const signature=[pos.x,pos.y,sceneRef.current,skinRef.current,hairRef.current,gesture.name,gesture.at].join("|");
+      if(signature===lastSignature&&Date.now()-lastSent<12000)return;
+      busy=true;
       try{
-        const pos=heroRef.current;
-        await supabase.from("couple_world_players" as any).upsert({
+        const {error}=await supabase.from("couple_world_players" as any).upsert({
           couple_id:couple.coupleId,user_id:user.id,x:pos.x,y:pos.y,
-          scene:sceneRef.current,skin:skinRef.current,name:"Mi amor"
+          scene:sceneRef.current,skin:skinRef.current,hair:hairRef.current,
+          name:"Mi amor",emote:gesture.name,emote_at:gesture.at
         } as any,{onConflict:"couple_id,user_id"});
-      }catch{}
+        if(error)throw error;
+        lastSignature=signature;lastSent=Date.now();
+      }catch{lastSignature=signature;lastSent=Date.now();}
+      finally{busy=false;}
     };
     const channel=supabase.channel("couple-world-db-"+couple.coupleId);
     channel.on("postgres_changes",{event:"*",schema:"public",table:"couple_world_players",filter:"couple_id=eq."+couple.coupleId},()=>void refresh());
     channel.on("postgres_changes",{event:"*",schema:"public",table:"couple_worlds",filter:"couple_id=eq."+couple.coupleId},()=>void loadRemote());
     channel.subscribe();
     void refresh();void presence();
-    const handle=setInterval(()=>{void presence();void refresh();},4000);
+    const handle=setInterval(()=>{void presence();void refresh();},1800);
     const onVisible=()=>{if(document.visibilityState==="visible"){void refresh();void loadRemote();void presence();}};
     document.addEventListener("visibilitychange",onVisible);
     return()=>{active=false;clearInterval(handle);void supabase.removeChannel(channel);document.removeEventListener("visibilitychange",onVisible);};
@@ -226,16 +267,48 @@ function MundoPage(){
         : await table.insert(payload as any).select("updated_at").maybeSingle();
       if(error)throw error;
       if(!data){setConflict(true);toast.error("Tu pareja guardó otra versión. Guarda una copia local antes de recargar.");return;}
-      const version=(data as {updated_at:string}).updated_at;
+      const version=(data as unknown as {updated_at:string}).updated_at;
       savedVersion.current=version;setRemoteVersion(version);dirtyRef.current=false;
+      baseRef.current=worldRef.current;pendingRemote.current=null;
+      try{localStorage.setItem(bucket+":version",version);localStorage.setItem(bucket+":base",JSON.stringify(worldRef.current));localStorage.setItem(bucket+":dirty","0");}catch{}
       setDirty(false);setConflict(false);setStatus("ready");toast.success("Mundo guardado para los dos");
     }catch{
       setStatus("local");toast.error("No se pudo sincronizar con el servidor. La versión local se conserva.");
     }finally{setSaving(false);}
   };
+  const exportBackup=()=>{
+    const blob=new Blob([JSON.stringify(worldRef.current,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download="nuestro-mundo-respaldo.json";a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  const combineChanges=()=>{
+    const latest=pendingRemote.current;
+    if(!latest)return;
+    const {merged,conflicts}=mergeWorlds(baseRef.current,worldRef.current,latest.world);
+    if(conflicts.length){
+      toast.info("Se combinaron los cambios. En "+conflicts.length+" casilla(s) disputadas se conservaron los tuyos.");
+    }else toast.success("Se unieron los cambios de ambos.");
+    baseRef.current=latest.world;worldRef.current=merged;setWorld(merged);
+    savedVersion.current=latest.updated_at;setRemoteVersion(latest.updated_at);
+    pendingRemote.current=null;setConflict(false);dirtyRef.current=true;setDirty(true);
+    try{
+      localStorage.setItem(bucket,JSON.stringify(merged));
+      localStorage.setItem(bucket+":base",JSON.stringify(latest.world));
+      localStorage.setItem(bucket+":version",latest.updated_at);
+      localStorage.setItem(bucket+":dirty","1");
+    }catch{}
+  };
   const chooseSkin=(skin:Skin)=>{
     skinRef.current=skin;setSkin(skin);
     try{if(user)localStorage.setItem("ne-world-skin-"+user.id,skin);}catch{}
+  };
+  const chooseHair=(value:HairStyle)=>{
+    hairRef.current=value;setHair(value);
+    try{if(user)localStorage.setItem("ne-world-hair-"+user.id,value);}catch{}
+  };
+  const sendGesture=(value:Emote)=>{
+    emoteRef.current={name:value,at:new Date().toISOString()};setEmote(value);
   };
   const options=ITEMS.filter(item=>item.scene==="both"||item.scene===scene);
   return <main className="mx-auto max-w-6xl space-y-5 pb-16">
@@ -255,9 +328,12 @@ function MundoPage(){
         <span className="rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">{steps} pasos</span></div>
       <span role="status" className="text-xs text-muted-foreground">{formatStatus(status)}{partner&&partner.scene===scene?" · Tu pareja está aquí":""}</span>
     </div>
-    {conflict && <p role="alert" className="rounded-xl border border-amber-400/40 bg-amber-100/10 p-3 text-sm">Hay cambios del otro dispositivo. Tu versión local no se ha borrado. Puedes exportarla copiando tus datos antes de recargar.</p>}
-    <div className="relative rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
-      <WorldCanvas scene={scene} hero={hero} skin={skin} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,name:partner.name}:undefined}
+    {conflict && <div role="alert" className="space-y-2 rounded-xl border border-amber-400/40 bg-amber-100/10 p-4 text-sm">
+      <p><strong>Hay cambios en otro dispositivo.</strong> Tu versión local está protegida. Puedes guardar una copia y combinar las decoraciones de ambos.</p>
+      <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={exportBackup}>Descargar respaldo</Button><Button size="sm" onClick={combineChanges}>Combinar cambios</Button></div>
+    </div>}
+    <div className="relative overflow-x-auto rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
+      <WorldCanvas scene={scene} hero={hero} skin={skin} hair={hair} emote={emote} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,hair:partner.hair,emote:partner.emote,name:partner.name}:undefined}
         decor={decor} editing={editing} night={night} onTile={clickTile}/>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/80">
         <span>WASD / flechas: moverte · Toca el mapa: caminar · E: entrar o salir</span>
@@ -290,6 +366,14 @@ function MundoPage(){
             className={"flex size-11 items-center justify-center rounded-xl border-2 "+(skin===option.id?"border-primary":"border-border")}
             ><span className="size-6 rounded-lg shadow-sm" style={{backgroundColor:option.color}}/></button>)}</div>
         </div>
+        <div><p className="mb-2 text-sm font-medium">Peinado</p>
+          <div className="flex flex-wrap gap-2">{hairStyles.map(style=><Button key={style.id} size="sm" type="button"
+            variant={hair===style.id?"default":"outline"} onClick={()=>chooseHair(style.id)}>{style.label}</Button>)}</div>
+        </div>
+        <div><p className="mb-2 text-sm font-medium">Gestos para tu pareja</p>
+          <div className="flex flex-wrap gap-2">{gestures.map(gesture=><Button key={gesture.id} size="sm" type="button"
+            variant="outline" onClick={()=>sendGesture(gesture.id)}>{gesture.symbol} {gesture.label}</Button>)}</div>
+        </div>
       </section>
       <aside className="surface flex flex-col items-center justify-center gap-3 p-5">
         <div className="flex gap-2"><Button variant="outline" onClick={changeScene}><DoorOpen className="mr-2 size-4"/>{scene==="garden"?"Entrar a casa":"Volver al jardín"}</Button></div>
@@ -297,13 +381,14 @@ function MundoPage(){
         <div className="grid grid-cols-3 gap-2">
           <span/><Button size="icon" variant="outline" aria-label="Arriba" onClick={()=>{stop();step(0,-1);}}><ArrowUp/></Button><span/>
           <Button size="icon" variant="outline" aria-label="Izquierda" onClick={()=>{stop();step(-1,0);}}><ArrowLeft/></Button>
-          <Button size="icon" variant="outline" aria-label="Centro" onClick={()=>{stop();setHero(scene==="garden"?outsideSpawn:insideSpawn);}}><RotateCcw/></Button>
+          <Button size="icon" variant="outline" aria-label="Centro" onClick={()=>{stop();const spawn=scene==="garden"?outsideSpawn:insideSpawn;heroRef.current=spawn;setHero(spawn);}}><RotateCcw/></Button>
           <Button size="icon" variant="outline" aria-label="Derecha" onClick={()=>{stop();step(1,0);}}><ArrowRight/></Button>
           <span/><Button size="icon" variant="outline" aria-label="Abajo" onClick={()=>{stop();step(0,1);}}><ArrowDown/></Button><span/>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground"><Users className="size-4"/>{couple?.partnerId?"Espacio vinculado":"Vincula a tu pareja en Ajustes"}</div>
       </aside>
     </div>
+    <WorldAdventures userId={user?.id} scene={scene} hero={hero} steps={steps} furnitureCount={Object.keys(world.garden).length+Object.keys(world.home).length}/>
     <p className="text-center text-xs text-muted-foreground">Tu jardín siempre se guarda en este dispositivo. Para verlo desde dos dispositivos, despliega la migración SQL y utiliza «Guardar cambios».</p>
   </main>;
 }

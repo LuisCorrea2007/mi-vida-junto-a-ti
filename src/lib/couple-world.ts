@@ -4,6 +4,8 @@ export const WORLD_W = 28;
 export const WORLD_H = 20;
 export type Scene = "garden" | "home";
 export type Skin = "rose" | "mint" | "lavender" | "gold";
+export type HairStyle = "short" | "long" | "curly" | "cap";
+export type Emote = "heart" | "wave" | "dance";
 export type DecorId =
   | "tree" | "flowers" | "rosebush" | "bench" | "lamp" | "fountain"
   | "sunflower" | "plant" | "gift" | "cat" | "heart"
@@ -87,10 +89,10 @@ export function parseWorld(input:unknown):WorldDoc {
     }
     return out;
   };
-  const name=typeof data.name==="string" ? data.name.slice(0,48):base.name;
+  const name=typeof data["name"]==="string" ? data["name"].slice(0,48):base.name;
   // Migration from the original emoji-only grid, preserving existing objects.
-  if(data.version!==2 && data.furniture)return {...base,name,garden:parseDecor(data.furniture,"garden")};
-  return {version:2,name,garden:parseDecor(data.garden,"garden"),home:parseDecor(data.home,"home")};
+  if(data["version"]!==2 && data["furniture"])return {...base,name,garden:parseDecor(data["furniture"],"garden")};
+  return {version:2,name,garden:parseDecor(data["garden"],"garden"),home:parseDecor(data["home"],"home")};
 }
 export function findPath(scene:Scene,start:Point,target:Point,decor:Record<string,DecorId>):Point[] {
   if(!canWalk(scene,target.x,target.y,decor))return [];
@@ -98,18 +100,20 @@ export function findPath(scene:Scene,start:Point,target:Point,decor:Record<strin
   const parent=new Map<string,string>();
   let i=0;
   while(i<queue.length){
-    const p=queue[i++],id=pointKey(p.x,p.y);
+    const p=queue[i++];
+    if(!p)break;
+    const id=pointKey(p.x,p.y);
     if(id===pointKey(target.x,target.y)){
       const path:Point[]=[];
       let next=id;
       while(next!==pointKey(start.x,start.y)){
-        const [x,y]=next.split(",").map(Number);
+        const [x=0,y=0]=next.split(",").map(Number);
         path.unshift({x,y});
         next=parent.get(next)!;
       }
       return path;
     }
-    for(const [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]]){
+    for(const [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]] as const){
       const x=p.x+dx,y=p.y+dy,k=pointKey(x,y);
       if(!found.has(k)&&canWalk(scene,x,y,decor)){
         found.add(k);parent.set(k,id);queue.push({x,y});
