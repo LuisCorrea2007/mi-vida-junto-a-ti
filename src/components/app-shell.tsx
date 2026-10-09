@@ -30,6 +30,7 @@ import {
   Music,
   NotebookPen,
   PartyPopper,
+  ChefHat,
   Settings,
   Sparkles,
   Stars,
@@ -63,35 +64,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/panel", label: "Panel", icon: Sparkles },
-  { to: "/consejero", label: "Consejero", icon: MessageCircleHeart },
-  { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart },
-  { to: "/notas", label: "Notas", icon: NotebookPen },
-  { to: "/galeria", label: "Galería", icon: Images },
-  { to: "/conexion", label: "Conexión", icon: Handshake },
-  { to: "/videos", label: "Videos", icon: Video },
-  { to: "/cartas", label: "Cartas", icon: Mail },
-  { to: "/dados", label: "Dados", icon: Dice5 },
-  { to: "/calendario", label: "Citas", icon: CalendarHeart },
-  { to: "/cerca", label: "Ahora", icon: MapPin },
-  { to: "/deseos", label: "Deseos", icon: Stars },
-  { to: "/dedicatorias", label: "Dedicatorias", icon: Gift },
-  { to: "/diario", label: "Diario", icon: Heart },
-  { to: "/diversion", label: "Diversión", icon: Laugh },
-  { to: "/capsulas", label: "Cápsulas", icon: Hourglass },
-  { to: "/retos", label: "Retos", icon: Flame },
-  { to: "/canciones", label: "Canciones", icon: Music },
-  { to: "/cupones", label: "Cupones", icon: Ticket },
-  { to: "/metas", label: "Metas", icon: PiggyBank },
-  { to: "/tareas", label: "Lista", icon: ListChecks },
-  { to: "/libro", label: "Libro", icon: BookOpen },
-  { to: "/ruleta", label: "Ruleta", icon: Dices },
-  { to: "/lugares", label: "Lugares", icon: MapPin },
-  { to: "/estadisticas", label: "Números", icon: BarChart3 },
-  { to: "/cumplidos", label: "Cumplidos", icon: Quote },
-  { to: "/promesas", label: "Promesas", icon: HandHeart },
-  { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper },
+  { to: "/panel", label: "Panel", icon: Sparkles, cat: "Amor" },
+  { to: "/consejero", label: "Consejero", icon: MessageCircleHeart, cat: "Amor" },
+  { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart, cat: "Amor" },
+  { to: "/conexion", label: "Conexión", icon: Handshake, cat: "Amor" },
+  { to: "/cartas", label: "Cartas", icon: Mail, cat: "Amor" },
+  { to: "/cupones", label: "Cupones", icon: Ticket, cat: "Amor" },
+  { to: "/cumplidos", label: "Cumplidos", icon: Quote, cat: "Amor" },
+  { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper, cat: "Amor" },
+  { to: "/dedicatorias", label: "Dedicatorias", icon: Gift, cat: "Amor" },
+  { to: "/promesas", label: "Promesas", icon: HandHeart, cat: "Amor" },
+  { to: "/calendario", label: "Citas", icon: CalendarHeart, cat: "Vida" },
+  { to: "/cerca", label: "Ahora", icon: MapPin, cat: "Vida" },
+  { to: "/metas", label: "Metas", icon: PiggyBank, cat: "Vida" },
+  { to: "/tareas", label: "Lista", icon: ListChecks, cat: "Vida" },
+  { to: "/deseos", label: "Deseos", icon: Stars, cat: "Vida" },
+  { to: "/lugares", label: "Lugares", icon: MapPin, cat: "Vida" },
+  { to: "/recetas", label: "Recetas", icon: ChefHat, cat: "Vida" },
+  { to: "/notas", label: "Notas", icon: NotebookPen, cat: "Historia" },
+  { to: "/galeria", label: "Galería", icon: Images, cat: "Historia" },
+  { to: "/videos", label: "Videos", icon: Video, cat: "Historia" },
+  { to: "/diario", label: "Diario", icon: Heart, cat: "Historia" },
+  { to: "/canciones", label: "Canciones", icon: Music, cat: "Historia" },
+  { to: "/capsulas", label: "Cápsulas", icon: Hourglass, cat: "Historia" },
+  { to: "/libro", label: "Libro", icon: BookOpen, cat: "Historia" },
+  { to: "/estadisticas", label: "Números", icon: BarChart3, cat: "Historia" },
+  { to: "/dados", label: "Dados", icon: Dice5, cat: "Risas" },
+  { to: "/ruleta", label: "Ruleta", icon: Dices, cat: "Risas" },
+  { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
+  { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
 ] as const;
+
+type NavItem = (typeof NAV)[number];
+
+/** Secciones hermanas que se muestran como una sola entrada del menú, con pestañas arriba. */
+const FAMILIES: { label: string; members: readonly string[] }[] = [
+  { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
+  { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
+  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion"] },
+];
+const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
+const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
+const CATEGORIES = [
+  { key: "Amor", label: "Amor e intimidad" },
+  { key: "Vida", label: "Vida y planes" },
+  { key: "Historia", label: "Nuestra historia" },
+  { key: "Risas", label: "Risas" },
+] as const;
+const menuLabel = (item: NavItem) => FAMILY_LABEL[item.to] ?? item.label;
+const familyOf = (pathname: string) => FAMILIES.find((f) => f.members.some((m) => isRouteActive(pathname, m)));
+const isItemActive = (pathname: string, to: string) =>
+  isRouteActive(pathname, to) || (!!FAMILY_LABEL[to] && familyOf(pathname)?.members[0] === to);
+
+function FamilyTabs({ pathname }: { pathname: string }) {
+  const family = familyOf(pathname);
+  if (!family) return null;
+  return (
+    <div className="mb-5 flex gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/50 p-1 backdrop-blur">
+      {family.members.map((to) => {
+        const item = NAV.find((n) => n.to === to)!;
+        const active = isRouteActive(pathname, to);
+        return (
+          <Link key={to} to={item.to} className={cn("flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground", active && "bg-primary/15 text-primary shadow-[var(--shadow-glow)]")}>
+            <item.icon className="size-4" /> {item.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
 const MOBILE_PRIMARY = ["/panel", "/mensajes", "/notas", "/galeria"] as const;
@@ -290,7 +331,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const locationError = useLiveLocation(profile);
   useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters");
   const [sectionSearch, setSectionSearch] = useState("");
-  const visibleNav = NAV.filter((item) => item.label.toLocaleLowerCase("es").includes(sectionSearch.trim().toLocaleLowerCase("es")));
+  const searchTerm = sectionSearch.trim().toLocaleLowerCase("es");
+  const visibleNav = NAV.filter((item) =>
+    searchTerm
+      ? `${item.label} ${menuLabel(item)}`.toLocaleLowerCase("es").includes(searchTerm)
+      : !HIDDEN_IN_MENU.has(item.to),
+  );
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const hash = useRouterState({ select: (s) => s.location.hash });
@@ -349,15 +395,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Input aria-label="Buscar sección" placeholder="Buscar sección…" value={sectionSearch} onChange={(event) => setSectionSearch(event.target.value)} className="mb-3 h-9" />
         <ScrollArea className="min-h-0 flex-1 pr-2">
           <nav className="space-y-1">
-            {visibleNav.map((item) => (
-              <Link key={item.to} to={item.to} className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
-                isRouteActive(pathname, item.to) && "bg-sidebar-accent text-primary shadow-[inset_0_0_18px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
-              )}>
-                <item.icon className="size-4.5" />
-                {item.label}
-              </Link>
-            ))}
+            {CATEGORIES.map((c) => {
+              const items = visibleNav.filter((i) => i.cat === c.key);
+              if (!items.length) return null;
+              return (
+                <div key={c.key} className="pb-2">
+                  <p className="px-3 pb-1 pt-2 font-display text-[11px] uppercase tracking-[0.18em] text-primary/70">{c.label}</p>
+                  {items.map((item) => (
+                    <Link key={item.to} to={item.to} className={cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-all duration-200 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                      isItemActive(pathname, item.to) && "bg-sidebar-accent text-primary shadow-[inset_0_0_18px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
+                    )}>
+                      <item.icon className="size-4.5" />
+                      {menuLabel(item)}
+                    </Link>
+                  ))}
+                </div>
+              );
+            })}
           </nav>
         </ScrollArea>
         <Link to="/ajustes" className="mt-4 flex items-center gap-3 rounded-2xl border border-sidebar-border bg-card/40 p-3 transition-colors hover:bg-sidebar-accent">
@@ -466,7 +521,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {mounted && user && <PushBanner userId={user.id} />}
       {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
-      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><div key={pathname} className="animate-fade-up">{children}</div></main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><FamilyTabs pathname={pathname} /><div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
       <MusicPlayer />
@@ -478,7 +533,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 function MobileNav({ pathname }: { pathname: string }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const primary = NAV.filter((n) => (MOBILE_PRIMARY as readonly string[]).includes(n.to));
-  const secondary = NAV.filter((n) => !(MOBILE_PRIMARY as readonly string[]).includes(n.to));
+  const secondary = NAV.filter((n) => !(MOBILE_PRIMARY as readonly string[]).includes(n.to) && !HIDDEN_IN_MENU.has(n.to));
   const moreActive = secondary.some((n) => isRouteActive(pathname, n.to)) || pathname === "/ajustes";
 
   const itemClass = (active: boolean) =>
@@ -521,21 +576,29 @@ function MobileNav({ pathname }: { pathname: string }) {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" side="top" sideOffset={10} className="w-[min(23rem,calc(100vw-1.5rem))] border-border/80 bg-background/95 p-3 shadow-lift backdrop-blur-2xl">
-              <div className="grid max-h-[60vh] grid-cols-3 gap-1 overflow-y-auto">
-                {[...secondary, { to: "/ajustes" as const, label: "Ajustes", icon: Settings }].map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => setMoreOpen(false)}
-                    className={cn(
-                      "group flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[11px] font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground active:scale-95",
-                      isRouteActive(pathname, item.to) && "bg-primary/15 text-primary",
-                    )}
-                  >
-                    <span className="flex size-10 items-center justify-center rounded-xl bg-background/50 ring-1 ring-border transition-colors group-hover:ring-primary/40"><item.icon className="size-5" /></span>
-                    {item.label}
-                  </Link>
+              <div className="max-h-[62vh] space-y-3 overflow-y-auto">
+                {CATEGORIES.map((c) => (
+                  <div key={c.key}>
+                    <p className="mb-1 px-2 font-display text-xs uppercase tracking-[0.18em] text-primary/80">{c.label}</p>
+                    <div className="grid grid-cols-3 gap-1">
+                      {secondary.filter((i) => i.cat === c.key).map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          onClick={() => setMoreOpen(false)}
+                          className={cn(
+                            "group flex flex-col items-center gap-1.5 rounded-2xl px-1 py-2.5 text-center text-[11px] font-medium leading-tight text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent hover:text-foreground active:scale-95",
+                            isItemActive(pathname, item.to) && "bg-primary/15 text-primary",
+                          )}
+                        >
+                          <span className="flex size-10 items-center justify-center rounded-xl bg-background/50 ring-1 ring-border transition-colors group-hover:ring-primary/40"><item.icon className="size-5" /></span>
+                          {menuLabel(item)}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 ))}
+                <Link to="/ajustes" onClick={() => setMoreOpen(false)} className="flex items-center gap-2 rounded-2xl px-3 py-2 text-sm text-muted-foreground hover:bg-accent"><Settings className="size-4" /> Ajustes</Link>
               </div>
             </PopoverContent>
           </Popover>
