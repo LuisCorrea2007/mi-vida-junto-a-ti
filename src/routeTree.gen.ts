@@ -37,12 +37,14 @@ import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMensajesRouteImport } from './routes/_authenticated/mensajes'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as AuthenticatedPelisRouteImport } from './routes/_authenticated/pelis'
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
 import { Route as AuthenticatedRecetasRouteImport } from './routes/_authenticated/recetas'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
 import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
 import { Route as AuthenticatedSorpresasRouteImport } from './routes/_authenticated/sorpresas'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
+import { Route as AuthenticatedTriviaRouteImport } from './routes/_authenticated/trivia'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedConsejeroIndexRouteImport } from './routes/_authenticated/consejero.index'
@@ -191,6 +193,11 @@ const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   path: '/panel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPelisRoute = AuthenticatedPelisRouteImport.update({
+  id: '/pelis',
+  path: '/pelis',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPromesasRoute = AuthenticatedPromesasRouteImport.update({
   id: '/promesas',
   path: '/promesas',
@@ -219,6 +226,11 @@ const AuthenticatedSorpresasRoute = AuthenticatedSorpresasRouteImport.update({
 const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
   id: '/tareas',
   path: '/tareas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTriviaRoute = AuthenticatedTriviaRouteImport.update({
+  id: '/trivia',
+  path: '/trivia',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
@@ -282,12 +294,14 @@ export interface FileRoutesByFullPath {
   '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/pelis': typeof AuthenticatedPelisRoute
   '/promesas': typeof AuthenticatedPromesasRoute
   '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
+  '/trivia': typeof AuthenticatedTriviaRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -323,12 +337,14 @@ export interface FileRoutesByTo {
   '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/pelis': typeof AuthenticatedPelisRoute
   '/promesas': typeof AuthenticatedPromesasRoute
   '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
+  '/trivia': typeof AuthenticatedTriviaRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -366,12 +382,14 @@ export interface FileRoutesById {
   '/_authenticated/mensajes': typeof AuthenticatedMensajesRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/pelis': typeof AuthenticatedPelisRoute
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
   '/_authenticated/recetas': typeof AuthenticatedRecetasRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
   '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
   '/_authenticated/sorpresas': typeof AuthenticatedSorpresasRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
+  '/_authenticated/trivia': typeof AuthenticatedTriviaRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/consejero/$id': typeof AuthenticatedConsejeroIdRoute
@@ -409,12 +427,14 @@ export interface FileRouteTypes {
     | '/mensajes'
     | '/metas'
     | '/panel'
+    | '/pelis'
     | '/promesas'
     | '/recetas'
     | '/retos'
     | '/ruleta'
     | '/sorpresas'
     | '/tareas'
+    | '/trivia'
     | '/videos'
     | '/api/chat'
     | '/consejero/$id'
@@ -450,12 +470,14 @@ export interface FileRouteTypes {
     | '/mensajes'
     | '/metas'
     | '/panel'
+    | '/pelis'
     | '/promesas'
     | '/recetas'
     | '/retos'
     | '/ruleta'
     | '/sorpresas'
     | '/tareas'
+    | '/trivia'
     | '/videos'
     | '/api/chat'
     | '/consejero/$id'
@@ -492,12 +514,14 @@ export interface FileRouteTypes {
     | '/_authenticated/mensajes'
     | '/_authenticated/metas'
     | '/_authenticated/panel'
+    | '/_authenticated/pelis'
     | '/_authenticated/promesas'
     | '/_authenticated/recetas'
     | '/_authenticated/retos'
     | '/_authenticated/ruleta'
     | '/_authenticated/sorpresas'
     | '/_authenticated/tareas'
+    | '/_authenticated/trivia'
     | '/_authenticated/videos'
     | '/api/chat'
     | '/_authenticated/consejero/$id'
@@ -713,6 +737,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pelis': {
+      id: '/_authenticated/pelis'
+      path: '/pelis'
+      fullPath: '/pelis'
+      preLoaderRoute: typeof AuthenticatedPelisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/promesas': {
       id: '/_authenticated/promesas'
       path: '/promesas'
@@ -753,6 +784,13 @@ declare module '@tanstack/react-router' {
       path: '/tareas'
       fullPath: '/tareas'
       preLoaderRoute: typeof AuthenticatedTareasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/trivia': {
+      id: '/_authenticated/trivia'
+      path: '/trivia'
+      fullPath: '/trivia'
+      preLoaderRoute: typeof AuthenticatedTriviaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/videos': {
@@ -824,12 +862,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMensajesRoute: typeof AuthenticatedMensajesRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedPelisRoute: typeof AuthenticatedPelisRoute
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
   AuthenticatedRecetasRoute: typeof AuthenticatedRecetasRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
   AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
   AuthenticatedSorpresasRoute: typeof AuthenticatedSorpresasRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
+  AuthenticatedTriviaRoute: typeof AuthenticatedTriviaRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedConsejeroIdRoute: typeof AuthenticatedConsejeroIdRoute
   AuthenticatedNotasIdRoute: typeof AuthenticatedNotasIdRoute
@@ -861,12 +901,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMensajesRoute: AuthenticatedMensajesRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedPelisRoute: AuthenticatedPelisRoute,
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
   AuthenticatedRecetasRoute: AuthenticatedRecetasRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
   AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
   AuthenticatedSorpresasRoute: AuthenticatedSorpresasRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
+  AuthenticatedTriviaRoute: AuthenticatedTriviaRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedConsejeroIdRoute: AuthenticatedConsejeroIdRoute,
   AuthenticatedNotasIdRoute: AuthenticatedNotasIdRoute,

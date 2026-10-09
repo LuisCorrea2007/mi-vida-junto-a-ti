@@ -99,6 +99,13 @@
       "when": 1791515410399,
       "tag": "0013_recipes",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791516038333,
+      "tag": "0014_trivia_and_watchlist",
+      "breakpoints": true
     }
   ]
 }
