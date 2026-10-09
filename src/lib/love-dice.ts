@@ -1,4 +1,5 @@
-export type DiceLevel = 'tierno' | 'atrevido' | 'muy-atrevido';
+export type DiceLevel = 'tierno' | 'caliente' | 'atrevido' | 'muy-atrevido';
+export type DiceMode = 'dados' | 'verdad' | 'reto';
 export type LoveRoll = { id: string; action: string; place: string; seconds: number };
 
 export const DICE_LEVELS: Record<DiceLevel, { label: string; description: string; actions: string[] }> = {
@@ -20,6 +21,36 @@ export const DICE_LEVELS: Record<DiceLevel, { label: string; description: string
       'Dile una promesa pequeña que sí puedas cumplir',
     ],
   },
+  caliente: {
+    label: 'Caliente', description: 'La chispa de un beso que se hace esperar.',
+    actions: [
+      'Acérquense como para un beso y esperen una sonrisa antes de darlo',
+      'Bailen despacio con las manos entrelazadas',
+      'Susúrrale qué detalle suyo te distrae cuando lo tienes cerca',
+      'Dale un beso lento, si ambos lo desean',
+      'Invítale a elegir la canción de su próximo beso',
+      'Coquetea usando únicamente la mirada',
+      'Toma su mano y pídele una cita para esta misma noche',
+      'Dile muy cerca qué te encanta de su sonrisa',
+      'Dejen que un abrazo se convierta en un baile',
+      'Pide un beso como si fuera el primero de los dos',
+      'Dedícale una frase de su canción favorita al oído',
+      'Recreen su despedida más difícil con un abrazo',
+      'Elijan juntos un beso para celebrar esta noche',
+      'Déjale elegir entre un beso lento o un abrazo largo',
+      'Mírale a los ojos y cuenta por qué quieres quedarte cerca',
+      'Róbale una sonrisa antes de pedirle un beso',
+      'Inventen una señal privada para decir «quiero un beso»',
+      'Acérquense frente a frente sin apartar la sonrisa',
+      'Dile con voz baja qué recuerdo de sus besos guardarías',
+      'Invítale a bailar como en la escena final de una película',
+      'Ofrece un beso en la mano y espera su respuesta',
+      'Encuentren una canción que describa su química',
+      'Dale un abrazo por la cintura si le gusta',
+      'Dile una invitación romántica sin usar la palabra beso',
+      'Elijan cómo terminarían su cita perfecta esta noche',
+    ],
+  },
   atrevido: {
     label: 'Atrevido', description: 'Coqueteo, miradas y besos elegidos.',
     actions: [
@@ -39,7 +70,7 @@ export const DICE_LEVELS: Record<DiceLevel, { label: string; description: string
     ],
   },
   'muy-atrevido': {
-    label: 'Muy atrevido', description: 'Más complicidad, siempre al ritmo de ambos.',
+    label: 'Muy picante', description: 'Besos lentos, susurros y una noche sin prisa.',
     actions: [
       'Pídele un beso lento y deja que marque el ritmo', 'Dile al oído qué te hace perder la timidez',
       'Invítale a un baile lento sin apartar la mirada', 'Deja que tu pareja dirija un momento de besos',
@@ -67,6 +98,39 @@ export const DICE_PLACES = [
   'junto a las almohadas', 'donde estén cómodos ahora',
 ];
 export const DICE_DURATIONS = [15, 30, 45, 60, 90, 120];
+export const DICE_TRUTHS: Record<DiceLevel, string[]> = {
+  tierno: [
+    '¿Qué pequeño gesto mío te hace sentir más querido?', '¿Cuándo te sentiste en casa conmigo por primera vez?',
+    '¿Qué recuerdo nuestro repetirías hoy?', '¿Qué te gustaría que celebráramos más seguido?',
+    '¿Qué canción cuenta un pedacito de nosotros?', '¿Qué abrazo nuestro no has olvidado?',
+    '¿Qué plan sencillo te gustaría hacer conmigo?', '¿Qué quisieras que supiera sobre cómo cuidarte?',
+  ],
+  caliente: [
+    '¿Qué recuerdas del instante antes de nuestro primer beso?', '¿Qué hago sin darme cuenta que te parece irresistible?',
+    '¿Qué canción pondrías para bailar muy cerca conmigo?', '¿Cómo me pedirías un beso sin hablar?',
+    '¿Qué cita nuestra tuvo más química?', '¿Qué detalle de mi mirada te gusta?',
+    '¿Cuál sería tu despedida perfecta esta noche?', '¿Qué cumplido mío te hace sonrojar?',
+  ],
+  atrevido: [
+    '¿Qué momento nuestro te hizo perder la timidez?', '¿Cómo sería una cita secreta organizada por ti?',
+    '¿Qué beso nuestro repetirías sin cambiar nada?', '¿Qué frase te gustaría que te dijera al oído?',
+    '¿Cómo me coquetearías si nos conociéramos hoy?', '¿Qué gesto te hace querer acercarte más?',
+    '¿Cuál es tu rincón favorito para estar a solas conmigo?', '¿Qué invitación romántica todavía no te has atrevido a hacerme?',
+  ],
+  'muy-atrevido': [
+    '¿Cómo te gustaría que empezara una noche romántica sin distracciones?', '¿Qué hace que un beso sea inolvidable para ti?',
+    '¿Qué te gustaría que te susurrara cuando estamos muy cerca?', '¿Qué momento de película recrearías conmigo?',
+    '¿Prefieres que me acerque primero o tomar tú la iniciativa?', '¿Qué señal tuya me dice que quieres otro beso?',
+    '¿Cómo sería una escapada privada diseñada solo para nosotros?', '¿Qué límite quieres que siempre cuide, incluso en un momento de mucha química?',
+  ],
+};
+
+export function canStartChallenge(level: DiceLevel, ready: readonly boolean[]): boolean {
+  return level === 'tierno' || (ready[0] === true && ready[1] === true);
+}
+export function roundComplete(points: readonly number[], target: number): boolean {
+  return points.reduce((total, point) => total + point, 0) >= target;
+}
 export const LIKELY_QUESTIONS = [
   '¿Quién se enamoró primero?', '¿Quién planearía una escapada sorpresa?',
   '¿Quién guarda más fotos de los dos?', '¿Quién prepara el desayuno para sorprender?',
@@ -83,8 +147,8 @@ export const LIKELY_QUESTIONS = [
 ];
 
 export function diceCombinations(actions: readonly string[], places: readonly string[], durations: readonly number[]): LoveRoll[] {
-  return actions.flatMap((action, a) => places.flatMap((place, p) => durations.map(seconds => ({
-    id: `${a}:${p}:${seconds}`, action, place, seconds,
+  return actions.flatMap(action => places.flatMap(place => durations.map(seconds => ({
+    id: JSON.stringify([action, place, seconds]), action, place, seconds,
   }))));
 }
 
