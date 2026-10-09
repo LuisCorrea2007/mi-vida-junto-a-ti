@@ -80,7 +80,7 @@ function RecetasPage() {
     },
     onSuccess: () => {
       toast.success("Receta guardada en nuestro recetario");
-      notifyPartner(user!.id, "Nueva receta para cocinar juntos", form.title.trim(), "/recetas").catch(() => {});
+      notifyPartner(user!.id, { type: "receta", title: "Nueva receta para cocinar juntos", message: form.title.trim(), link: "/recetas" }).catch(() => {});
       setForm({ title: "", ingredients: "", steps: "", minutes: "", difficulty: "facil" });
       setOpen(false);
       refresh();
