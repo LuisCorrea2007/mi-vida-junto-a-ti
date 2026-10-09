@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RotateCcw, Trophy, Gamepad2, Heart, Dices, Brain, Flame, Laugh } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ function GamesHub() {
   const [moves,setMoves]=useState(0);
   const [locked,setLocked]=useState(false);
   const finished=matched.length===deck.length;
-  const [round,setRound]=useState(0);
+  const activeRound=useRef(0);
   const resetBoard=()=>{setBoard(Array(9).fill(null));setTurn("X");};
   const play=(i:number)=>{
     if(board[i] || outcome)return;
@@ -40,7 +40,7 @@ function GamesHub() {
     if(result)setScore(s=>({...s,[result]:s[result]+1}));
     setTurn(turn==="X"?"O":"X");
   };
-  const resetMemory=()=>{setDeck(shuffleDeck());setShown([]);setMatched([]);setMoves(0);setLocked(false);setRound(r=>r+1);};
+  const resetMemory=()=>{setDeck(shuffleDeck());setShown([]);setMatched([]);setMoves(0);setLocked(false);activeRound.current += 1;};
   const reveal=(i:number)=>{
     if(locked || shown.includes(i) || matched.includes(i) || finished)return;
     if(shown.length===0){setShown([i]);return;}
@@ -57,7 +57,7 @@ function GamesHub() {
       },850);
     }
   };
-  const activeRound=useMemo(()=>({current:round}),[round]);
+
   return <div className="mx-auto max-w-5xl space-y-6 pb-12">
     <div className="surface warm-gradient p-6 sm:p-9">
       <p className="text-xs font-semibold uppercase tracking-[.25em] text-primary">Un ratito para los dos</p>
