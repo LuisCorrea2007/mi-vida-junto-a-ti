@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, CalendarHeart, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
+import { BookOpen, CalendarHeart, ChevronLeft, ChevronRight, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfiles, anniversaryOf } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
@@ -45,6 +45,8 @@ function BookPage() {
   const { data: profiles } = useProfiles();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  const [page, setPage] = useState(0);
+  const [flipMode,setFlipMode] = useState(false);
   const years = useMemo(() => [currentYear, currentYear - 1, currentYear - 2], [currentYear]);
 
   const range = { from: `${year}-01-01`, to: `${year}-12-31T23:59:59` };
@@ -116,6 +118,12 @@ function BookPage() {
     },
   });
 
+  const pages = data ? [
+    { title: "Nuestro año", subtitle: "Un capítulo de nuestra historia", kind: "cover" as const },
+    ...data.photos.map((p)=>({ title:p.caption || "Un momento especial", subtitle:new Date(p.created_at).toLocaleDateString("es",{day:"numeric",month:"long",year:"numeric"}),kind:"photo" as const,photo:p })),
+    ...data.milestones.map((m)=>({title:m.title,subtitle:m.description || m.date,kind:"text" as const})),
+    ...data.notes.map((n)=>({title:n.title,subtitle:n.content,kind:"text" as const})),
+  ] : [];
   const anniversary = anniversaryOf(profiles);
   const names = profiles?.map((p) => p.name).filter(Boolean).join(" & ") ?? "Ustedes dos";
   const days = anniversary
@@ -132,12 +140,13 @@ function BookPage() {
             Un resumen de su año, listo para imprimir o guardar como PDF.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="rounded-full" onClick={()=>{setFlipMode(v=>!v);setPage(0);}}>{flipMode?"Ver libro completo":"Pasar páginas"}</Button>
           <div className="flex rounded-full border border-border">
             {years.map((y) => (
               <button
                 key={y}
-                onClick={() => setYear(y)}
+                onClick={() => {setYear(y);setPage(0);}}
                 className={
                   y === year
                     ? "rounded-full bg-primary/15 px-4 py-1.5 text-xs font-medium text-primary"
@@ -154,7 +163,19 @@ function BookPage() {
         </div>
       </header>
 
-      {isLoading || !data ? (
+      {flipMode && data && (
+        <section className="surface mx-auto max-w-3xl space-y-4 p-4 sm:p-8 print:hidden" aria-label="Álbum interactivo">
+          <div className="flex min-h-[360px] flex-col items-center justify-center gap-5 rounded-2xl border-4 border-double border-primary/30 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-6 text-center shadow-inner sm:min-h-[480px]">
+            {pages[page]?.kind==="photo" && pages[page].photo ? <div className="w-full max-w-sm"><BookPhoto path={pages[page].photo.file_path} caption={pages[page].photo.caption}/></div> : <BookOpen className="size-16 text-primary" />}
+            <p className="text-xs uppercase tracking-[0.3em] text-primary">{year} · {page+1} / {pages.length}</p>
+            <h2 className="max-w-xl font-display text-3xl font-semibold sm:text-4xl">{pages[page]?.kind==="cover" ? names : pages[page]?.title}</h2>
+            <p className="max-w-xl whitespace-pre-line text-sm text-muted-foreground">{pages[page]?.subtitle}</p>
+          </div>
+          <div className="flex items-center justify-between gap-3"><Button variant="outline" onClick={()=>setPage(p=>Math.max(0,p-1))} disabled={page===0}><ChevronLeft className="mr-1 size-4"/>Anterior</Button><span role="status" className="text-xs text-muted-foreground">Página {page+1} de {pages.length}</span><Button variant="outline" onClick={()=>setPage(p=>Math.min(pages.length-1,p+1))} disabled={page>=pages.length-1}>Siguiente<ChevronRight className="ml-1 size-4"/></Button></div>
+          <p className="text-center text-xs text-muted-foreground">Las fotos, notas e hitos provienen de su biblioteca existente. Utiliza «Imprimir / PDF» para obtener el libro completo.</p>
+        </section>
+      )}
+      {flipMode ? null : isLoading || !data ? (
         <div className="space-y-4">
           <Skeleton className="h-64 rounded-2xl" />
           <Skeleton className="h-40 rounded-2xl" />
