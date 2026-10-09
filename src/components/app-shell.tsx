@@ -12,6 +12,7 @@ import {
   CalendarHeart,
   Mail,
   Dice5,
+  Gamepad2,
   Flame,
   Gift,
   HandHeart,
@@ -97,6 +98,7 @@ const NAV = [
   { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
   { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
   { to: "/trivia", label: "Trivia", icon: Brain, cat: "Risas" },
+  { to: "/juegos", label: "Juegos", icon: Gamepad2, cat: "Risas" },
 ] as const;
 
 type NavItem = (typeof NAV)[number];
