@@ -1,3 +1,4 @@
+import { celebrate } from "@/lib/celebrate";
 import { useMemo, useState } from "react";
 import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
@@ -157,7 +158,7 @@ function MetasPage() {
       }
     },
     onSuccess: (_d, goal) => {
-      const reached = !!goal.target_amount && savedFor(goal.id) + Number(amounts[goal.id]) >= Number(goal.target_amount);
+      const reached = !!goal.target_amount && savedOf(goal.id) + Number(amounts[goal.id]) >= Number(goal.target_amount);
       setAmounts((prev) => ({ ...prev, [goal.id]: "" }));
       burst(10);
       if (reached) { celebrate(48); toast.success("¡Lo lograron! Este sueño ya es de los dos"); }

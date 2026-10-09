@@ -350,6 +350,20 @@ END:VCALENDAR`;
         </Dialog>
       </header>
 
+      {nextDate && (
+        <section className="surface warm-gradient animate-fade-up flex flex-wrap items-center justify-between gap-4 p-6">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-gold">Nuestra próxima cita</p>
+            <p className="mt-2 font-display text-2xl font-semibold">{nextDate.title}</p>
+            <p className="text-sm text-muted-foreground">
+              {new Date(`${nextDate.date}T00:00:00`).toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long" })}
+              {nextDate.time ? ` · ${nextDate.time.slice(0, 5)}` : ""}{nextDate.location ? ` · ${nextDate.location}` : ""}
+            </p>
+          </div>
+          <Countdown targetDate={nextDate.date} time={nextDate.time} />
+        </section>
+      )}
+
       <section className="surface p-5">
         <div className="flex items-center justify-between">
           <Button
