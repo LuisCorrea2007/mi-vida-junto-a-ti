@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import {
   TILE,WORLD_W,WORLD_H,pointKey,isWater,isHouse,
-  type Scene,type Skin,type Point,type DecorId
+  type Scene,type Skin,type HairStyle,type Emote,type Point,type DecorId
 } from "@/lib/couple-world";
 
-type Player={id:string;x:number;y:number;skin:Skin;name:string};
+type Player={id:string;x:number;y:number;skin:Skin;hair:HairStyle;emote?:Emote|null;name:string};
 type Props={
-  scene:Scene; decor:Record<string,DecorId>; hero:Point; skin:Skin;
+  scene:Scene; decor:Record<string,DecorId>; hero:Point; skin:Skin;hair:HairStyle;emote?:Emote|null;
   partner?:Player; editing:boolean; night:boolean; onTile:(p:Point)=>void;
 };
 type Ctx=CanvasRenderingContext2D;
@@ -135,7 +135,7 @@ function drawDecor(ctx:Ctx,id:DecorId,x:number,y:number,t:number){
       b("#755945",7,17,3,7);b("#755945",15,17,3,7);break;
   }
 }
-function avatar(ctx:Ctx,x:number,y:number,skin:Skin,t:number,partner=false){
+function avatar(ctx:Ctx,x:number,y:number,skin:Skin,t:number,partner=false,hair:HairStyle="short",emote:Emote|null=null){
   const X=x*TILE,Y=y*TILE;
   const shirt={rose:"#e6789d",mint:"#63b8aa",lavender:"#a38bd4",gold:"#e6af5f"}[skin];
   const bob=Math.floor(t/230)%2;
@@ -144,12 +144,20 @@ function avatar(ctx:Ctx,x:number,y:number,skin:Skin,t:number,partner=false){
   C(ctx,"#f2ba91",X+9,Y+5,9,9);
   C(ctx,partner?"#483a5a":"#59414a",X+8,Y+3,11,5);
   C(ctx,partner?"#483a5a":"#59414a",X+7,Y+5,3,6);
+  const hairColor=partner?"#4c354b":"#674756";
+  if(hair==="long"){C(ctx,hairColor,X+6,Y+6,4,11);C(ctx,hairColor,X+18,Y+6,4,11);}
+  if(hair==="curly"){C(ctx,hairColor,X+6,Y+3,5,5);C(ctx,hairColor,X+14,Y+2,6,6);C(ctx,hairColor,X+8,Y+1,8,4);}
+  if(hair==="cap"){C(ctx,"#eac17b",X+6,Y+3,16,6);C(ctx,"#b56f84",X+10,Y+1,9,4);}
+  if(emote==="heart"){C(ctx,"#f17598",X+9,Y-13,5,6);C(ctx,"#f17598",X+16,Y-13,5,6);C(ctx,"#fc9eb4",X+12,Y-8,7,5);C(ctx,"#f17598",X+14,Y-3,3,3);}
+  if(emote==="wave"){C(ctx,"#f1bb89",X+22,Y-10,5,10);C(ctx,"#f1bb89",X+20,Y-6,8,5);C(ctx,"#fff1ce",X+20,Y-13,3,4);}
+  if(emote==="dance"){C(ctx,"#ffe5a3",X+5,Y-13,4,4);C(ctx,"#ffe5a3",X+22,Y-9,4,4);C(ctx,"#fff0ca",X+16,Y-15,3,3);}
   C(ctx,"#33394a",X+11,Y+10,2,2);C(ctx,"#33394a",X+16,Y+10,2,2);
   C(ctx,"#f2ba91",X+4,Y+13,3,7);C(ctx,"#f2ba91",X+19,Y+13,3,7);
   C(ctx,"#fff5f1",X+12,Y+15,3,2);
 }
-export function WorldCanvas({scene,decor,hero,skin,partner,editing,night,onTile}:Props){
+export function WorldCanvas({scene,decor,hero,skin,hair,emote,partner,editing,night,onTile}:Props){
   const canvasRef=useRef<HTMLCanvasElement>(null);
+  const smoothPeer=useRef({id:"",x:0,y:0});
   useEffect(()=>{
     const canvas=canvasRef.current,ctx=canvas?.getContext("2d");
     if(!canvas||!ctx)return;
@@ -174,8 +182,17 @@ export function WorldCanvas({scene,decor,hero,skin,partner,editing,night,onTile}
           C(ctx,"#eec6a1",13*TILE+4,13*TILE+3,16,10);
           C(ctx,"#c77f86",13*TILE+8,13*TILE+1,8,4);
         }
-        if(partner&&partner.x>=0&&partner.y>=0)avatar(ctx,partner.x,partner.y,partner.skin,t,true);
-        avatar(ctx,hero.x,hero.y,skin,t);
+        if(partner&&partner.x>=0&&partner.y>=0){
+          const ghost=smoothPeer.current;
+          if(ghost.id!==partner.id || Math.hypot(ghost.x-partner.x,ghost.y-partner.y)>7){
+            ghost.x=partner.x;ghost.y=partner.y;ghost.id=partner.id;
+          }else{
+            ghost.x+=(partner.x-ghost.x)*0.25;
+            ghost.y+=(partner.y-ghost.y)*0.25;
+          }
+          avatar(ctx,ghost.x,ghost.y,partner.skin,t,true,partner.hair,partner.emote);
+        }
+        avatar(ctx,hero.x,hero.y,skin,t,false,hair,emote);
         if(night){
           C(ctx,"rgba(23,32,85,.22)",0,0,WORLD_W*TILE,WORLD_H*TILE);
           for(let i=0;i<24;i++){
@@ -191,7 +208,7 @@ export function WorldCanvas({scene,decor,hero,skin,partner,editing,night,onTile}
     }
     animation=requestAnimationFrame(paint);
     return()=>cancelAnimationFrame(animation);
-  },[scene,decor,hero.x,hero.y,skin,partner?.x,partner?.y,partner?.skin,editing,night]);
+  },[scene,decor,hero.x,hero.y,skin,hair,emote,partner?.id,partner?.x,partner?.y,partner?.skin,partner?.hair,partner?.emote,editing,night]);
   return <canvas
     ref={canvasRef} width={WORLD_W*TILE} height={WORLD_H*TILE}
     className="block h-auto w-full cursor-crosshair rounded-xl border-4 border-[#725d62] shadow-2xl"
