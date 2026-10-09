@@ -27,8 +27,15 @@ function BoardScene({ kind, state, selected, hint, onMove, disabled }: { kind: B
         const p = disc(kind === 't3' ? 0.31 : 0.38, 0.22, v % 2 ? colors.rose : colors.gold);
         p.position.set(x, kind === 'c4' ? 0.8 : 0.18, z); p.userData['index'] = i; clickable.push(p); view.scene.add(p);
         if (kind === 'c4') falling.push(p);
-        if (v > 2 || kind === 't3') {
-          const cap = disc(v > 2 ? 0.2 : 0.12, 0.09, colors.white); cap.position.set(x, 0.34, z); view.scene.add(cap);
+        if (kind === 't3') {
+          if (v === 1) for (const angle of [-Math.PI / 4, Math.PI / 4]) {
+            const stroke = box(0.46, 0.06, 0.08, colors.white); stroke.rotation.y = angle; stroke.position.set(x, 0.33, z); view.scene.add(stroke);
+          } else {
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.035, 10, 32), new THREE.MeshStandardMaterial({ color: colors.ink }));
+            ring.rotation.x = Math.PI / 2; ring.position.set(x, 0.33, z); view.scene.add(ring);
+          }
+        } else if (v > 2) {
+          const cap = disc(0.2, 0.09, colors.white); cap.position.set(x, 0.34, z); view.scene.add(cap);
         }
       }
     });
