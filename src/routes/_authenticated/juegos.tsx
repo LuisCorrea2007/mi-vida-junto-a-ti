@@ -673,13 +673,13 @@ function AirHockey({ difficulty }: { difficulty: Difficulty }) {
       me.x = W / 2; me.y = H - 70; bot.x = W / 2; bot.y = 70;
     };
 
-    const collide = (p: typeof me) => {
+    const collide = (p: { x: number; y: number; r: number }, isMe: boolean) => {
       const dx = puck.x - p.x, dy = puck.y - p.y;
       const d = Math.hypot(dx, dy), min = puck.r + p.r;
       if (d > 0 && d < min) {
         const nx = dx / d, ny = dy / d;
         puck.x = p.x + nx * min; puck.y = p.y + ny * min;
-        const pvx = p === me ? (p.x - p.px) : 0, pvy = p === me ? (p.y - p.py) : 0;
+        const pvx = isMe ? (p.x - me.px) : 0, pvy = isMe ? (p.y - me.py) : 0;
         puck.vx = nx * 7 + pvx * 0.6; puck.vy = ny * 7 + pvy * 0.6;
       }
     };
