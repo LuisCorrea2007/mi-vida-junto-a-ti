@@ -52,8 +52,9 @@ function GamesHub() {
     }else{
       setLocked(true);
       // The timeout is limited to transient UI state; reset changes the round token.
+      const currentRound = activeRound.current;
       window.setTimeout(()=>{
-        if(activeRound.current===round){setShown([]);setLocked(false);}
+        if(activeRound.current===currentRound){setShown([]);setLocked(false);}
       },850);
     }
   };
