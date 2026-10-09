@@ -1,5 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { streamText, type ModelMessage, type UIMessage, type ToolSet } from "ai";
+import { streamText, generateId, type ModelMessage, type UIMessage, type ToolSet } from "ai";
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -52,7 +52,7 @@ export function createResponsesCall(
   return {
     result,
     response: async (originalMessages: UIMessage[] = [], onFinish?: (message:UIMessage)=>Promise<void>) => {
-      const response=result.toUIMessageStreamResponse({ originalMessages, sendReasoning: true,
+      const response=result.toUIMessageStreamResponse({ originalMessages, generateMessageId:generateId, sendReasoning: true,
         onError:(e)=>failure?.message ?? (e instanceof Error?e.message:'La IA no pudo responder.'),
         ...(onFinish?{onFinish:async({responseMessage})=>onFinish(responseMessage)}:{}) });
       const wrapped=await withLovableAiGatewayRunIdHeader(response,runIdFetch);

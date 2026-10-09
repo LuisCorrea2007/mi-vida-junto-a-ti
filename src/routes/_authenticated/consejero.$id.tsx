@@ -54,7 +54,7 @@ type Row = { sdk_id?:string | null; id: string; role: string; parts: unknown; us
 
 function rowsToMessages(rows: Row[]): UIMessage[] {
   return rows.map((r) => ({
-    id: r.sdk_id ?? r.id,
+    id: r.sdk_id || r.id,
     role: r.role as UIMessage["role"],
     parts: (Array.isArray(r.parts) ? r.parts : []) as UIMessage["parts"],
   }));

@@ -386,7 +386,7 @@ export async function handleAdvisor(request: Request) {
     if(blocked)return Response.json({error:blocked.message},{status:blocked.status});
     const {data:saved,error:historyError}=await supabase.from('advisor_messages').select('id,sdk_id,role,parts').eq('thread_id',thread.id).order('created_at');
     if(historyError)throw new Error('No pudimos leer el historial de esta charla.');
-    const history=(saved??[]).map(row=>({id:row.sdk_id??row.id,role:row.role as UIMessage['role'],parts:row.parts as unknown as UIMessage['parts']}));
+    const history=(saved??[]).map(row=>({id:row.sdk_id||row.id,role:row.role as UIMessage['role'],parts:row.parts as unknown as UIMessage['parts']}));
     messages=reconcileAdvisorHistory(history,messages);
     const lastUser=[...messages].reverse().find(m=>m.role==='user');
     if(lastUser&&!history.some(m=>m.id===lastUser.id)){
