@@ -713,7 +713,7 @@ function AirHockey({ difficulty }: { difficulty: Difficulty }) {
         if (puck.y < puck.r && !inGoal) { puck.y = puck.r; puck.vy = Math.abs(puck.vy); }
         if (puck.y > H - puck.r && !inGoal) { puck.y = H - puck.r; puck.vy = -Math.abs(puck.vy); }
 
-        collide(me); collide(bot);
+        collide(me, true); collide(bot, false);
 
         if (puck.y < -puck.r) {
           const s = { ...scoreRef.current, me: scoreRef.current.me + 1 };
@@ -838,7 +838,7 @@ function FutbolFichas({ difficulty }: { difficulty: Difficulty }) {
       const ball = discs.find((d) => d.team === 2)!;
       const mine = discs.filter((d) => d.team === 1);
       // Ficha más cercana a la bola
-      let best = mine[0], bd = Infinity;
+      let best = mine[0]!, bd = Infinity;
       for (const d of mine) {
         const dist = Math.hypot(d.x - ball.x, d.y - ball.y);
         if (dist < bd) { bd = dist; best = d; }
@@ -875,7 +875,7 @@ function FutbolFichas({ difficulty }: { difficulty: Difficulty }) {
         }
         // Colisiones entre discos
         for (let i = 0; i < discs.length; i++) for (let j = i + 1; j < discs.length; j++) {
-          const a = discs[i], b = discs[j];
+          const a = discs[i]!, b = discs[j]!;
           const dx = b.x - a.x, dy = b.y - a.y;
           const dist = Math.hypot(dx, dy), min = a.r + b.r;
           if (dist > 0 && dist < min) {
