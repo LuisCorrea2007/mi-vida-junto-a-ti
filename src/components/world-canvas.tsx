@@ -211,7 +211,7 @@ export function WorldCanvas({scene,decor,hero,skin,hair,emote,partner,editing,ni
   },[scene,decor,hero.x,hero.y,skin,hair,emote,partner?.id,partner?.x,partner?.y,partner?.skin,partner?.hair,partner?.emote,editing,night]);
   return <canvas
     ref={canvasRef} width={WORLD_W*TILE} height={WORLD_H*TILE}
-    className="block h-auto w-full cursor-crosshair rounded-xl border-4 border-[#725d62] shadow-2xl"
+    className="block h-auto w-full min-w-[560px] cursor-crosshair rounded-xl border-4 border-[#725d62] shadow-2xl sm:min-w-0"
     style={{imageRendering:"pixelated",touchAction:"manipulation"}}
     role="img" aria-label="Mundo virtual 2D interactivo. Usa el teclado o los controles para moverte."
     onPointerDown={event=>{
