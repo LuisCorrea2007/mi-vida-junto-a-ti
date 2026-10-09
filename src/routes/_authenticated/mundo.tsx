@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCouple } from "@/hooks/use-couple";
 import { WorldCanvas } from "@/components/world-canvas";
+import { WorldAdventures } from "@/components/world-adventures";
 import { mergeWorlds } from "@/lib/world-merge";
 import {
   ITEMS, WORLD_W, WORLD_H, pointKey, canWalk, canPlace, findPath,
@@ -331,7 +332,7 @@ function MundoPage(){
       <p><strong>Hay cambios en otro dispositivo.</strong> Tu versión local está protegida. Puedes guardar una copia y combinar las decoraciones de ambos.</p>
       <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={exportBackup}>Descargar respaldo</Button><Button size="sm" onClick={combineChanges}>Combinar cambios</Button></div>
     </div>}
-    <div className="relative rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
+    <div className="relative overflow-x-auto rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
       <WorldCanvas scene={scene} hero={hero} skin={skin} hair={hair} emote={emote} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,hair:partner.hair,emote:partner.emote,name:partner.name}:undefined}
         decor={decor} editing={editing} night={night} onTile={clickTile}/>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/80">
@@ -387,6 +388,7 @@ function MundoPage(){
         <div className="flex items-center gap-2 text-xs text-muted-foreground"><Users className="size-4"/>{couple?.partnerId?"Espacio vinculado":"Vincula a tu pareja en Ajustes"}</div>
       </aside>
     </div>
+    <WorldAdventures userId={user?.id} scene={scene} hero={hero} steps={steps} furnitureCount={Object.keys(world.garden).length+Object.keys(world.home).length}/>
     <p className="text-center text-xs text-muted-foreground">Tu jardín siempre se guarda en este dispositivo. Para verlo desde dos dispositivos, despliega la migración SQL y utiliza «Guardar cambios».</p>
   </main>;
 }
