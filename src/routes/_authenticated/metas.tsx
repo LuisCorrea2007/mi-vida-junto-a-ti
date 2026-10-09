@@ -157,9 +157,11 @@ function MetasPage() {
       }
     },
     onSuccess: (_d, goal) => {
+      const reached = !!goal.target_amount && savedFor(goal.id) + Number(amounts[goal.id]) >= Number(goal.target_amount);
       setAmounts((prev) => ({ ...prev, [goal.id]: "" }));
       burst(10);
-      toast.success("¡Un paso más cerca!");
+      if (reached) { celebrate(48); toast.success("¡Lo lograron! Este sueño ya es de los dos"); }
+      else toast.success("Cada moneda que guardamos es un mañana juntos");
       qc.invalidateQueries({ queryKey: ["goal_contributions"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -345,9 +347,12 @@ function MetasPage() {
                       </span>
                       <span className="font-semibold text-primary">{pct}%</span>
                     </div>
-                    <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-secondary">
-                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+                    <div className="relative mt-2 h-3.5 overflow-hidden rounded-full bg-secondary">
+                      <div className="shine h-full rounded-full bg-gradient-to-r from-primary to-gold transition-all duration-700" style={{ width: `${pct}%` }} />
                     </div>
+                    <p className="mt-2 text-xs italic text-muted-foreground">
+                      {pct === 100 ? "Alcancía llena: este sueño ya les pertenece." : (pct ?? 0) >= 50 ? "Más de la mitad del camino, tomados de la mano." : "Cada aporte es una promesa que se va cumpliendo."}
+                    </p>
                   </div>
                 ) : (
                   saved > 0 && (

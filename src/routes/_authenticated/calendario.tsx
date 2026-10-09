@@ -251,12 +251,17 @@ END:VCALENDAR`;
     selected ? dayEvents(selected) : (events ?? []).filter((e) => e.date >= todayStr)
   ).filter((e) => filter === "todas" || e.category === filter);
 
+  const nextDate = (events ?? [])
+    .filter((e) => new Date(`${e.date}T${e.time || "23:59:00"}`) > today)
+    .sort((a, b) => `${a.date}${a.time ?? ""}`.localeCompare(`${b.date}${b.time ?? ""}`))[0];
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Citas</h1>
-          <p className="text-sm text-muted-foreground">Propón, acepten y no olviden ninguna fecha.</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-primary">Nuestras citas</p>
+          <h1 className="font-display text-3xl font-semibold">Los días que esperamos con ilusión</h1>
+          <p className="text-sm text-muted-foreground">Propón un plan y deja que la cuenta regresiva haga latir el corazón más rápido.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
