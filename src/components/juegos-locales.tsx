@@ -255,7 +255,7 @@ function Parchis() {
         })}
         <div style={{ gridRow: "3 / span 7", gridColumn: "3 / span 7" }} className="flex flex-col items-center justify-center gap-3 rounded-xl bg-background/60 p-2">
           <button onClick={roll} disabled={die !== null || winner >= 0}
-            className={cn("grid size-16 place-items-center rounded-2xl border-2 border-gold bg-panel text-3xl font-bold text-gold transition-transform",
+            className={cn("grid size-16 place-items-center rounded-2xl border-2 border-gold text-3xl font-bold text-gold transition-transform",
               rolling && "animate-spin", die === null && winner < 0 && "press")}
             style={{ background: C.panel }}>{die ?? "?"}</button>
           <p className="text-xs text-muted-foreground">{die === null ? `Toca el dado, ${P[turn]}` : "Mueve una ficha"}</p>
