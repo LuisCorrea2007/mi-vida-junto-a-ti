@@ -108,14 +108,25 @@ function DiaryPage() {
     list.sort((a, b) => (order === "recientes" ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date)));
     return list;
   }, [milestones, yearFilter, query, order]);
-
+  const today = new Date();
+  const todayKey = today.toISOString().slice(5, 10);
+  const onThisDay = (milestones ?? []).filter((m) => m.date.slice(5, 10) === todayKey && Number(m.date.slice(0, 4)) < today.getFullYear());
+  const ago = (iso: string) => {
+    const days = Math.floor((today.getTime() - new Date(`${iso}T00:00:00`).getTime()) / 86_400_000);
+    if (days < 0) return "Muy pronto";
+    if (days === 0) return "Hoy mismo";
+    if (days < 30) return `Hace ${days} ${days === 1 ? "día" : "días"}`;
+    if (days < 365) { const m = Math.floor(days / 30); return `Hace ${m} ${m === 1 ? "mes" : "meses"}`; }
+    const y = Math.floor(days / 365); return `Hace ${y} ${y === 1 ? "año" : "años"}`;
+  };
 
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Diario</h1>
-          <p className="text-sm text-muted-foreground">La historia de los dos, momento a momento.</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-primary">Nuestro diario</p>
+          <h1 className="font-display text-3xl font-semibold">Cada capítulo que escribimos juntos</h1>
+          <p className="text-sm text-muted-foreground">Lo que vivimos no se pierde: se guarda aquí, con la fecha exacta en que el corazón lo supo.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -166,8 +177,21 @@ function DiaryPage() {
         </Dialog>
       </header>
 
+      {onThisDay.length > 0 && (
+        <section className="surface warm-gradient animate-fade-up p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-gold">Un día como hoy</p>
+          <ul className="mt-3 space-y-2">
+            {onThisDay.map((m) => (
+              <li key={m.id} className="font-display text-lg">
+                {m.title} <span className="text-sm text-muted-foreground">· {ago(m.date)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="surface p-6 text-center">
-        <p className="text-xs uppercase tracking-[0.25em] text-primary">Pregunta para hablar hoy</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-primary">Para conversar esta noche</p>
         <p className="mt-3 font-display text-xl">{pickOfTheDay(DAILY_QUESTIONS, 3)}</p>
       </section>
 
@@ -229,6 +253,7 @@ function DiaryPage() {
                         month: "long",
                         year: "numeric",
                       })}
+                      <span className="ml-2 normal-case text-primary">{ago(m.date)}</span>
                     </p>
                     <h2 className="mt-1 font-display text-xl font-semibold">{m.title}</h2>
                   </div>

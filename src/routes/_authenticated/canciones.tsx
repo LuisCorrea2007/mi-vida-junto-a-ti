@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Glyph } from "@/components/glyph";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, Music, Plus, Quote as QuoteIcon, Search, Star, Trash2 } from "lucide-react";
+import { ExternalLink, Music, Play, Plus, Quote as QuoteIcon, Search, Star, Trash2 } from "lucide-react";
+import { playTrack, toEmbed } from "@/components/music-player";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -352,14 +353,22 @@ function CancionesPage() {
                       </button>
                     );
                   })}
+                  {s.url && toEmbed(s.url) && (
+                    <button
+                      onClick={() => playTrack({ title: s.title, artist: s.artist, embed: toEmbed(s.url!)! })}
+                      className="press ml-auto flex items-center gap-1 rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary"
+                    >
+                      <Play className="size-3 fill-primary" /> Que suene mientras recorremos
+                    </button>
+                  )}
                   {s.url && (
                     <a
                       href={s.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="ml-auto flex items-center gap-1 text-xs text-primary hover:underline"
+                      className={cn("flex items-center gap-1 text-xs text-primary hover:underline", !toEmbed(s.url) && "ml-auto")}
                     >
-                      Escuchar <ExternalLink className="size-3" />
+                      Abrir <ExternalLink className="size-3" />
                     </a>
                   )}
                   {s.user_id === user?.id && (

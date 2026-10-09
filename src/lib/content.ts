@@ -44,6 +44,13 @@ export const ROMANTIC_QUOTES: string[] = [
   "Amarte es lo más fácil que hago.",
   "Gracias por ser mi calma y mi aventura.",
   "El amor no se mide en tiempo, se mide en momentos como los nuestros.",
+  "Si volviera a nacer, te buscaría antes.",
+  "Tu risa es el sonido que quiero escuchar toda la vida.",
+  "No sé qué traerá mañana, pero sé que quiero vivirlo contigo.",
+  "Me enamoro de ti en las cosas pequeñas, una y otra vez.",
+  "Eres la casualidad más bonita que me pasó.",
+  "Contigo aprendí que la paz también puede tener nombre.",
+  "Cada latido que no entiendo, lo entiendo cuando te miro.",
 ];
 
 export const DAILY_QUESTIONS: string[] = [
@@ -54,6 +61,13 @@ export const DAILY_QUESTIONS: string[] = [
   "¿Cuál es tu recuerdo favorito de nosotros?",
   "¿Qué canción te recuerda a mí?",
   "¿Qué te gustaría hacer en nuestra próxima cita?",
+  "¿En qué momento supiste que esto era de verdad?",
+  "¿Qué pequeño gesto mío te hace sentir más amada?",
+  "Si pudiéramos repetir un solo día juntos, ¿cuál sería?",
+  "¿Qué te gustaría que nunca cambie entre nosotros?",
+  "¿Dónde te imaginas que estaremos en cinco años?",
+  "¿Qué miedo te gustaría que enfrentemos juntos?",
+  "¿Qué te enamoró de mí sin que yo lo supiera?",
 ];
 
 export function labelFor(options: Option[], value?: string | null): string {

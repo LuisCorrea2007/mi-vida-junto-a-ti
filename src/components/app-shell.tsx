@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ThinkingOfYou } from "@/components/thinking-of-you";
+import { MusicPlayer } from "@/components/music-player";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -468,6 +469,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
+      <MusicPlayer />
       <MobileNav pathname={pathname} />
     </div>
   );
