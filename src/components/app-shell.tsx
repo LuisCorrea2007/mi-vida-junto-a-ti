@@ -63,35 +63,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/panel", label: "Panel", icon: Sparkles },
-  { to: "/consejero", label: "Consejero", icon: MessageCircleHeart },
-  { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart },
-  { to: "/notas", label: "Notas", icon: NotebookPen },
-  { to: "/galeria", label: "Galería", icon: Images },
-  { to: "/conexion", label: "Conexión", icon: Handshake },
-  { to: "/videos", label: "Videos", icon: Video },
-  { to: "/cartas", label: "Cartas", icon: Mail },
-  { to: "/dados", label: "Dados", icon: Dice5 },
-  { to: "/calendario", label: "Citas", icon: CalendarHeart },
-  { to: "/cerca", label: "Ahora", icon: MapPin },
-  { to: "/deseos", label: "Deseos", icon: Stars },
-  { to: "/dedicatorias", label: "Dedicatorias", icon: Gift },
-  { to: "/diario", label: "Diario", icon: Heart },
-  { to: "/diversion", label: "Diversión", icon: Laugh },
-  { to: "/capsulas", label: "Cápsulas", icon: Hourglass },
-  { to: "/retos", label: "Retos", icon: Flame },
-  { to: "/canciones", label: "Canciones", icon: Music },
-  { to: "/cupones", label: "Cupones", icon: Ticket },
-  { to: "/metas", label: "Metas", icon: PiggyBank },
-  { to: "/tareas", label: "Lista", icon: ListChecks },
-  { to: "/libro", label: "Libro", icon: BookOpen },
-  { to: "/ruleta", label: "Ruleta", icon: Dices },
-  { to: "/lugares", label: "Lugares", icon: MapPin },
-  { to: "/estadisticas", label: "Números", icon: BarChart3 },
-  { to: "/cumplidos", label: "Cumplidos", icon: Quote },
-  { to: "/promesas", label: "Promesas", icon: HandHeart },
-  { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper },
+  { to: "/panel", label: "Panel", icon: Sparkles, cat: "Amor" },
+  { to: "/consejero", label: "Consejero", icon: MessageCircleHeart, cat: "Amor" },
+  { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart, cat: "Amor" },
+  { to: "/conexion", label: "Conexión", icon: Handshake, cat: "Amor" },
+  { to: "/cartas", label: "Cartas", icon: Mail, cat: "Amor" },
+  { to: "/cupones", label: "Cupones", icon: Ticket, cat: "Amor" },
+  { to: "/cumplidos", label: "Cumplidos", icon: Quote, cat: "Amor" },
+  { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper, cat: "Amor" },
+  { to: "/dedicatorias", label: "Dedicatorias", icon: Gift, cat: "Amor" },
+  { to: "/promesas", label: "Promesas", icon: HandHeart, cat: "Amor" },
+  { to: "/calendario", label: "Citas", icon: CalendarHeart, cat: "Vida" },
+  { to: "/cerca", label: "Ahora", icon: MapPin, cat: "Vida" },
+  { to: "/metas", label: "Metas", icon: PiggyBank, cat: "Vida" },
+  { to: "/tareas", label: "Lista", icon: ListChecks, cat: "Vida" },
+  { to: "/deseos", label: "Deseos", icon: Stars, cat: "Vida" },
+  { to: "/lugares", label: "Lugares", icon: MapPin, cat: "Vida" },
+  { to: "/recetas", label: "Recetas", icon: ChefHat, cat: "Vida" },
+  { to: "/notas", label: "Notas", icon: NotebookPen, cat: "Historia" },
+  { to: "/galeria", label: "Galería", icon: Images, cat: "Historia" },
+  { to: "/videos", label: "Videos", icon: Video, cat: "Historia" },
+  { to: "/diario", label: "Diario", icon: Heart, cat: "Historia" },
+  { to: "/canciones", label: "Canciones", icon: Music, cat: "Historia" },
+  { to: "/capsulas", label: "Cápsulas", icon: Hourglass, cat: "Historia" },
+  { to: "/libro", label: "Libro", icon: BookOpen, cat: "Historia" },
+  { to: "/estadisticas", label: "Números", icon: BarChart3, cat: "Historia" },
+  { to: "/dados", label: "Dados", icon: Dice5, cat: "Risas" },
+  { to: "/ruleta", label: "Ruleta", icon: Dices, cat: "Risas" },
+  { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
+  { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
 ] as const;
+
+type NavItem = (typeof NAV)[number];
+
+/** Secciones hermanas que se muestran como una sola entrada del menú, con pestañas arriba. */
+const FAMILIES: { label: string; members: readonly string[] }[] = [
+  { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
+  { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
+  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion"] },
+];
+const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
+const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
+const CATEGORIES = [
+  { key: "Amor", label: "Amor e intimidad" },
+  { key: "Vida", label: "Vida y planes" },
+  { key: "Historia", label: "Nuestra historia" },
+  { key: "Risas", label: "Risas" },
+] as const;
+const menuLabel = (item: NavItem) => FAMILY_LABEL[item.to] ?? item.label;
+const familyOf = (pathname: string) => FAMILIES.find((f) => f.members.some((m) => isRouteActive(pathname, m)));
+const isItemActive = (pathname: string, to: string) =>
+  isRouteActive(pathname, to) || (!!FAMILY_LABEL[to] && familyOf(pathname)?.members[0] === to);
+
+function FamilyTabs({ pathname }: { pathname: string }) {
+  const family = familyOf(pathname);
+  if (!family) return null;
+  return (
+    <div className="mb-5 flex gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/50 p-1 backdrop-blur">
+      {family.members.map((to) => {
+        const item = NAV.find((n) => n.to === to)!;
+        const active = isRouteActive(pathname, to);
+        return (
+          <Link key={to} to={item.to} className={cn("flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground", active && "bg-primary/15 text-primary shadow-[var(--shadow-glow)]")}>
+            <item.icon className="size-4" /> {item.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
 
 /** En el celular: 4 accesos fijos y el resto dentro de "Más". */
 const MOBILE_PRIMARY = ["/panel", "/mensajes", "/notas", "/galeria"] as const;
