@@ -52,7 +52,7 @@ function BookPage() {
 
   const range = { from: `${year}-01-01`, to: `${year}-12-31T23:59:59` };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["libro", year],
     queryFn: async () => {
       const [photos,milestones,events,notes,dedications,songs,videos] = await Promise.all([
@@ -127,13 +127,18 @@ function BookPage() {
         </div>
       </header>
 
+      {error && <div role="alert" className="surface space-y-3 p-5">
+        <p className="font-semibold">No pudimos cargar todos los recuerdos de este año.</p>
+        <p className="text-sm text-muted-foreground">{error instanceof Error?error.message:"Se produjo un error al consultar tus datos."}</p>
+        <Button size="sm" variant="outline" onClick={()=>void refetch()}>Reintentar</Button>
+      </div>}
       {flipMode && data && <AlbumFlipbook stories={stories} names={names} year={year} />}
-      {isLoading || !data ? (
+      {isLoading || (!data && !error) ? (
         <div className="space-y-4">
           <Skeleton className="h-64 rounded-2xl" />
           <Skeleton className="h-40 rounded-2xl" />
         </div>
-      ) : (
+      ) : !data ? null : (
         <div className={flipMode ? "hidden print:block print:space-y-10" : "space-y-8 print:space-y-10"}>
           {/* Portada */}
           <section className="surface warm-gradient break-inside-avoid p-5 text-center sm:p-10 print:rounded-none">
