@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
+import { AlbumFlipbook, type AlbumStory } from "@/components/album-flipbook";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, CalendarHeart, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
+import { BookOpen, CalendarHeart, ChevronLeft, ChevronRight, Gift, Heart, Images, Music, NotebookPen, Printer, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfiles, anniversaryOf } from "@/hooks/use-profiles";
 import { useSignedUrl } from "@/lib/media";
@@ -45,6 +46,7 @@ function BookPage() {
   const { data: profiles } = useProfiles();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  const [flipMode,setFlipMode] = useState(false);
   const years = useMemo(() => [currentYear, currentYear - 1, currentYear - 2], [currentYear]);
 
   const range = { from: `${year}-01-01`, to: `${year}-12-31T23:59:59` };
@@ -60,7 +62,7 @@ function BookPage() {
           .lte("created_at", range.to)
           .order("is_favorite", { ascending: false })
           .order("created_at")
-          .limit(12),
+          .limit(30),
         supabase
           .from("milestones")
           .select("id, title, description, date")
@@ -80,7 +82,7 @@ function BookPage() {
           .lte("created_at", range.to)
           .order("is_favorite", { ascending: false })
           .order("created_at")
-          .limit(8),
+          .limit(20),
         supabase
           .from("videos_diarios")
           .select("id", { count: "exact", head: true })
@@ -95,7 +97,7 @@ function BookPage() {
           .lte("created_at", range.to)
           .order("is_favorite", { ascending: false })
           .order("created_at")
-          .limit(6),
+          .limit(12),
         supabase
           .from("songs")
           .select("id, title, artist, note")
@@ -116,6 +118,15 @@ function BookPage() {
     },
   });
 
+  const stories: AlbumStory[] = data ? [
+    {id:"cover",title:"Nuestro año",text:"Una historia de dos.",kind:"cover"},
+    ...data.photos.map(p=>({id:"photo-"+p.id,title:p.caption||"Un momento especial",text:p.caption||"Un recuerdo que merece una página.",kind:"photo" as const,date:p.created_at,path:p.file_path,favorite:p.is_favorite})),
+    ...data.milestones.map(m=>({id:"milestone-"+m.id,title:m.title,text:m.description||"",kind:"milestone" as const,date:m.date})),
+    ...data.events.map(e=>({id:"event-"+e.id,title:e.title,text:e.location||"Una cita para recordar",kind:"event" as const,date:e.date})),
+    ...data.notes.map(n=>({id:"note-"+n.id,title:n.title,text:n.content,kind:"note" as const,date:n.created_at})),
+    ...data.dedications.map(d=>({id:"dedication-"+d.id,title:d.title,text:d.content||"",kind:"dedication" as const,date:d.created_at})),
+    ...data.songs.map(n=>({id:"song-"+n.id,title:n.title,text:[n.artist,n.note].filter(Boolean).join(" · "),kind:"song" as const})),
+  ] : [];
   const anniversary = anniversaryOf(profiles);
   const names = profiles?.map((p) => p.name).filter(Boolean).join(" & ") ?? "Ustedes dos";
   const days = anniversary
@@ -132,12 +143,13 @@ function BookPage() {
             Un resumen de su año, listo para imprimir o guardar como PDF.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="rounded-full" onClick={()=>{setFlipMode(v=>!v);}}>{flipMode?"Ver libro completo":"Pasar páginas"}</Button>
           <div className="flex rounded-full border border-border">
             {years.map((y) => (
               <button
                 key={y}
-                onClick={() => setYear(y)}
+                onClick={() => {setYear(y);}}
                 className={
                   y === year
                     ? "rounded-full bg-primary/15 px-4 py-1.5 text-xs font-medium text-primary"
@@ -154,13 +166,14 @@ function BookPage() {
         </div>
       </header>
 
+      {flipMode && data && <AlbumFlipbook stories={stories} names={names} year={year} />}
       {isLoading || !data ? (
         <div className="space-y-4">
           <Skeleton className="h-64 rounded-2xl" />
           <Skeleton className="h-40 rounded-2xl" />
         </div>
       ) : (
-        <div className="space-y-8 print:space-y-10">
+        <div className={flipMode ? "hidden print:block print:space-y-10" : "space-y-8 print:space-y-10"}>
           {/* Portada */}
           <section className="surface warm-gradient break-inside-avoid p-5 text-center sm:p-10 print:rounded-none">
             <BookOpen className="mx-auto size-8 text-primary" />

@@ -19,6 +19,7 @@ import {
   Handshake,
   Hourglass,
   Heart,
+  Home,
   Images,
   Laugh,
   LayoutGrid,
@@ -68,6 +69,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/panel", label: "Panel", icon: Sparkles, cat: "Amor" },
+  { to: "/mundo", label: "Nuestro Mundo", icon: Home, cat: "Amor" },
   { to: "/consejero", label: "Consejero", icon: MessageCircleHeart, cat: "Amor" },
   { to: "/mensajes", label: "Mensajes", icon: MessageCircleHeart, cat: "Amor" },
   { to: "/conexion", label: "Conexión", icon: Handshake, cat: "Amor" },
