@@ -106,6 +106,13 @@
       "when": 1791516038333,
       "tag": "0014_trivia_and_watchlist",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1791519401409,
+      "tag": "0015_couple_rituals_and_care",
+      "breakpoints": true
     }
   ]
 }

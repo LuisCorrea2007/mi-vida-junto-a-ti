@@ -135,6 +135,33 @@ export type Database = {
         }
         Relationships: []
       }
+      care_cards: {
+        Row: {
+          category: string
+          created_at: string
+          detail: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          detail: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          detail?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenge_completions: {
         Row: {
           challenge_id: string
@@ -533,6 +560,33 @@ export type Database = {
           time_available?: string
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      couple_rituals: {
+        Row: {
+          cadence: string
+          created_at: string
+          detail: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          cadence?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          cadence?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -1869,6 +1923,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ritual_completions: {
+        Row: {
+          created_at: string
+          id: string
+          period: string
+          ritual_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period: string
+          ritual_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period?: string
+          ritual_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ritual_completions_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "couple_rituals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roulette_items: {
         Row: {
