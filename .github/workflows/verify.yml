@@ -23,7 +23,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: World model tests
-        run: bun test src/lib/couple-world.test.ts
+        run: bun test src/lib/couple-world.test.ts src/lib/world-merge.test.ts src/lib/album-pages.test.ts
 
       - name: Build
         run: bun run build
