@@ -9,3 +9,6 @@
 - [x] Retirar Cine y añadir Cartas de amor con sobres cerrados, avisos y transiciones de página.
 - [x] Íconos SVG en lugar de emojis, nueva tipografía, Dados del amor y menú renovado.
 - [x] Juegos en el mismo celular: Damas, Parchís, Serpientes, Pong, Catapultas y Cocina juntos.
+- [ ] Retirar Naval, Cocina, Catapultas y Parchís del código y del catálogo.
+- [ ] Renovar juegos restantes con escenas 3D, modos compartidos y bots de decisión local.
+- [ ] Verificar reglas, interacción y carga de Juegos.
