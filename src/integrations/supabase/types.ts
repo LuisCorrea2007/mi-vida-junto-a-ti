@@ -20,6 +20,7 @@ export type Database = {
           id: string
           parts: Json
           role: string
+          sdk_id: string | null
           thread_id: string
           user_id: string
         }
@@ -28,6 +29,7 @@ export type Database = {
           id?: string
           parts?: Json
           role: string
+          sdk_id?: string | null
           thread_id: string
           user_id: string
         }
@@ -36,6 +38,7 @@ export type Database = {
           id?: string
           parts?: Json
           role?: string
+          sdk_id?: string | null
           thread_id?: string
           user_id?: string
         }
