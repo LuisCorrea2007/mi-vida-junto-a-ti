@@ -315,7 +315,9 @@ function CoupleGameScreen({ game, userId, partnerId, onExit }: {
 
   const save = useMutation({
     mutationFn: async (patch: { board: Record<string, unknown>; turn: string; winner?: string | null }) => {
-      const { error } = await supabase.from("couple_games").update(patch).eq("id", game.id);
+      const { error } = await supabase.from("couple_games")
+        .update({ board: patch.board as never, turn: patch.turn, winner: patch.winner ?? null })
+        .eq("id", game.id);
       if (error) throw error;
       if (patch.winner && patch.winner !== "draw" && partnerId) {
         await notifyPartner({
@@ -358,8 +360,8 @@ function CoupleGameScreen({ game, userId, partnerId, onExit }: {
 /* ---------- Tres en raya ---------- */
 
 function t3Winner(cells: (string | null)[]): string | null {
-  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  for (const [a, b, c] of lines) if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
+  const lines: [number, number, number][] = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for (const [a, b, c] of lines) if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a] ?? null;
   return cells.every(Boolean) ? "draw" : null;
 }
 
@@ -367,7 +369,7 @@ function TresEnRaya({ game, userId, myTurn, save }: {
   game: GameRow; userId: string; myTurn: boolean;
   save: (p: { board: Record<string, unknown>; turn: string; winner?: string | null }) => void;
 }) {
-  const cells = (game.board.cells as (string | null)[]) ?? Array(9).fill(null);
+  const cells = (game.board["cells"] as (string | null)[]) ?? Array(9).fill(null);
   const myMark = game.user_id === userId ? "X" : "O";
   const play = (i: number) => {
     if (!myTurn || cells[i] || game.winner) return;
