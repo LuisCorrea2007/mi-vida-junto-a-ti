@@ -1831,6 +1831,45 @@ export type Database = {
         }
         Relationships: []
       }
+      recipes: {
+        Row: {
+          cooked_count: number
+          created_at: string
+          difficulty: string
+          favorite: boolean
+          id: string
+          ingredients: string | null
+          minutes: number | null
+          steps: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          cooked_count?: number
+          created_at?: string
+          difficulty?: string
+          favorite?: boolean
+          id?: string
+          ingredients?: string | null
+          minutes?: number | null
+          steps?: string | null
+          title: string
+          user_id?: string
+        }
+        Update: {
+          cooked_count?: number
+          created_at?: string
+          difficulty?: string
+          favorite?: boolean
+          id?: string
+          ingredients?: string | null
+          minutes?: number | null
+          steps?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       roulette_items: {
         Row: {
           category: string
