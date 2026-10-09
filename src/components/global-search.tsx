@@ -49,6 +49,8 @@ const KIND_ORDER = [
   "Retos",
   "Diario",
   "Consejero",
+  "Rituales",
+  "Cuidarnos",
 ];
 
 async function searchAll(q: string): Promise<Result[]> {
@@ -66,7 +68,7 @@ async function searchAll(q: string): Promise<Result[]> {
     capsules,
     challenges,
     milestones,
-    advisorThreads,
+    advisorThreads, rituals, care,
   ] = await Promise.all([
     supabase.from("notes").select("id, title, category").ilike("title", like).limit(6),
     supabase.from("dedications").select("id, title, kind").ilike("title", like).limit(6),
@@ -81,6 +83,8 @@ async function searchAll(q: string): Promise<Result[]> {
     supabase.from("challenges").select("id, title, description").ilike("title", like).limit(6),
     supabase.from("milestones").select("id, title, date").ilike("title", like).limit(6),
     supabase.from("advisor_threads").select("id, title, is_shared").ilike("title", like).limit(6),
+    supabase.from("couple_rituals").select("id,title,detail").ilike("title", like).limit(6),
+    supabase.from("care_cards").select("id,title,detail").ilike("title", like).limit(6),
   ]);
   const out: Result[] = [];
   for (const n of notes.data ?? [])
@@ -171,6 +175,8 @@ async function searchAll(q: string): Promise<Result[]> {
       title: thread.title,
       to: `/consejero/${thread.id}`,
     });
+  for (const r of rituals.data ?? []) out.push({kind:"Rituales",label:"Ritual",icon:Heart,id:r.id,title:r.title,sub:r.detail,to:"/rituales"});
+  for (const r of care.data ?? []) out.push({kind:"Cuidarnos",label:"Cuidado",icon:Heart,id:r.id,title:r.title,sub:r.detail,to:"/cuidarnos"});
   return out;
 }
 

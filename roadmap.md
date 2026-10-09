@@ -1,14 +1,10 @@
-## Roadmap
-- [x] Retirar Juegos, sus accesos y recursos exclusivos, sin borrar los datos de la pareja.
-- [x] Mantener la ubicación en vivo al navegar por toda la app, respetando permiso y duración elegida; verificado con GPS simulado, sin modificar ubicaciones reales.
-- [x] Mejorar actualizaciones en vivo con invalidación agrupada y recuperación al volver o recuperar conexión.
-- [x] Facilitar encontrar secciones y acceder a mensajes desde el menú.
-- [x] Verificar navegación, ubicación y ausencia de errores.
-- [x] Investigar e integrar catálogo de licencias abiertas declaradas; disponibilidad limitada en español, sin prometer doblaje o estrenos.
-- [x] Mejorar la experiencia compartida mediante navegación y actualizaciones transversales; no equivale a añadir funciones específicas nuevas en cada sección.
-- [x] Retirar Cine y añadir Cartas de amor con sobres cerrados, avisos y transiciones de página.
-- [x] Íconos SVG en lugar de emojis, nueva tipografía, Dados del amor y menú renovado.
-- [x] Juegos en el mismo celular: Damas, Parchís, Serpientes, Pong, Catapultas y Cocina juntos.
-- [x] Retirar Naval, Cocina, Catapultas y Parchís del código y del catálogo, conservando datos antiguos privados.
-- [x] Renovar siete juegos con escenas 3D, práctica, mismo dispositivo y bots de decisión local; a distancia disponible para Tres en raya, Conecta 4 y Damas, no para los cuatro arcade.
-- [x] Verificar siete reglas y carga, pausa, revancha y respuesta del bot; partidas entre ambas cuentas no verificadas.
+## Actualización de pareja
+- [x] Retirar Juegos y sus recursos exclusivos, conservar enlaces antiguos y datos privados.
+- [x] Añadir Rituales compartidos con seguimiento diario/semanal.
+- [x] Añadir Cuidarnos con necesidades, límites y alegrías propias.
+- [x] Reparar Consejero con IA económica, respuestas en vivo, historial y confirmación de acciones.
+- [x] Incorporar acceso contextual al Consejero desde las secciones sin llamadas automáticas.
+- [x] Verificar creación, edición, eliminación y seguimiento en Rituales y Cuidarnos; respuesta real y seguimiento del Consejero, restauración de historial y rechazo de una acción; cuatro pruebas de reglas e historial pasan.
+- [ ] Verificar guardado de una acción aprobada y sincronización entre dos cuentas; ampliar IA más allá de los accesos contextuales.
+
+La IA utiliza créditos del espacio de trabajo; no ofrece uso gratuito ilimitado. Las consultas se inician únicamente por acción del usuario.

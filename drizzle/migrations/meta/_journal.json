@@ -106,6 +106,34 @@
       "when": 1791516038333,
       "tag": "0014_trivia_and_watchlist",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1791519401409,
+      "tag": "0015_couple_rituals_and_care",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1791519453579,
+      "tag": "0016_advisor_message_deduplication",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1791519686449,
+      "tag": "0017_advisor_gateway_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791519724687,
+      "tag": "0018_advisor_action_receipts",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { AdvisorShortcut } from "@/components/advisor-shortcut";
 import { ThinkingOfYou } from "@/components/thinking-of-you";
 import { MusicPlayer } from "@/components/music-player";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -12,7 +13,6 @@ import {
   CalendarHeart,
   Mail,
   Dice5,
-  Gamepad2,
   Flame,
   Gift,
   HandHeart,
@@ -76,6 +76,8 @@ const NAV = [
   { to: "/cumplidos", label: "Cumplidos", icon: Quote, cat: "Amor" },
   { to: "/sorpresas", label: "Sorpresas", icon: PartyPopper, cat: "Amor" },
   { to: "/dedicatorias", label: "Dedicatorias", icon: Gift, cat: "Amor" },
+  { to: "/rituales", label: "Rituales", icon: Heart, cat: "Amor" },
+  { to: "/cuidarnos", label: "Cuidarnos", icon: HandHeart, cat: "Amor" },
   { to: "/promesas", label: "Promesas", icon: HandHeart, cat: "Amor" },
   { to: "/calendario", label: "Citas", icon: CalendarHeart, cat: "Vida" },
   { to: "/cerca", label: "Ahora", icon: MapPin, cat: "Vida" },
@@ -98,7 +100,6 @@ const NAV = [
   { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
   { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
   { to: "/trivia", label: "Trivia", icon: Brain, cat: "Risas" },
-  { to: "/juegos", label: "Juegos", icon: Gamepad2, cat: "Risas" },
 ] as const;
 
 type NavItem = (typeof NAV)[number];
@@ -107,7 +108,7 @@ type NavItem = (typeof NAV)[number];
 const FAMILIES: { label: string; members: readonly string[] }[] = [
   { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
   { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
-  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
+  { label: "Complicidad", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
 ];
 const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
 const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
@@ -128,7 +129,8 @@ function FamilyTabs({ pathname }: { pathname: string }) {
   return (
     <div className="mb-5 flex gap-1 overflow-x-auto rounded-2xl border border-border/70 bg-card/50 p-1 backdrop-blur">
       {family.members.map((to) => {
-        const item = NAV.find((n) => n.to === to)!;
+        const item = NAV.find((n) => n.to === to);
+        if (!item) return null;
         const active = isRouteActive(pathname, to);
         return (
           <Link key={to} to={item.to} className={cn("flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground", active && "bg-primary/15 text-primary shadow-[var(--shadow-glow)]")}>
@@ -335,7 +337,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile(user?.id);
   const { data: avatar } = useSignedUrl(profile?.avatar_url);
   const locationError = useLiveLocation(profile);
-  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters");
+  useRealtime("profiles", "couple_members", "notifications", "notes", "photos", "albums", "events", "wishes", "private_messages", "private_message_reactions", "moods", "time_capsules", "challenges", "songs", "quotes", "couple_tasks", "couple_goals", "goal_contributions", "dedications", "milestones", "coupons", "places", "compliments", "promises", "surprises", "couple_checkins", "couple_agreements", "deep_questions", "question_responses", "couple_plans", "love_letters", "couple_rituals", "ritual_completions", "care_cards");
   const [sectionSearch, setSectionSearch] = useState("");
   const searchTerm = sectionSearch.trim().toLocaleLowerCase("es");
   const visibleNav = NAV.filter((item) =>
@@ -527,7 +529,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {mounted && user && <PushBanner userId={user.id} />}
       {locationError && <div role="status" className="border-b border-border bg-accent/40 px-4 py-2 text-xs text-muted-foreground">{locationError} <Link to="/cerca" className="text-primary underline">Ver ubicación</Link></div>}
 
-      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><FamilyTabs pathname={pathname} /><div key={pathname} className="animate-fade-up">{children}</div></main>
+      <main className="mx-auto min-w-0 max-w-7xl px-3 pb-28 pt-5 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"><FamilyTabs pathname={pathname} />{!pathname.startsWith("/consejero") && !["/rituales", "/cuidarnos", "/panel"].includes(pathname) && <div className="mb-4 flex justify-end"><AdvisorShortcut subject={NAV.find(item => isRouteActive(pathname,item.to))?.label.toLocaleLowerCase("es") ?? "nuestro día a día"} /></div>}<div key={pathname} className="animate-fade-up">{children}</div></main>
       </div>
 
       <MusicPlayer />

@@ -14,12 +14,58 @@ export type Database = {
   }
   public: {
     Tables: {
+      advisor_action_receipts: {
+        Row: {
+          created_at: string
+          result: string | null
+          thread_id: string
+          tool_call_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          result?: string | null
+          thread_id: string
+          tool_call_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          result?: string | null
+          thread_id?: string
+          tool_call_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      advisor_gateway_guard: {
+        Row: {
+          blocked_at: string
+          message: string
+          scope: string
+          status: number
+        }
+        Insert: {
+          blocked_at?: string
+          message: string
+          scope: string
+          status: number
+        }
+        Update: {
+          blocked_at?: string
+          message?: string
+          scope?: string
+          status?: number
+        }
+        Relationships: []
+      }
       advisor_messages: {
         Row: {
           created_at: string
           id: string
           parts: Json
           role: string
+          sdk_id: string | null
           thread_id: string
           user_id: string
         }
@@ -28,6 +74,7 @@ export type Database = {
           id?: string
           parts?: Json
           role: string
+          sdk_id?: string | null
           thread_id: string
           user_id: string
         }
@@ -36,6 +83,7 @@ export type Database = {
           id?: string
           parts?: Json
           role?: string
+          sdk_id?: string | null
           thread_id?: string
           user_id?: string
         }
@@ -131,6 +179,33 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      care_cards: {
+        Row: {
+          category: string
+          created_at: string
+          detail: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          detail: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          detail?: string
+          id?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -533,6 +608,33 @@ export type Database = {
           time_available?: string
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      couple_rituals: {
+        Row: {
+          cadence: string
+          created_at: string
+          detail: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          cadence?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          cadence?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -1869,6 +1971,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ritual_completions: {
+        Row: {
+          created_at: string
+          id: string
+          period: string
+          ritual_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period: string
+          ritual_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period?: string
+          ritual_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ritual_completions_ritual_id_fkey"
+            columns: ["ritual_id"]
+            isOneToOne: false
+            referencedRelation: "couple_rituals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roulette_items: {
         Row: {

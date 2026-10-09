@@ -197,6 +197,8 @@ function Panel() {
             { label: "Cápsula del tiempo", to: "/capsulas" as const },
             { label: "Regalar un cupón", to: "/cupones" as const },
             { label: "Nueva meta juntos", to: "/metas" as const },
+            { label: "Nuestros rituales", to: "/rituales" as const },
+            { label: "Cuidarnos mejor", to: "/cuidarnos" as const },
             { label: "Añadir un pendiente", to: "/tareas" as const },
           ].map((a) => (
             <Button key={a.label} asChild variant="outline" size="sm" className="rounded-full">
