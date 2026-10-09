@@ -28,7 +28,7 @@ export function SportsGame({ kind, mode, level }: { kind: Sport; mode: Mode; lev
       const rim = box(2.2, 0.24, 0.18, colors.wood); rim.position.set(x, 0.04, y); view.scene.add(rim);
     }
     const entities: { body: Matter.Body; mesh: THREE.Mesh; team: number }[] = [];
-    function add(x: number, y: number, radius: number, team: number, fixed = false) {
+    function add(x: number, y: number, radius: number, team: number, fixed = false): { body: Matter.Body; mesh: THREE.Mesh; team: number } {
       const body = Bodies.circle(x, y, radius, { isStatic: fixed, restitution: 0.96, friction: 0, frictionAir: kind === 'fichas' ? 0.035 : 0.002, density: team === 2 ? 0.001 : 0.002 });
       const mesh = disc(radius, team === 2 ? 0.17 : 0.3, team === 0 ? colors.rose : team === 1 ? colors.gold : colors.white);
       mesh.position.set(x, 0.16, y); view.scene.add(mesh); Composite.add(engine.world, body);
@@ -160,7 +160,7 @@ export function SportsGame({ kind, mode, level }: { kind: Sport; mode: Mode; lev
       <div className="flex gap-6"><span className="text-primary text-xl font-semibold">Rosa {score[0]}</span><span className="text-gold text-xl font-semibold">{mode === 'bot' ? 'Bot' : mode === 'solo' ? 'Práctica' : 'Oro'} {score[1]}</span></div>
       <div className="flex"><Button variant="ghost" size="icon" aria-label="Pausar o continuar" title="Pausar o continuar" onClick={() => setPaused(p => !p)}>{paused ? <Play /> : <Pause />}</Button><Button variant="ghost" size="icon" title="Revancha" aria-label="Revancha" onClick={reset}><RotateCcw /></Button></div>
     </div>
-    <p role="status" className="text-sm text-muted-foreground">{winner !== null ? `Ganó ${winner ? mode === 'bot' ? 'el bot' : 'Oro' : 'Rosa'}` : paused ? 'Partida en pausa' : kind === 'fichas' ? `Turno de ${turn ? mode === 'bot' ? 'el bot' : 'Oro' : 'Rosa'}` : mode === 'solo' ? 'Práctica libre' : `Primero en llegar a ${kind === 'fichas' ? 3 : 5}`}</p>
+    <p role="status" className="text-sm text-muted-foreground">{winner !== null ? `Ganó ${winner ? mode === 'bot' ? 'el bot' : 'Oro' : 'Rosa'}` : paused ? 'Partida en pausa' : kind === 'fichas' ? `Turno de ${turn ? mode === 'bot' ? 'el bot' : 'Oro' : 'Rosa'}` : mode === 'solo' ? 'Práctica libre' : 'Primero en llegar a 5'}</p>
     <div ref={host} className="game-scene aspect-[2/3] max-h-[680px] w-full" />
   </div>;
 }
