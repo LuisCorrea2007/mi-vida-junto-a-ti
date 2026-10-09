@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { describe, expect, test } from 'bun:test';
 import { applyMove, boardWinner, chooseMove, initialBoard, legalMoves, type BoardState } from './board';
 describe('Board rules and local AI', () => {
