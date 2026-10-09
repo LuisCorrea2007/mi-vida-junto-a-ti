@@ -1,4 +1,5 @@
 ## Actualización de pareja
+- [ ] Ampliar Dados con tres niveles sugerentes no explícitos, al menos mil combinaciones por nivel, turnos, pases, temporizador, filtros y favoritos de sesión; comprobar reglas e interfaz.
 - [x] Retirar Juegos y sus recursos exclusivos, conservar enlaces antiguos y datos privados.
 - [x] Añadir Rituales compartidos con seguimiento diario/semanal.
 - [x] Añadir Cuidarnos con necesidades, límites y alegrías propias.

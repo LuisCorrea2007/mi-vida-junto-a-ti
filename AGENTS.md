@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Decisions
+- Love dice uses a browser-safe combinatorial catalog and session-only play state: counted options represent complete action/place/duration combinations, not thousands of individually authored prompts.
 - Dev and build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by sandbox reinstalls, which broke the preview and publishing.
 
 - Shared location tracking lives in the authenticated shell and only follows a previously consented sharing session; navigation must not stop updates or extend consent.
