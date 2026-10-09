@@ -31,6 +31,8 @@ import {
   NotebookPen,
   PartyPopper,
   ChefHat,
+  Clapperboard,
+  Brain,
   Settings,
   Sparkles,
   Stars,
@@ -81,6 +83,7 @@ const NAV = [
   { to: "/deseos", label: "Deseos", icon: Stars, cat: "Vida" },
   { to: "/lugares", label: "Lugares", icon: MapPin, cat: "Vida" },
   { to: "/recetas", label: "Recetas", icon: ChefHat, cat: "Vida" },
+  { to: "/pelis", label: "Pelis", icon: Clapperboard, cat: "Vida" },
   { to: "/notas", label: "Notas", icon: NotebookPen, cat: "Historia" },
   { to: "/galeria", label: "Galería", icon: Images, cat: "Historia" },
   { to: "/videos", label: "Videos", icon: Video, cat: "Historia" },
@@ -93,6 +96,7 @@ const NAV = [
   { to: "/ruleta", label: "Ruleta", icon: Dices, cat: "Risas" },
   { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
   { to: "/diversion", label: "Diversión", icon: Laugh, cat: "Risas" },
+  { to: "/trivia", label: "Trivia", icon: Brain, cat: "Risas" },
 ] as const;
 
 type NavItem = (typeof NAV)[number];
@@ -101,7 +105,7 @@ type NavItem = (typeof NAV)[number];
 const FAMILIES: { label: string; members: readonly string[] }[] = [
   { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
   { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
-  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion"] },
+  { label: "Risas y juegos", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
 ];
 const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
 const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
