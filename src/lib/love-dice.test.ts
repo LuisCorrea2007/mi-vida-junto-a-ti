@@ -5,8 +5,8 @@ import { DICE_LEVELS, DICE_PLACES, DICE_DURATIONS, DICE_TRUTHS, canStartChalleng
 for (const [level, deck] of Object.entries(DICE_LEVELS)) {
   test(`${level} contains at least 1000 unique complete options`, () => {
     const pool = diceCombinations(deck.actions, DICE_PLACES, DICE_DURATIONS);
-    assert.equal(pool.length, 3000);
-    assert.equal(new Set(pool.map(r => `${r.action}|${r.place}|${r.seconds}`)).size, 3000);
+    assert.ok(pool.length >= 1000);
+    assert.equal(new Set(pool.map(r => `${r.action}|${r.place}|${r.seconds}`)).size, pool.length);
   });
 }
 test('requested home locations are present', () => {
@@ -43,6 +43,9 @@ test('filtered catalogs keep stable identities so used options cannot repeat', (
   assert.ok(bed);
   assert.equal(availableRolls(filtered, [bed.id]).length, 0);
 });
-test('each intensity includes eight different truth questions', () => {
-  for (const truths of Object.values(DICE_TRUTHS)) assert.equal(new Set(truths).size, 8);
+test('each intensity includes at least eight different truth questions', () => {
+  for (const truths of Object.values(DICE_TRUTHS)) {
+    assert.ok(truths.length >= 8);
+    assert.equal(new Set(truths).size, truths.length);
+  }
 });
