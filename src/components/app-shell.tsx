@@ -95,6 +95,7 @@ const NAV = [
   { to: "/capsulas", label: "Cápsulas", icon: Hourglass, cat: "Historia" },
   { to: "/libro", label: "Libro", icon: BookOpen, cat: "Historia" },
   { to: "/estadisticas", label: "Números", icon: BarChart3, cat: "Historia" },
+  { to: "/juegos", label: "Juegos", icon: Dices, cat: "Risas" },
   { to: "/dados", label: "Dados", icon: Dice5, cat: "Risas" },
   { to: "/ruleta", label: "Ruleta", icon: Dices, cat: "Risas" },
   { to: "/retos", label: "Retos", icon: Flame, cat: "Risas" },
@@ -108,7 +109,7 @@ type NavItem = (typeof NAV)[number];
 const FAMILIES: { label: string; members: readonly string[] }[] = [
   { label: "Detalles y regalos", members: ["/cartas", "/cupones", "/cumplidos", "/sorpresas", "/dedicatorias"] },
   { label: "Proyectos juntos", members: ["/metas", "/tareas", "/deseos"] },
-  { label: "Complicidad", members: ["/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
+  { label: "Complicidad", members: ["/juegos", "/dados", "/ruleta", "/retos", "/diversion", "/trivia"] },
 ];
 const FAMILY_LABEL: Record<string, string> = Object.fromEntries(FAMILIES.map((f) => [f.members[0], f.label]));
 const HIDDEN_IN_MENU = new Set(FAMILIES.flatMap((f) => f.members.slice(1)));
