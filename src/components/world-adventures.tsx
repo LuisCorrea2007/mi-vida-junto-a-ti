@@ -3,7 +3,7 @@ import { Fish, Heart, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Scene, type Point } from "@/lib/couple-world";
 
-type Props={userId?:string;scene:Scene;hero:Point;steps:number;furnitureCount:number;};
+type Props={userId?:string|undefined;scene:Scene;hero:Point;steps:number;furnitureCount:number;};
 type Phase="idle"|"waiting"|"bite"|"caught"|"missed";
 export function WorldAdventures({userId,scene,hero,steps,furnitureCount}:Props){
   const [phase,setPhase]=useState<Phase>("idle");
