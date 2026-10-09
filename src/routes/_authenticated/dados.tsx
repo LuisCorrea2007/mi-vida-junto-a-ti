@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Dices, Flame, Heart, MapPin, Timer, Users, LockKeyhole, LockKeyholeOpen, Check, SkipForward, RotateCcw, Bookmark, Play, Pause, ShieldCheck, ChevronRight, Shuffle, MessageCircle, Sparkles, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import diceCover from '@/assets/love-dice-cover.jpg';
 import { useAuth } from '@/hooks/use-auth';
 import { useCouple } from '@/hooks/use-couple';
 import { useProfiles } from '@/hooks/use-profiles';
@@ -99,19 +100,21 @@ function DadosPage() {
     { key: 'seconds' as const, icon: Timer, label: 'El tiempo', value: roll ? duration(roll.seconds) : 'Sin mirar el reloj' },
   ];
 
-  return <div className="space-y-8 pb-6">
-    <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
-      <div><p className="mb-2 flex items-center gap-2 text-sm text-primary"><Dices className="size-5" /> Un juego de los dos</p>
-        <h1 className="font-display text-3xl font-semibold sm:text-4xl">Dados del amor.<br /><span className="text-primary">La chispa la ponen ustedes.</span></h1>
-        <p className="mt-3 text-sm text-muted-foreground">Una mirada que invita. Un beso que se hace esperar. Esta noche, los dos.</p></div>
-      <div className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4 text-primary" /> Un pase siempre está bien. Sin perder puntos.</div>
+  return <div className="love-dice-page space-y-6 pb-6">
+    <header className="relative isolate -mx-4 flex min-h-64 items-end overflow-hidden px-5 py-7 sm:mx-0 sm:min-h-72 sm:px-8">
+      <img src={diceCover} width={1536} height={768} alt="Dos dados de corazones sobre terciopelo vino" className="absolute inset-0 -z-20 h-full w-full object-cover object-right" fetchPriority="high" />
+      <div className="dice-cover-shade absolute inset-0 -z-10" />
+      <div className="max-w-lg"><p className="mb-3 flex items-center gap-2 text-xs font-medium uppercase text-gold"><Dices className="size-4" /> Solo tú y yo</p>
+        <h1 className="font-display text-3xl font-semibold sm:text-4xl">Dados del amor.</h1>
+        <p className="mt-2 font-display text-xl text-gold">Que el próximo beso no sea casualidad.</p>
+        <p className="mt-4 max-w-xs text-sm text-foreground/80">Un poco de misterio. Mucha química. El resto lo deciden ustedes.</p></div>
     </header>
 
-    <div className="flex flex-wrap gap-2 border-b border-border pb-4" aria-label="Tipo de juego">{modes.map(m => <Button key={m.key} variant={mode === m.key ? 'default' : 'outline'} aria-pressed={mode === m.key} disabled={spinning} onClick={() => { setMode(m.key); resetRoll(); }}><m.icon className="size-4" />{m.label}</Button>)}</div>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4"><div className="grid grid-cols-3 gap-1 bg-muted/50 p-1" aria-label="Tipo de juego">{modes.map(m => <Button key={m.key} variant={mode === m.key ? 'default' : 'ghost'} className="rounded-md sm:min-w-28" aria-pressed={mode === m.key} disabled={spinning} onClick={() => { setMode(m.key); resetRoll(); }}><m.icon className="size-4" />{m.label}</Button>)}</div><span className="flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="size-4 text-primary" /> Sin presión. Sin castigos.</span></div>
 
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Nivel de los dados">
-      {levelKeys.map((k, index) => { const Icon = LEVEL_ICONS[k]; const selected = deck === k; return <Button key={k} variant={selected ? 'default' : 'outline'} aria-pressed={selected} disabled={spinning} className="h-auto min-h-36 items-start justify-start gap-3 whitespace-normal rounded-lg p-4 text-left" onClick={() => { setDeck(k); setReady([false, false]); resetRoll(); }}>
-        <Icon className="mt-1 size-5 shrink-0" /><span className="min-w-0"><span className="block text-base font-semibold">{DICE_LEVELS[k].label}</span><span className="mt-1 block text-xs font-normal">{DICE_LEVELS[k].description}</span><span className="mt-2 block text-xs">{mode === 'verdad' ? `${DICE_TRUTHS[k].length} preguntas` : '3.000 combinaciones · 25 gestos'}</span><span className="mt-3 flex gap-1" aria-label={`Intensidad ${index + 1} de 4`}>{levelKeys.map((_, i) => <span key={i} className={cn('h-1 w-5 rounded-full', i <= index ? 'bg-current' : 'bg-current opacity-20')} />)}</span></span>
+      {levelKeys.map((k, index) => { const Icon = LEVEL_ICONS[k]; const selected = deck === k; return <Button key={k} variant="outline" aria-pressed={selected} disabled={spinning} className={cn('dice-level h-auto min-h-36 items-start justify-start gap-3 whitespace-normal rounded-lg p-4 text-left', selected && 'border-primary bg-accent text-accent-foreground shadow-soft')} onClick={() => { setDeck(k); setReady([false, false]); resetRoll(); }}>
+        <Icon className={cn('mt-1 size-5 shrink-0', selected ? 'text-primary' : 'text-muted-foreground')} /><span className="min-w-0"><span className="block text-base font-semibold">{DICE_LEVELS[k].label}</span><span className="mt-1 block text-xs font-normal text-muted-foreground">{DICE_LEVELS[k].description}</span><span className="mt-2 block text-xs text-muted-foreground">{mode === 'verdad' ? `${DICE_TRUTHS[k].length} preguntas` : '3.000 combinaciones · 25 gestos'}</span><span className="mt-3 flex gap-1 text-primary" aria-label={`Intensidad ${index + 1} de 4`}>{levelKeys.map((_, i) => <span key={i} className={cn('h-1 w-5 rounded-full', i <= index ? 'bg-current' : 'bg-current opacity-20')} />)}</span></span>
       </Button>; })}
     </div>
 
@@ -122,17 +125,17 @@ function DadosPage() {
         <p className="flex items-center gap-2 text-sm"><Users className="size-4 text-primary" /> Turno de <strong className="break-all">{players[turn]}</strong><ChevronRight className="size-4 text-muted-foreground" /></p>
         <span className="text-xs text-muted-foreground">{points[0] + points[1]} de {target} momentos · {optionsLeft.toLocaleString('es')} disponibles</span>
       </div>
-      <div className="flex flex-wrap gap-3">{players.map((name, i) => <span key={i} className="flex items-center gap-2 text-xs text-muted-foreground"><Heart className="size-3 text-primary" />{name} · {points[i]}</span>)}</div>
+      <div className="grid grid-cols-2 gap-4 border-b border-border pb-4">{players.map((name, i) => <div key={i} className={cn('flex min-w-0 items-center gap-3', turn !== i && 'opacity-60')}><span className={cn('flex size-10 shrink-0 items-center justify-center rounded-full border border-border font-display text-lg', turn === i ? 'bg-primary text-primary-foreground' : 'bg-muted')}>{name?.slice(0, 1)}</span><div className="min-w-0"><p className="break-words text-sm font-medium">{name}</p><p className="text-xs text-muted-foreground">{points[i]} momentos{turn === i ? ' · Tu turno' : ''}</p></div></div>)}</div>
       {complete && <div role="status" className="flex flex-wrap items-center gap-3 border-y border-primary py-5"><Trophy className="size-6 text-gold" /><div><p className="font-display text-xl">Una ronda para recordar.</p><p className="text-sm text-muted-foreground">{points[0] + points[1]} momentos que eligieron compartir.</p></div><Button variant="outline" onClick={newRound}><RotateCcw className="size-4" /> Otra ronda juntos</Button></div>}
-      <div className={cn('grid gap-4', mode === 'dados' && 'md:grid-cols-[1.5fr_1fr_0.8fr]')} aria-live="polite">
-        {(mode === 'dados' ? faces : faces.slice(0, 1)).map(f => <div key={`${f.key}-${serial}`} className={cn('relative flex min-h-56 flex-col justify-between rounded-lg border border-border bg-card p-5', spinning && 'animate-dice', locks[f.key] && 'border-primary')}>
-          <div className="flex items-center justify-between gap-3"><span className="flex items-center gap-2 text-xs text-muted-foreground"><f.icon className="size-4 text-primary" />{mode === 'verdad' ? 'Una verdad entre los dos' : mode === 'reto' ? 'Tu reto de esta noche' : f.label}</span>{mode === 'dados' && <Button variant="ghost" size="icon" className="size-8" aria-label={`${locks[f.key] ? 'Liberar' : 'Fijar'} ${f.label.toLowerCase()}`} title={`${locks[f.key] ? 'Liberar' : 'Fijar'} ${f.label.toLowerCase()}`} disabled={!roll || spinning} onClick={() => setLocks(l => ({ ...l, [f.key]: !l[f.key] }))}>{locks[f.key] ? <LockKeyhole className="size-4" /> : <LockKeyholeOpen className="size-4" />}</Button>}</div>
-          <p className="my-5 font-display text-2xl leading-snug">{spinning ? 'El azar está eligiendo…' : f.value}</p>
-          <span className="text-xs text-muted-foreground">{mode === 'reto' && roll ? `${roll.place} · ${duration(roll.seconds)}` : locks[f.key] ? 'Se queda para el próximo lanzamiento' : 'A su ritmo, si ambos quieren'}</span>
+      <div className={cn('grid gap-3', mode === 'dados' && 'grid-cols-2')} aria-live="polite">
+        {(mode === 'dados' ? faces : faces.slice(0, 1)).map(f => <div key={`${f.key}-${serial}`} className={cn('dice-moment relative flex min-h-36 flex-col justify-between rounded-lg border border-border bg-card p-5', f.key === 'action' && 'col-span-full min-h-64 bg-gold text-gold-foreground sm:p-8', spinning && 'dice-reveal', locks[f.key] && 'border-primary')}>
+          <div className="flex items-center justify-between gap-3"><span className={cn('flex items-center gap-2 text-xs', f.key === 'action' ? 'text-gold-foreground/70' : 'text-muted-foreground')}><f.icon className="size-4" />{mode === 'verdad' ? 'Una verdad entre los dos' : mode === 'reto' ? 'Tu reto de esta noche' : f.label}</span>{mode === 'dados' && <Button variant="ghost" size="icon" className="size-8 text-inherit hover:bg-current/10 hover:text-inherit" aria-label={`${locks[f.key] ? 'Liberar' : 'Fijar'} ${f.label.toLowerCase()}`} title={`${locks[f.key] ? 'Liberar' : 'Fijar'} ${f.label.toLowerCase()}`} disabled={!roll || spinning} onClick={() => setLocks(l => ({ ...l, [f.key]: !l[f.key] }))}>{locks[f.key] ? <LockKeyhole className="size-4" /> : <LockKeyholeOpen className="size-4" />}</Button>}</div>
+          <p className={cn('my-5 max-w-3xl font-display leading-snug', f.key === 'action' ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl')}>{spinning ? 'Un instante…' : f.value}</p>
+          <span className={cn('text-xs', f.key === 'action' ? 'text-gold-foreground/70' : 'text-muted-foreground')}>{mode === 'reto' && roll ? `${roll.place} · ${duration(roll.seconds)}` : locks[f.key] ? 'Se queda para el próximo lanzamiento' : 'A su ritmo, si ambos quieren'}</span>
         </div>)}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button size="lg" disabled={spinning || !optionsLeft || !permitted || complete} onClick={throwDice}><Dices className={cn('size-5', spinning && 'animate-spin')} />{spinning ? 'Eligiendo…' : mode === 'verdad' ? 'Descubrir una verdad' : mode === 'reto' ? 'Descubrir un reto' : roll ? 'Lanzar otra vez' : 'Lanzar los dados'}</Button>
+        <Button size="lg" className="min-h-12 w-full rounded-lg sm:w-auto sm:min-w-56" disabled={spinning || !optionsLeft || !permitted || complete} onClick={throwDice}><Dices className={cn('size-5', spinning && 'animate-spin')} />{spinning ? 'Eligiendo…' : mode === 'verdad' ? 'Descubrir una verdad' : mode === 'reto' ? 'Descubrir un reto' : roll ? 'Lanzar otra vez' : 'Lanzar los dados'}</Button>
         {roll && <><Button variant="outline" disabled={done || spinning} onClick={() => finish(true)}><Check className="size-4" /> Lo compartimos</Button><Button variant="ghost" disabled={done || spinning} onClick={() => finish(false)}><SkipForward className="size-4" /> Pasar</Button><Button variant="ghost" disabled={spinning} aria-label={saved ? 'Quitar favorito' : 'Guardar favorito'} onClick={() => setFavorites(f => saved ? f.filter(v => !(v.id === roll.id && v.level === deck)) : [...f, { ...roll, level: deck }])}><Bookmark className={cn('size-4', saved && 'fill-primary text-primary')} />{saved ? 'Guardado' : 'Guardar'}</Button></>}
       </div>
       {notice && <p role="status" className="text-sm text-primary">{notice}</p>}
