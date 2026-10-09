@@ -1,3 +1,4 @@
+import { celebrate } from "@/lib/celebrate";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -139,7 +140,7 @@ function WishesPage() {
       const { error } = await supabase.from("wishes").update({ is_completed: done }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["wishes"] }),
+    onSuccess: (_d, v) => { if (v.done) celebrate(); void qc.invalidateQueries({ queryKey: ["wishes"] }); },
   });
 
   const remove = useMutation({
