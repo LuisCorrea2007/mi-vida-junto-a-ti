@@ -379,7 +379,7 @@ export async function handleAdvisor(request: Request) {
     const {data:thread,error}=await supabase.from('advisor_threads').select('id,user_id,is_shared').eq('id',body.threadId).maybeSingle();
     if(error || !thread) return Response.json({error:'No puedes acceder a esta conversación.'},{status:403});
     let messages=body.messages;
-    if(messages.some(m=>!m.id || !Array.isArray(m.parts) || !['user','assistant'].includes(m.role))) return Response.json({error:'Hay un mensaje no válido.'},{status:400});
+    if(messages.some(m=>(m.role==='user'&&!m.id) || !Array.isArray(m.parts) || !['user','assistant'].includes(m.role))) return Response.json({error:'Hay un mensaje no válido.'},{status:400});
     const {supabaseAdmin}=await import('@/integrations/supabase/client.server');
     const {data:blocked,error:guardError}=await supabaseAdmin.from('advisor_gateway_guard').select('status,message').eq('scope','workspace').maybeSingle();
     if(guardError)throw new Error('No pudimos verificar el acceso a la IA.');
