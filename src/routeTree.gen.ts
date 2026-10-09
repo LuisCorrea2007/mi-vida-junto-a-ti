@@ -22,6 +22,7 @@ import { Route as AuthenticatedCartasRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCercaRouteImport } from './routes/_authenticated/cerca'
 import { Route as AuthenticatedCineRouteImport } from './routes/_authenticated/cine'
 import { Route as AuthenticatedConexionRouteImport } from './routes/_authenticated/conexion'
+import { Route as AuthenticatedCuidarnosRouteImport } from './routes/_authenticated/cuidarnos'
 import { Route as AuthenticatedCumplidosRouteImport } from './routes/_authenticated/cumplidos'
 import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
 import { Route as AuthenticatedDadosRouteImport } from './routes/_authenticated/dados'
@@ -41,6 +42,7 @@ import { Route as AuthenticatedPelisRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
 import { Route as AuthenticatedRecetasRouteImport } from './routes/_authenticated/recetas'
 import { Route as AuthenticatedRetosRouteImport } from './routes/_authenticated/retos'
+import { Route as AuthenticatedRitualesRouteImport } from './routes/_authenticated/rituales'
 import { Route as AuthenticatedRuletaRouteImport } from './routes/_authenticated/ruleta'
 import { Route as AuthenticatedSorpresasRouteImport } from './routes/_authenticated/sorpresas'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
@@ -114,6 +116,11 @@ const AuthenticatedCineRoute = AuthenticatedCineRouteImport.update({
 const AuthenticatedConexionRoute = AuthenticatedConexionRouteImport.update({
   id: '/conexion',
   path: '/conexion',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCuidarnosRoute = AuthenticatedCuidarnosRouteImport.update({
+  id: '/cuidarnos',
+  path: '/cuidarnos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCumplidosRoute = AuthenticatedCumplidosRouteImport.update({
@@ -213,6 +220,11 @@ const AuthenticatedRetosRoute = AuthenticatedRetosRouteImport.update({
   path: '/retos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRitualesRoute = AuthenticatedRitualesRouteImport.update({
+  id: '/rituales',
+  path: '/rituales',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRuletaRoute = AuthenticatedRuletaRouteImport.update({
   id: '/ruleta',
   path: '/ruleta',
@@ -279,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/cerca': typeof AuthenticatedCercaRoute
   '/cine': typeof AuthenticatedCineRoute
   '/conexion': typeof AuthenticatedConexionRoute
+  '/cuidarnos': typeof AuthenticatedCuidarnosRoute
   '/cumplidos': typeof AuthenticatedCumplidosRoute
   '/cupones': typeof AuthenticatedCuponesRoute
   '/dados': typeof AuthenticatedDadosRoute
@@ -298,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/promesas': typeof AuthenticatedPromesasRoute
   '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/rituales': typeof AuthenticatedRitualesRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
@@ -322,6 +336,7 @@ export interface FileRoutesByTo {
   '/cerca': typeof AuthenticatedCercaRoute
   '/cine': typeof AuthenticatedCineRoute
   '/conexion': typeof AuthenticatedConexionRoute
+  '/cuidarnos': typeof AuthenticatedCuidarnosRoute
   '/cumplidos': typeof AuthenticatedCumplidosRoute
   '/cupones': typeof AuthenticatedCuponesRoute
   '/dados': typeof AuthenticatedDadosRoute
@@ -341,6 +356,7 @@ export interface FileRoutesByTo {
   '/promesas': typeof AuthenticatedPromesasRoute
   '/recetas': typeof AuthenticatedRecetasRoute
   '/retos': typeof AuthenticatedRetosRoute
+  '/rituales': typeof AuthenticatedRitualesRoute
   '/ruleta': typeof AuthenticatedRuletaRoute
   '/sorpresas': typeof AuthenticatedSorpresasRoute
   '/tareas': typeof AuthenticatedTareasRoute
@@ -367,6 +383,7 @@ export interface FileRoutesById {
   '/_authenticated/cerca': typeof AuthenticatedCercaRoute
   '/_authenticated/cine': typeof AuthenticatedCineRoute
   '/_authenticated/conexion': typeof AuthenticatedConexionRoute
+  '/_authenticated/cuidarnos': typeof AuthenticatedCuidarnosRoute
   '/_authenticated/cumplidos': typeof AuthenticatedCumplidosRoute
   '/_authenticated/cupones': typeof AuthenticatedCuponesRoute
   '/_authenticated/dados': typeof AuthenticatedDadosRoute
@@ -386,6 +403,7 @@ export interface FileRoutesById {
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
   '/_authenticated/recetas': typeof AuthenticatedRecetasRoute
   '/_authenticated/retos': typeof AuthenticatedRetosRoute
+  '/_authenticated/rituales': typeof AuthenticatedRitualesRoute
   '/_authenticated/ruleta': typeof AuthenticatedRuletaRoute
   '/_authenticated/sorpresas': typeof AuthenticatedSorpresasRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
@@ -412,6 +430,7 @@ export interface FileRouteTypes {
     | '/cerca'
     | '/cine'
     | '/conexion'
+    | '/cuidarnos'
     | '/cumplidos'
     | '/cupones'
     | '/dados'
@@ -431,6 +450,7 @@ export interface FileRouteTypes {
     | '/promesas'
     | '/recetas'
     | '/retos'
+    | '/rituales'
     | '/ruleta'
     | '/sorpresas'
     | '/tareas'
@@ -455,6 +475,7 @@ export interface FileRouteTypes {
     | '/cerca'
     | '/cine'
     | '/conexion'
+    | '/cuidarnos'
     | '/cumplidos'
     | '/cupones'
     | '/dados'
@@ -474,6 +495,7 @@ export interface FileRouteTypes {
     | '/promesas'
     | '/recetas'
     | '/retos'
+    | '/rituales'
     | '/ruleta'
     | '/sorpresas'
     | '/tareas'
@@ -499,6 +521,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cerca'
     | '/_authenticated/cine'
     | '/_authenticated/conexion'
+    | '/_authenticated/cuidarnos'
     | '/_authenticated/cumplidos'
     | '/_authenticated/cupones'
     | '/_authenticated/dados'
@@ -518,6 +541,7 @@ export interface FileRouteTypes {
     | '/_authenticated/promesas'
     | '/_authenticated/recetas'
     | '/_authenticated/retos'
+    | '/_authenticated/rituales'
     | '/_authenticated/ruleta'
     | '/_authenticated/sorpresas'
     | '/_authenticated/tareas'
@@ -630,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/conexion'
       fullPath: '/conexion'
       preLoaderRoute: typeof AuthenticatedConexionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cuidarnos': {
+      id: '/_authenticated/cuidarnos'
+      path: '/cuidarnos'
+      fullPath: '/cuidarnos'
+      preLoaderRoute: typeof AuthenticatedCuidarnosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cumplidos': {
@@ -765,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRetosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rituales': {
+      id: '/_authenticated/rituales'
+      path: '/rituales'
+      fullPath: '/rituales'
+      preLoaderRoute: typeof AuthenticatedRitualesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ruleta': {
       id: '/_authenticated/ruleta'
       path: '/ruleta'
@@ -847,6 +885,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCercaRoute: typeof AuthenticatedCercaRoute
   AuthenticatedCineRoute: typeof AuthenticatedCineRoute
   AuthenticatedConexionRoute: typeof AuthenticatedConexionRoute
+  AuthenticatedCuidarnosRoute: typeof AuthenticatedCuidarnosRoute
   AuthenticatedCumplidosRoute: typeof AuthenticatedCumplidosRoute
   AuthenticatedCuponesRoute: typeof AuthenticatedCuponesRoute
   AuthenticatedDadosRoute: typeof AuthenticatedDadosRoute
@@ -866,6 +905,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
   AuthenticatedRecetasRoute: typeof AuthenticatedRecetasRoute
   AuthenticatedRetosRoute: typeof AuthenticatedRetosRoute
+  AuthenticatedRitualesRoute: typeof AuthenticatedRitualesRoute
   AuthenticatedRuletaRoute: typeof AuthenticatedRuletaRoute
   AuthenticatedSorpresasRoute: typeof AuthenticatedSorpresasRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
@@ -886,6 +926,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCercaRoute: AuthenticatedCercaRoute,
   AuthenticatedCineRoute: AuthenticatedCineRoute,
   AuthenticatedConexionRoute: AuthenticatedConexionRoute,
+  AuthenticatedCuidarnosRoute: AuthenticatedCuidarnosRoute,
   AuthenticatedCumplidosRoute: AuthenticatedCumplidosRoute,
   AuthenticatedCuponesRoute: AuthenticatedCuponesRoute,
   AuthenticatedDadosRoute: AuthenticatedDadosRoute,
@@ -905,6 +946,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
   AuthenticatedRecetasRoute: AuthenticatedRecetasRoute,
   AuthenticatedRetosRoute: AuthenticatedRetosRoute,
+  AuthenticatedRitualesRoute: AuthenticatedRitualesRoute,
   AuthenticatedRuletaRoute: AuthenticatedRuletaRoute,
   AuthenticatedSorpresasRoute: AuthenticatedSorpresasRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
