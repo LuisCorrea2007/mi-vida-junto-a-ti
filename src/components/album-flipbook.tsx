@@ -32,7 +32,7 @@ export function AlbumFlipbook({stories,names,year}:Props){
   const [indexOpen,setIndexOpen]=useState(false);
   const filtered=useMemo(()=>stories.filter(s=>s.kind==="cover" ||
     ((filter==="todo" || s.kind===filter || (filter==="milestone"&&s.kind==="event")) &&
-    (!favorites || s.kind!=="photo" || s.favorite))),[stories,filter,favorites]);
+    (!favorites || (s.kind==="photo" && s.favorite)))),[stories,filter,favorites]);
   const bounded=Math.min(index,Math.max(0,filtered.length-1));
   const story=filtered[bounded];
   useEffect(()=>{setIndex(0);},[year,filter,favorites]);
