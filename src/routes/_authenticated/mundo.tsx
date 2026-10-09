@@ -97,7 +97,7 @@ function MundoPage(){
           try{localStorage.setItem(bucket,JSON.stringify(parsed));}catch{}
           setConflict(false);
         }
-        savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);
+        if(!dirtyRef.current){savedVersion.current=row.updated_at;setRemoteVersion(row.updated_at);}
       }
       setStatus("ready");
     }catch{
