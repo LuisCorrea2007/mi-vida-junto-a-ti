@@ -241,19 +241,12 @@ function ChatWindow({
                       );
                     }
                     if (part.type === "reasoning") {
-                      return (
-                        <p
-                          key={`${message.id}-${index}`}
-                          className="text-xs italic text-muted-foreground"
-                        >
-                          {part.text}
-                        </p>
-                      );
+                      return <details key={`${message.id}-${index}`} className="text-xs text-muted-foreground"><summary className="cursor-pointer">Cómo está preparando tu respuesta</summary><p className="mt-2 whitespace-pre-wrap">{part.text}</p></details>;
                     }
                     if (part.type.startsWith('tool-') || part.type==='dynamic-tool') {
                       const toolPart=part as import('ai').ToolUIPart;
                       const approvalId=toolPart.approval?.id;
-                      return <div key={`${message.id}-${index}`}><Tool defaultOpen={false}><ToolHeader type={toolPart.type} state={toolPart.state} title={toolLabel(toolPart.type)} /><ToolContent><ToolInput input={toolPart.input}/><ToolOutput output={toolPart.output} errorText={toolPart.errorText}/></ToolContent></Tool>{toolPart.state==='approval-requested'&&toolPart.approval&&!toolPart.approval.isAutomatic&&<div className="flex gap-2"><Button size="sm" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:true})}>Aprobar</Button><Button size="sm" variant="outline" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:false})}>No guardar</Button></div>}</div>;
+                      return <div key={`${message.id}-${index}`}><Tool defaultOpen={false}><ToolHeader type={toolPart.type} state={toolPart.state} title={toolLabel(toolPart.type)} /><ToolContent><ToolInput input={toolPart.input}/><ToolOutput {...(toolPart.output!==undefined?{output:toolPart.output}:{})} {...(toolPart.errorText?{errorText:toolPart.errorText}:{})}/></ToolContent></Tool>{toolPart.state==='approval-requested'&&toolPart.approval&&!toolPart.approval.isAutomatic&&<div className="flex gap-2"><Button size="sm" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:true})}>Aprobar</Button><Button size="sm" variant="outline" onClick={()=>addToolApprovalResponse({id:approvalId!,approved:false})}>No guardar</Button></div>}</div>;
                     }
                     return null;
                   })}
