@@ -399,8 +399,8 @@ function TresEnRaya({ game, userId, myTurn, save }: {
 /* ---------- Conecta 4 ---------- */
 
 function c4Winner(cells: number[]): number | null {
-  const at = (r: number, c: number) => cells[r * 7 + c];
-  const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+  const at = (r: number, c: number) => cells[r * 7 + c] ?? 0;
+  const dirs: [number, number][] = [[0,1],[1,0],[1,1],[1,-1]];
   for (let r = 0; r < 6; r++) for (let c = 0; c < 7; c++) {
     const v = at(r, c);
     if (!v) continue;
@@ -420,7 +420,7 @@ function Conecta4({ game, userId, myTurn, save }: {
   game: GameRow; userId: string; myTurn: boolean;
   save: (p: { board: Record<string, unknown>; turn: string; winner?: string | null }) => void;
 }) {
-  const cells = (game.board.cells as number[]) ?? Array(42).fill(0);
+  const cells = (game.board["cells"] as number[]) ?? Array(42).fill(0);
   const myVal = game.user_id === userId ? 1 : 2;
   const play = (col: number) => {
     if (!myTurn || game.winner) return;
@@ -478,7 +478,7 @@ function BatallaNaval({ game, userId, myTurn }: { game: GameRow; userId: string;
   });
 
   const myFleet = fleets.find((f) => f.user_id === userId);
-  const shots = (game.board.shots as Record<string, number[]>) ?? {};
+  const shots = (game.board["shots"] as Record<string, number[]>) ?? {};
   const myShots = shots[userId] ?? [];
   const theirId = fleets.find((f) => f.user_id !== userId)?.user_id;
   const theirShots = theirId ? (shots[theirId] ?? []) : [];
