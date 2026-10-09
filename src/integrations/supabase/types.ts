@@ -2061,6 +2061,39 @@ export type Database = {
         }
         Relationships: []
       }
+      trivia_questions: {
+        Row: {
+          answer: string
+          correct: boolean | null
+          created_at: string
+          guess: string | null
+          guessed_at: string | null
+          id: string
+          question: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          correct?: boolean | null
+          created_at?: string
+          guess?: string | null
+          guessed_at?: string | null
+          id?: string
+          question: string
+          user_id?: string
+        }
+        Update: {
+          answer?: string
+          correct?: boolean | null
+          created_at?: string
+          guess?: string | null
+          guessed_at?: string | null
+          id?: string
+          question?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       video_comentarios: {
         Row: {
           contenido: string
@@ -2126,6 +2159,39 @@ export type Database = {
           titulo?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      watchlist: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          platform: string | null
+          rating: number | null
+          title: string
+          user_id: string
+          watched: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          platform?: string | null
+          rating?: number | null
+          title: string
+          user_id?: string
+          watched?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          platform?: string | null
+          rating?: number | null
+          title?: string
+          user_id?: string
+          watched?: boolean
         }
         Relationships: []
       }
