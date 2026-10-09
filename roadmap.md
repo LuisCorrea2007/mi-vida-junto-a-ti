@@ -1,14 +1,7 @@
-## Roadmap
-- [x] Retirar Juegos, sus accesos y recursos exclusivos, sin borrar los datos de la pareja.
-- [x] Mantener la ubicación en vivo al navegar por toda la app, respetando permiso y duración elegida; verificado con GPS simulado, sin modificar ubicaciones reales.
-- [x] Mejorar actualizaciones en vivo con invalidación agrupada y recuperación al volver o recuperar conexión.
-- [x] Facilitar encontrar secciones y acceder a mensajes desde el menú.
-- [x] Verificar navegación, ubicación y ausencia de errores.
-- [x] Investigar e integrar catálogo de licencias abiertas declaradas; disponibilidad limitada en español, sin prometer doblaje o estrenos.
-- [x] Mejorar la experiencia compartida mediante navegación y actualizaciones transversales; no equivale a añadir funciones específicas nuevas en cada sección.
-- [x] Retirar Cine y añadir Cartas de amor con sobres cerrados, avisos y transiciones de página.
-- [x] Íconos SVG en lugar de emojis, nueva tipografía, Dados del amor y menú renovado.
-- [x] Juegos en el mismo celular: Damas, Parchís, Serpientes, Pong, Catapultas y Cocina juntos.
-- [x] Retirar Naval, Cocina, Catapultas y Parchís del código y del catálogo, conservando datos antiguos privados.
-- [x] Renovar siete juegos con escenas 3D, práctica, mismo dispositivo y bots de decisión local; a distancia disponible para Tres en raya, Conecta 4 y Damas, no para los cuatro arcade.
-- [x] Verificar siete reglas y carga, pausa, revancha y respuesta del bot; partidas entre ambas cuentas no verificadas.
+## Actualización de pareja
+- [ ] Retirar Juegos y sus recursos exclusivos, conservar enlaces antiguos y datos privados.
+- [ ] Añadir Rituales compartidos con seguimiento diario/semanal.
+- [ ] Añadir Cuidarnos con necesidades, límites y alegrías propias.
+- [ ] Reparar Consejero con IA económica, respuestas en vivo, historial y acciones aprobadas.
+- [ ] Incorporar acceso contextual al Consejero desde las secciones sin llamadas automáticas.
+- [ ] Verificar navegación, privacidad, guardado y una respuesta real de IA.
