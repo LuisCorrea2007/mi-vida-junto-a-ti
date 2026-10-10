@@ -68,10 +68,21 @@ export function canPlace(scene:Scene,x:number,y:number,id:DecorId):boolean {
   return x>=5&&x<=22&&y>=4&&y<=17 && !(x===13 && y>=15);
 }
 export function initialWorld():WorldDoc {
-  return {version:2,name:"Nuestro rincón",garden:{
-    "4,4":"tree","23,4":"tree","6,14":"rosebush","7,14":"flowers",
-    "19,7":"sunflower","6,9":"bench","19,10":"lamp","8,17":"plant"
-  },home:{"8,7":"sofa","15,6":"bed","10,12":"rug","18,10":"bookshelf","20,16":"plant"}};
+  return {version:2,name:"Nuestro rincón de primavera",garden:{
+    "3,3":"tree","7,3":"tree","23,3":"tree","4,11":"tree","24,12":"tree",
+    "6,14":"rosebush","7,14":"flowers","9,14":"flowers",
+    "8,6":"flowers","9,7":"rosebush","18,7":"rosebush",
+    "18,8":"flowers","19,6":"sunflower","20,7":"flowers",
+    "3,16":"flowers","5,16":"rosebush","6,17":"flowers",
+    "17,16":"rosebush","18,18":"flowers","20,12":"flowers",
+    "8,9":"bench","18,14":"lamp","7,7":"lamp",
+    "9,18":"plant","18,11":"plant","16,13":"plant",
+    "8,17":"cat","17,17":"heart","10,15":"flowers"
+  },home:{
+    "8,7":"sofa","15,6":"bed","10,12":"rug","18,10":"bookshelf",
+    "20,16":"plant","6,13":"fireplace","14,10":"table",
+    "19,13":"chair","9,17":"plant","6,6":"flowers"
+  }};
 }
 export function parseWorld(input:unknown):WorldDoc {
   const base=initialWorld();
