@@ -39,7 +39,7 @@ export function WorldCanvas({scene,decor,hero,skin,hair,emote,partner,editing,ni
         // Actors and scenery overlap by their position on the Y axis, like a top-down cozy RPG.
         const actors:{
           x:number;y:number;kind:"decor"|"hero"|"partner";
-          id?:DecorId; skin?:Skin;hair?:HairStyle;emote?:Emote|null
+          id?:DecorId; skin?:Skin;hair?:HairStyle;emote?:Emote|null|undefined
         }[]=decorEntries.map(item=>({...item,kind:"decor" as const}));
         const local=smoothHero.current;
         if(Math.hypot(local.x-hero.x,local.y-hero.y)>5){local.x=hero.x;local.y=hero.y;}
@@ -60,7 +60,7 @@ export function WorldCanvas({scene,decor,hero,skin,hair,emote,partner,editing,ni
           if(actor.kind==="decor"&&actor.id)drawSpringDecor(ctx,actor.id,actor.x,actor.y,timestamp);
           else if(actor.kind==="hero"||actor.kind==="partner"){
             drawSpringCharacter(ctx,{x:actor.x,y:actor.y,
-              skin:actor.skin??"rose",hair:actor.hair??"short",emote:actor.emote,
+              skin:actor.skin??"rose",hair:actor.hair??"short",emote:actor.emote??null,
               partner:actor.kind==="partner"},timestamp);
           }
         }
