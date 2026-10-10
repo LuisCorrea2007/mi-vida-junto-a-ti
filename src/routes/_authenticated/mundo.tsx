@@ -312,10 +312,10 @@ function MundoPage(){
   };
   const options=ITEMS.filter(item=>item.scene==="both"||item.scene===scene);
   return <main className="mx-auto max-w-6xl space-y-5 pb-16">
-    <section className="surface warm-gradient flex flex-wrap items-center justify-between gap-4 p-5 sm:p-8">
-      <div><p className="text-xs uppercase tracking-[.25em] text-primary">Un pequeño universo para dos</p>
-        <h1 className="mt-2 flex items-center gap-3 font-display text-3xl sm:text-5xl"><Heart className="size-8 fill-primary/20 text-primary"/>Nuestro Mundo</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Caminen, decoren su casa y creen recuerdos en su propio mundo pixel art.</p>
+    <section className="spring-world-hero flex flex-wrap items-center justify-between gap-4 p-5 sm:p-8">
+      <div><p className="text-xs font-semibold uppercase tracking-[.25em] text-[#aa7c8c]">✿ Primavera rosada · Un universo para dos</p>
+        <h1 className="spring-world-heading mt-2 flex items-center gap-3 font-display text-3xl sm:text-5xl"><Heart className="size-8 fill-primary/20 text-primary"/>Nuestro Mundo</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Un mundo de flores rosadas y lilas, casita acogedora y aventuras para compartir.</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button asChild variant="outline"><Link to="/libro"><BookHeart className="mr-2 size-4"/>Álbum de recuerdos</Link></Button>
@@ -323,7 +323,7 @@ function MundoPage(){
       </div>
     </section>
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex flex-wrap items-center gap-2"><span className="rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">{world.name || "Nuestro rincón"}</span>
+      <div className="flex flex-wrap items-center gap-2"><span className="spring-world-status rounded-full px-3 py-1.5 text-sm font-semibold">{world.name || "Nuestro rincón"}</span>
         <span className="rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">{scene==="garden"?"🌷 Jardín":"🏠 Casa"}</span>
         <span className="rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">{steps} pasos</span></div>
       <span role="status" className="text-xs text-muted-foreground">{formatStatus(status)}{partner&&partner.scene===scene?" · Tu pareja está aquí":""}</span>
@@ -332,16 +332,21 @@ function MundoPage(){
       <p><strong>Hay cambios en otro dispositivo.</strong> Tu versión local está protegida. Puedes guardar una copia y combinar las decoraciones de ambos.</p>
       <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={exportBackup}>Descargar respaldo</Button><Button size="sm" onClick={combineChanges}>Combinar cambios</Button></div>
     </div>}
-    <div className="relative overflow-x-auto rounded-[1.5rem] border border-border bg-[#2b3741] p-2 shadow-xl sm:p-4">
+    <div className="spring-world-frame relative overflow-x-auto shadow-xl">
+      <div className="spring-world-hud" aria-hidden="true">
+        <p className="font-display text-base font-semibold sm:text-xl">✿ Nuestro Mundo ♡</p>
+        <p className="mt-0.5 text-[10px] sm:text-xs">{night?"🌙 Noche serena":"☀️ Primavera · Día soleado"}</p>
+        <p className="text-[10px] opacity-70">{scene==="garden"?"Jardín de los dos":"Hogar de los dos"}</p>
+      </div>
       <WorldCanvas scene={scene} hero={hero} skin={skin} hair={hair} emote={emote} partner={partner?.scene===scene?{id:partner.id,x:partner.x,y:partner.y,skin:partner.skin,hair:partner.hair,emote:partner.emote,name:partner.name}:undefined}
         decor={decor} editing={editing} night={night} onTile={clickTile}/>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-white/80">
+      <div className="spring-world-instructions mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
         <span>WASD / flechas: moverte · Toca el mapa: caminar · E: entrar o salir</span>
         <span>{partner?.scene===scene?"💗 Los dos en el mismo lugar":"🌿 Explora a tu ritmo"}</span>
       </div>
     </div>
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto]">
-      <section className="surface space-y-4 p-5">
+      <section className="spring-world-decor surface space-y-4 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="flex items-center gap-2 font-semibold"><Sparkles className="size-5 text-primary"/>Tu mundo, tus reglas</h2>
           <div className="flex gap-2">
