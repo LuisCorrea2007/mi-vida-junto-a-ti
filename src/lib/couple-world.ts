@@ -81,7 +81,7 @@ export function initialWorld():WorldDoc {
   },home:{
     "8,7":"sofa","15,6":"bed","10,12":"rug","18,10":"bookshelf",
     "20,16":"plant","6,13":"fireplace","14,10":"table",
-    "19,13":"chair","9,17":"plant","6,6":"flowers"
+    "19,13":"chair","9,17":"plant","6,6":"plant"
   }};
 }
 export function parseWorld(input:unknown):WorldDoc {
