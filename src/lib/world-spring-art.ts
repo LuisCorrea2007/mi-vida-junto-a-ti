@@ -76,7 +76,7 @@ function waterTile(ctx:Ctx,x:number,y:number,t:number){
 }
 function coast(ctx:Ctx,x:number,y:number){
   const X=x*TILE,Y=y*TILE;
-  const neighbors=[[0,-1],[0,1],[-1,0],[1,0]];
+  const neighbors:ReadonlyArray<readonly [number,number]>=[[0,-1],[0,1],[-1,0],[1,0]];
   for(const [dx,dy] of neighbors){
     const nx=x+dx,ny=y+dy;
     if(nx<0||ny<0||nx>=WORLD_W||ny>=WORLD_H||!isWater(nx,ny))continue;
@@ -171,7 +171,7 @@ export function drawSpringTerrain(ctx:Ctx,scene:Scene,t:number,night:boolean){
   }
   if(night){
     ctx.fillStyle="rgba(36,40,85,.26)";ctx.fillRect(0,0,W,H);
-    const lamps=scene==="garden"?[[8,6],[18,14],[9,15]]:[[13,8],[8,6],[18,6]];
+    const lamps:ReadonlyArray<readonly [number,number]>=scene==="garden"?[[8,6],[18,14],[9,15]]:[[13,8],[8,6],[18,6]];
     for(const [lx,ly] of lamps){
       const X=lx*TILE,Y=ly*TILE;
       const glow=ctx.createRadialGradient(X,Y,1,X,Y,85);
@@ -274,7 +274,7 @@ export function drawSpringDecor(ctx:Ctx,id:DecorId,x:number,y:number,t:number){
       shadow();
       b("#438861",10,7,3,16);b("#63a669",5,13,10,4);b("#649e67",12,17,8,4);
       if(id==="sunflower"){
-        for(const [dx,dy] of [[9,0],[4,5],[14,5],[9,10]])b("#f4cb68",dx,dy,11,8);
+        for(const [dx,dy] of [[9,0],[4,5],[14,5],[9,10]] as const)b("#f4cb68",dx,dy,11,8);
         b("#99684f",11,4,7,8);b("#f9e6a1",11,4,3,2);
       }else if(id==="rosebush"){
         blossom(1,2,P.blush);blossom(11,-4,P.pink);blossom(7,9,P.pinkLight);
