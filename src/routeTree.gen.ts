@@ -37,6 +37,7 @@ import { Route as AuthenticatedLibroRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedLugaresRouteImport } from './routes/_authenticated/lugares'
 import { Route as AuthenticatedMensajesRouteImport } from './routes/_authenticated/mensajes'
 import { Route as AuthenticatedMetasRouteImport } from './routes/_authenticated/metas'
+import { Route as AuthenticatedMundoRouteImport } from './routes/_authenticated/mundo'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as AuthenticatedPelisRouteImport } from './routes/_authenticated/pelis'
 import { Route as AuthenticatedPromesasRouteImport } from './routes/_authenticated/promesas'
@@ -195,6 +196,11 @@ const AuthenticatedMetasRoute = AuthenticatedMetasRouteImport.update({
   path: '/metas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMundoRoute = AuthenticatedMundoRouteImport.update({
+  id: '/mundo',
+  path: '/mundo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/lugares': typeof AuthenticatedLugaresRoute
   '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/mundo': typeof AuthenticatedMundoRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pelis': typeof AuthenticatedPelisRoute
   '/promesas': typeof AuthenticatedPromesasRoute
@@ -351,6 +358,7 @@ export interface FileRoutesByTo {
   '/lugares': typeof AuthenticatedLugaresRoute
   '/mensajes': typeof AuthenticatedMensajesRoute
   '/metas': typeof AuthenticatedMetasRoute
+  '/mundo': typeof AuthenticatedMundoRoute
   '/panel': typeof AuthenticatedPanelRoute
   '/pelis': typeof AuthenticatedPelisRoute
   '/promesas': typeof AuthenticatedPromesasRoute
@@ -398,6 +406,7 @@ export interface FileRoutesById {
   '/_authenticated/lugares': typeof AuthenticatedLugaresRoute
   '/_authenticated/mensajes': typeof AuthenticatedMensajesRoute
   '/_authenticated/metas': typeof AuthenticatedMetasRoute
+  '/_authenticated/mundo': typeof AuthenticatedMundoRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/_authenticated/pelis': typeof AuthenticatedPelisRoute
   '/_authenticated/promesas': typeof AuthenticatedPromesasRoute
@@ -445,6 +454,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/mensajes'
     | '/metas'
+    | '/mundo'
     | '/panel'
     | '/pelis'
     | '/promesas'
@@ -490,6 +500,7 @@ export interface FileRouteTypes {
     | '/lugares'
     | '/mensajes'
     | '/metas'
+    | '/mundo'
     | '/panel'
     | '/pelis'
     | '/promesas'
@@ -536,6 +547,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lugares'
     | '/_authenticated/mensajes'
     | '/_authenticated/metas'
+    | '/_authenticated/mundo'
     | '/_authenticated/panel'
     | '/_authenticated/pelis'
     | '/_authenticated/promesas'
@@ -761,6 +773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMetasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mundo': {
+      id: '/_authenticated/mundo'
+      path: '/mundo'
+      fullPath: '/mundo'
+      preLoaderRoute: typeof AuthenticatedMundoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/panel': {
       id: '/_authenticated/panel'
       path: '/panel'
@@ -900,6 +919,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLugaresRoute: typeof AuthenticatedLugaresRoute
   AuthenticatedMensajesRoute: typeof AuthenticatedMensajesRoute
   AuthenticatedMetasRoute: typeof AuthenticatedMetasRoute
+  AuthenticatedMundoRoute: typeof AuthenticatedMundoRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedPelisRoute: typeof AuthenticatedPelisRoute
   AuthenticatedPromesasRoute: typeof AuthenticatedPromesasRoute
@@ -941,6 +961,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLugaresRoute: AuthenticatedLugaresRoute,
   AuthenticatedMensajesRoute: AuthenticatedMensajesRoute,
   AuthenticatedMetasRoute: AuthenticatedMetasRoute,
+  AuthenticatedMundoRoute: AuthenticatedMundoRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedPelisRoute: AuthenticatedPelisRoute,
   AuthenticatedPromesasRoute: AuthenticatedPromesasRoute,
