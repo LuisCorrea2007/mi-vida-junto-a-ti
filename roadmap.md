@@ -1,4 +1,5 @@
 ## Actualización de pareja
+- [ ] Cerrar todas las páginas y llamadas de la app con pantalla de página eliminada, conservar contenido y comprobar enlaces directos.
 - [x] Mejorar Dados con cuatro intensidades sugerentes, verdad o reto, rondas y elección mutua; 11 pruebas pasan, elección, turnos y pases comprobados en navegador sin errores; compilación correcta.
 - [x] Ampliar Dados con tres niveles sugerentes no explícitos: 3.000 combinaciones por nivel (25 gestos × 20 lugares × 6 duraciones), turnos, pases, temporizador, filtros y favoritos de sesión; seis pruebas pasan, controles comprobados en navegador y compilación correcta.
 - [x] Retirar Juegos y sus recursos exclusivos, conservar enlaces antiguos y datos privados.
