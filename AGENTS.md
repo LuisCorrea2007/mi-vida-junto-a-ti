@@ -10,6 +10,8 @@
 <!-- LOVABLE:END -->
 
 ## Decisions
+- Permanent retirement is enforced by unconditional first request middleware returning a standalone 410 document without loading the router; retain feature source and private data, and never add bypasses or reopening controls.
+- Retired service worker originals are preserved under archived/service-workers; deployed replacements only clear the app's obsolete caches and unregister, preventing old offline navigation after updating.
 - Love dice uses a browser-safe combinatorial catalog and session-only play state: counted options represent complete action/place/duration combinations, not thousands of individually authored prompts.
 - Love dice roll identities derive from content rather than filtered indexes so session history excludes repeats consistently when filters change.
 - Dev and build scripts run `scripts/repair-deps.mjs` first: it reinstalls @tanstack/seroval packages left with missing files by sandbox reinstalls, which broke the preview and publishing.
